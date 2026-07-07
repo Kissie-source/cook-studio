@@ -53,9 +53,13 @@ textarea{min-height:88px; resize:vertical}
 .sess small{color:var(--ink-soft)}
 .mini{padding:6px 10px; border:2px solid var(--ink); border-radius:10px; background:#fff; font:700 12px Quicksand; color:var(--ink)}
 .mini.red{background:var(--red); color:#fff; border-color:var(--red)}
-.steprow{display:flex; gap:6px; align-items:center; margin:6px 0}
-.steprow input.nm{flex:1; padding:8px}
-.steprow input.tm{width:74px; padding:8px; text-align:center; font-variant-numeric:tabular-nums}
+.steprow{display:flex; gap:6px; align-items:center; margin:10px 0; flex-wrap:wrap}
+.steprow input.nm{flex:1; min-width:110px; padding:8px}
+.cdot{width:14px; height:14px; border-radius:4px; border:2px solid var(--ink); flex:none}
+.sharewrap{display:flex; align-items:center; gap:8px; width:100%}
+.sharewrap input[type=range]{flex:1; accent-color:var(--red)}
+.pct{width:46px; text-align:right; font-weight:700; font-variant-numeric:tabular-nums}
+.mini:disabled{opacity:.25}
 .icon-btn{width:40px; height:40px; border:2px solid var(--ink); border-radius:10px; background:#fff; font-size:18px}
 .total-lock{text-align:center; font-weight:700; margin:8px 0; padding:8px; background:var(--butter); border-radius:12px; font-variant-numeric:tabular-nums}
 .thumbs{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
@@ -109,12 +113,13 @@ h3.sec{font-size:13px; letter-spacing:1px; margin:16px 0 4px}
       <button class="rushed on" id="segR" onclick="setRound('RUSHED')">⏱ RUSHED</button>
       <button class="slow" id="segS" onclick="setRound('SLOW')">🌿 SLOW</button>
     </div>
-    <label>Steps (one per line — tap "next step" while cooking)</label>
-    <textarea id="stepsIn">Prep
-Cook
-Plate</textarea>
+    <label>Steps (one per line — tap "next step" while cooking; switching the round resets to your standards)</label>
+    <textarea id="stepsIn">Recipe Reading
+MEP
+Reset
+Cooking</textarea>
     <button class="big-btn red" onclick="startCook()">▶ Start timer & mic</button>
-    <p class="hint">Mic auto-records each step so you can narrate what you're doing. A new note starts at every step.</p>
+    <p class="hint">At each step the mic records the first 7 seconds only — say what you're doing, then cook. Those notes are your captions.</p>
   </div>
 
   <div class="card" id="liveCard" style="display:none">
@@ -145,8 +150,8 @@ Plate</textarea>
     <div class="card">
       <h2 id="stTitle">—</h2>
       <div class="total-lock" id="stTotal">total locked · 0:00</div>
-      <div id="pieWrap"><div id="pieSvg"></div><div class="legend" id="pieLegend"></div></div>
-      <h3 class="sec">STEPS · edit times, total never changes</h3>
+      <div id="pieWrap" style="justify-content:center"><div id="pieSvg"></div></div>
+      <h3 class="sec">STEPS · reorder with ▲▼, slide the share — total never changes</h3>
       <div id="stSteps"></div>
       <button class="mini" onclick="addStep()">＋ add step</button>
       <h3 class="sec">VOICE NOTES · listen while writing your caption</h3>
@@ -155,6 +160,13 @@ Plate</textarea>
       <div class="thumbs" id="stPhotos"></div>
       <button class="mini" style="margin-top:8px" onclick="galleryIn.click()">＋ add from gallery</button>
       <input type="file" id="galleryIn" accept="image/*" multiple hidden>
+      <h3 class="sec">TITLE PIC · shown big on the cover slide</h3>
+      <div class="row">
+        <button class="mini" onclick="titleIn.click()">＋ choose title pic</button>
+        <img id="tpThumb" style="display:none;width:72px;height:72px;border-radius:12px;border:3px solid var(--butter);object-fit:cover" alt="title pic">
+        <button class="mini red" id="tpDel" style="display:none" onclick="delTitlePic()">✕</button>
+      </div>
+      <input type="file" id="titleIn" accept="image/*" hidden>
       <h3 class="sec">LEARNINGS</h3>
       <input type="text" id="learn0" placeholder="What I learned #1" style="margin-bottom:6px">
       <input type="text" id="learn1" placeholder="What I learned #2" style="margin-bottom:6px">
@@ -216,7 +228,8 @@ function showTab(t){['cook','sessions','studio'].forEach(x=>{$('tab-'+x).style.d
 
 /* ---------- cook mode ---------- */
 let round='RUSHED', live=null;
-function setRound(r){round=r;$('segR').classList.toggle('on',r==='RUSHED');$('segS').classList.toggle('on',r==='SLOW');}
+const STD_STEPS={RUSHED:'Recipe Reading\nMEP\nReset\nCooking',SLOW:'Recipe Reading\nMEP\nReset\nCooking\nPlating'};
+function setRound(r){round=r;$('segR').classList.toggle('on',r==='RUSHED');$('segS').classList.toggle('on',r==='SLOW');$('stepsIn').value=STD_STEPS[r];}
 async function startCook(){
   const dish=$('dish').value.trim()||'Untitled dish';
   const steps=$('stepsIn').value.split('\n').map(s=>s.trim()).filter(Boolean);
@@ -231,11 +244,15 @@ async function startCook(){
   $('liveBadge').textContent=round;$('liveBadge').className='badge '+round;
   live.int=setInterval(tick,500);renderLive();
 }
-function startRec(){if(!live.stream)return;live.chunks=[];live.rec=new MediaRecorder(live.stream);live.rec.ondataavailable=e=>live.chunks.push(e.data);live.rec.start();}
+function startRec(){if(!live||!live.stream)return;live.chunks=[];live.rec=new MediaRecorder(live.stream);live.rec.ondataavailable=e=>live.chunks.push(e.data);live.rec.start();live.recT0=Date.now();
+  $('recInd').innerHTML='<span class="dot"></span> recording 7s step note — say what you\'re doing';
+  clearTimeout(live.recTimer);
+  live.recTimer=setTimeout(async()=>{await stopRec();if(live)$('recInd').textContent='🎙 note saved — keep cooking';},7000);}
 function stopRec(){return new Promise(async res=>{
-  if(!live.rec||live.rec.state==='inactive')return res();
+  if(!live||!live.rec||live.rec.state==='inactive')return res();
+  clearTimeout(live.recTimer);
   live.rec.onstop=async()=>{const b=new Blob(live.chunks,{type:live.rec.mimeType||'audio/webm'});
-    if(b.size>200){const id='a'+Date.now();await putBlob(id,b);live.s.notes.push({id,stepIdx:live.i,sec:Math.round((Date.now()-live.st0)/1000)});}res();};
+    if(b.size>200){const id='a'+Date.now();await putBlob(id,b);live.s.notes.push({id,stepIdx:live.i,sec:Math.round((Date.now()-live.recT0)/1000)});}res();};
   live.rec.stop();});}
 function tick(){$('liveTotal').textContent=fmt((Date.now()-live.t0)/1000);$('liveStepTime').textContent='step · '+fmt((Date.now()-live.st0)/1000);}
 function renderLive(){
@@ -275,7 +292,7 @@ function renderSessions(){
 function delSession(id){
   if(!confirm('Delete this session and its recordings?'))return;
   const s=sessions.find(x=>x.id===id);
-  if(s){s.photos.forEach(p=>delBlob(p.id));s.notes.forEach(n=>delBlob(n.id));}
+  if(s){s.photos.forEach(p=>delBlob(p.id));s.notes.forEach(n=>delBlob(n.id));if(s.titlePic)delBlob(s.titlePic);}
   sessions=sessions.filter(x=>x.id!==id);saveSessions();renderSessions();
 }
 
@@ -291,34 +308,49 @@ $('verdict').addEventListener('input',e=>{if(cur){cur.verdict=e.target.value;sav
 function renderStudio(){
   $('stTitle').textContent=cur.dish+' · '+cur.round;
   $('stTotal').textContent='total locked · '+fmt(cur.total);
-  renderPie();renderSteps();renderNotes();renderPhotos();
+  renderPie();renderSteps();renderNotes();renderPhotos();renderTitlePic();
 }
 function renderPie(){
-  const size=130,r=52,cx=size/2,cy=size/2;let a=-Math.PI/2,ps='';
+  const size=210,r=90,cx=size/2,cy=size/2;let a=-Math.PI/2,ps='',ls='';
   cur.steps.forEach((s,i)=>{const f=s.sec/cur.total,a2=a+f*2*Math.PI;
     const x1=cx+r*Math.cos(a),y1=cy+r*Math.sin(a),x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2);
-    ps+=`<path d="M${cx} ${cy} L${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 ${f>.5?1:0} 1 ${x2.toFixed(1)} ${y2.toFixed(1)} Z" fill="${PIE[i%PIE.length]}" stroke="${C.ink}" stroke-width="1.5"/>`;a=a2;});
-  $('pieSvg').innerHTML=`<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${ps}</svg>`;
-  $('pieLegend').innerHTML=cur.steps.map((s,i)=>`<div><i style="background:${PIE[i%PIE.length]}"></i>${s.icon||''} ${s.name} · <b>${Math.round(s.sec/cur.total*100)}%</b> (${fmt(s.sec)})</div>`).join('');
+    ps+=`<path d="M${cx} ${cy} L${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 ${f>.5?1:0} 1 ${x2.toFixed(1)} ${y2.toFixed(1)} Z" fill="${PIE[i%PIE.length]}" stroke="${C.ink}" stroke-width="2"/>`;
+    const mid=(a+a2)/2,pct=Math.round(f*100);
+    if(pct>=7)ls+=`<text x="${(cx+Math.cos(mid)*r*0.62).toFixed(1)}" y="${(cy+Math.sin(mid)*r*0.62+5).toFixed(1)}" text-anchor="middle" font-family="Quicksand,sans-serif" font-weight="700" font-size="16" fill="${C.ink}">${pct}%</text>`;
+    a=a2;});
+  $('pieSvg').innerHTML=`<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${ps}${ls}</svg>`;
 }
 function renderSteps(){
-  $('stSteps').innerHTML=cur.steps.map((s,i)=>`<div class="steprow">
+  $('stSteps').innerHTML=cur.steps.map((s,i)=>{
+    const pct=Math.round(s.sec/cur.total*100);
+    return `<div class="steprow">
+    <span class="cdot" style="background:${PIE[i%PIE.length]}"></span>
+    <button class="mini" onclick="moveStep(${i},-1)" ${i===0?'disabled':''}>▲</button>
+    <button class="mini" onclick="moveStep(${i},1)" ${i===cur.steps.length-1?'disabled':''}>▼</button>
     <button class="icon-btn" onclick="pickIcon(${i})">${s.icon||'＋'}</button>
-    <input class="nm" value="${s.name.replace(/"/g,'&quot;')}" onchange="cur.steps[${i}].name=this.value;saveSessions();renderPie();">
-    <input class="tm" value="${fmt(s.sec)}" onchange="editTime(${i},this)">
-    ${cur.steps.length>1?`<button class="mini red" onclick="rmStep(${i})">✕</button>`:''}</div>`).join('');
+    <input class="nm" value="${s.name.replace(/"/g,'&quot;')}" onchange="cur.steps[${i}].name=this.value;saveSessions();">
+    ${cur.steps.length>1?`<button class="mini red" onclick="rmStep(${i})">✕</button>`:''}
+    <div class="sharewrap"><input type="range" min="1" max="99" step="1" value="${pct}" oninput="slideShare(${i},this.value)" onchange="renderStudio()"><span class="pct" id="pct-${i}">${pct}%</span></div>
+    </div>`;}).join('');
+}
+function slideShare(i,pct){
+  const n=cur.steps.length;if(n<2)return;
+  let sec=Math.round(cur.total*pct/100);
+  sec=Math.min(Math.max(5,sec),cur.total-5*(n-1));
+  cur.steps[i].sec=sec;redistribute(i,cur.total-sec);
+  saveSessions();renderPie();
+  cur.steps.forEach((s,j)=>{const el=$('pct-'+j);if(el)el.textContent=Math.round(s.sec/cur.total*100)+'%';});
+}
+function moveStep(i,d){
+  const j=i+d;if(j<0||j>=cur.steps.length)return;
+  [cur.steps[i],cur.steps[j]]=[cur.steps[j],cur.steps[i]];
+  saveSessions();renderStudio();
 }
 function redistribute(exceptIdx,targetOthers){
   const others=cur.steps.filter((_,j)=>j!==exceptIdx);
   const old=others.reduce((a,b)=>a+b.sec,0)||1;let acc=0;
   others.forEach((st,k)=>{if(k===others.length-1)st.sec=Math.max(5,targetOthers-acc);
     else{st.sec=Math.max(5,Math.round(st.sec*targetOthers/old));acc+=st.sec;}});
-}
-function editTime(i,el){
-  let v=parseTm(el.value);const minOthers=(cur.steps.length-1)*5;
-  v=Math.min(Math.max(5,v),cur.total-minOthers);
-  cur.steps[i].sec=v;redistribute(i,cur.total-v);
-  saveSessions();renderStudio();
 }
 function addStep(){
   const name=prompt('Step name (its time is taken from the other steps — total stays locked):');if(!name)return;
@@ -354,6 +386,19 @@ async function renderPhotos(){
 $('galleryIn').addEventListener('change',async e=>{
   for(const f of e.target.files){const id='p'+Date.now()+Math.random().toString(36).slice(2,6);await putBlob(id,f);cur.photos.push({id,stepIdx:-1,use:true});}
   e.target.value='';saveSessions();renderPhotos();});
+$('titleIn').addEventListener('change',async e=>{
+  const f=e.target.files[0];if(!f)return;
+  if(cur.titlePic)delBlob(cur.titlePic);
+  const id='t'+Date.now();await putBlob(id,f);
+  cur.titlePic=id;saveSessions();e.target.value='';renderTitlePic();});
+async function renderTitlePic(){
+  const has=!!cur.titlePic;$('tpDel').style.display=has?'':'none';
+  const img=$('tpThumb');
+  if(!has){img.style.display='none';return;}
+  const b=await getBlob(cur.titlePic);
+  if(b){img.src=URL.createObjectURL(b);img.style.display='';}else{img.style.display='none';}
+}
+function delTitlePic(){if(cur.titlePic)delBlob(cur.titlePic);cur.titlePic=null;saveSessions();renderTitlePic();}
 
 /* ---------- polish (AI copy editor) ---------- */
 const POLISH_RULES=`You are the copy editor for @perfection.a.la.carte, an Instagram channel where one dish is cooked twice: once rushed against a timer, once slow with unlimited time. Polish each item of carousel text: fix grammar (the writer is a German native writing English), make it concise, readable and lightly funny with a dry wink — never influencer hype, never like a generic recipe app. Keep the writer's meaning and personality. Banned words: yummy, delicious, easy peasy, foodie, elevate, game-changer. No exclamation marks. Keep each item under ~15 words unless the original is longer. If an item is already great, return it unchanged.`;
@@ -444,27 +489,44 @@ function wrap(x,t,px,y,size,maxW,lh,opts={}){x.font=`${opts.w||500} ${size}px Qu
     if(x.measureText(test).width>maxW&&line){txt(x,line,px,yy,size,opts);line=wd;yy+=lh;}else line=test;}
   if(line)txt(x,line,px,yy,size,opts);return yy;}
 
-function slCover(){const[c,x]=newC();
-  txt(x,'PERFECTION À LA CARTE',W/2,170,34,{col:C.soft,w:500});
-  const yy=wrap(x,cur.dish,W/2,540,110,880,120,{w:700});
-  badge(x,W/2,yy+160,(cur.round==='RUSHED'?'⏱ RUSHED':'🌿 SLOW'),cur.round==='RUSHED'?C.red:C.sage,cur.round==='RUSHED'?'#fff':C.ink);
-  txt(x,fmt(cur.total),W/2,yy+400,150,{col:cur.round==='RUSHED'?C.red:C.ink});
-  txt(x,'total time — every second tracked',W/2,yy+470,32,{col:C.soft,w:500});
+async function slCover(){const[c,x]=newC();
+  const hasPic=!!cur.titlePic;
+  txt(x,'PERFECTION À LA CARTE',W/2,hasPic?150:170,34,{col:C.soft,w:500});
+  const yy=wrap(x,cur.dish,W/2,hasPic?290:540,hasPic?88:110,880,hasPic?96:120,{w:700});
+  badge(x,W/2,yy+(hasPic?95:160),(cur.round==='RUSHED'?'⏱ RUSHED':'🌿 SLOW'),cur.round==='RUSHED'?C.red:C.sage,cur.round==='RUSHED'?'#fff':C.ink);
+  if(hasPic){
+    const b=await getBlob(cur.titlePic);
+    const ix=100,iy=yy+170,iw=W-200,ih=1120-iy;
+    if(b&&ih>120){
+      const img=await createImageBitmap(b);
+      const s=Math.max(iw/img.width,ih/img.height);
+      x.save();rr(x,ix,iy,iw,ih,32);x.clip();
+      x.drawImage(img,W/2-img.width*s/2,iy+ih/2-img.height*s/2,img.width*s,img.height*s);x.restore();
+      x.strokeStyle=C.ink;x.lineWidth=5;rr(x,ix,iy,iw,ih,32);x.stroke();
+    }
+    txt(x,fmt(cur.total),W/2,1210,80,{col:cur.round==='RUSHED'?C.red:C.ink});
+  }else{
+    txt(x,fmt(cur.total),W/2,yy+400,150,{col:cur.round==='RUSHED'?C.red:C.ink});
+    txt(x,'total time — every second tracked',W/2,yy+470,32,{col:C.soft,w:500});
+  }
   footer(x);return c;}
 function slPie(){const[c,x]=newC();
   txt(x,'WHERE THE TIME WENT',W/2,170,52);
-  txt(x,cur.dish+' · '+fmt(cur.total)+' total',W/2,225,34,{col:C.soft,w:500});
-  const cx=W/2,cy=560,r=270;let a=-Math.PI/2;
+  txt(x,cur.dish,W/2,225,34,{col:C.soft,w:500});
+  const cx=W/2,cy=700,r=270;let a=-Math.PI/2;
   cur.steps.forEach((s,i)=>{const f=s.sec/cur.total,a2=a+f*2*Math.PI;
     x.beginPath();x.moveTo(cx,cy);x.arc(cx,cy,r,a,a2);x.closePath();
     x.fillStyle=PIE[i%PIE.length];x.fill();x.strokeStyle=C.ink;x.lineWidth=4;x.stroke();
-    const mid=(a+a2)/2,pct=Math.round(f*100);
-    if(pct>=8)txt(x,pct+'%',cx+Math.cos(mid)*r*0.62,cy+Math.sin(mid)*r*0.62+14,44);
     a=a2;});
-  let ly=930;cur.steps.forEach((s,i)=>{
-    x.fillStyle=PIE[i%PIE.length];rr(x,180,ly-30,36,36,10);x.fill();x.strokeStyle=C.ink;x.lineWidth=3;rr(x,180,ly-30,36,36,10);x.stroke();
-    txt(x,`${s.icon?s.icon+' ':''}${s.name}`,240,ly,36,{align:'left',w:500});
-    txt(x,`${Math.round(s.sec/cur.total*100)}% · ${fmt(s.sec)}`,W-180,ly,36,{align:'right'});ly+=64;});
+  a=-Math.PI/2;
+  cur.steps.forEach((s,i)=>{const f=s.sec/cur.total,a2=a+f*2*Math.PI;
+    const mid=(a+a2)/2,pct=Math.round(f*100);
+    if(pct>=8)txt(x,pct+'%',cx+Math.cos(mid)*r*0.62,cy+Math.sin(mid)*r*0.62+16,48);
+    const cos=Math.cos(mid),sin=Math.sin(mid);
+    const lx=cx+cos*(r+42),ly=cy+sin*(r+42)+12;
+    const align=Math.abs(cos)<0.35?'center':(cos>0?'left':'right');
+    txt(x,`${s.icon?s.icon+' ':''}${s.name}${pct<8?' · '+pct+'%':''}`,lx,ly,32,{align,w:700});
+    a=a2;});
   footer(x);return c;}
 function slSteps(){const[c,x]=newC();
   txt(x,'THE STEPS',W/2,170,52);
@@ -495,7 +557,7 @@ function slCTA(){const[c,x]=newC();
 
 async function buildSlides(){
   await document.fonts.ready;
-  const list=[slCover(),slPie(),slSteps()];
+  const list=[await slCover(),slPie(),slSteps()];
   for(const p of cur.photos.filter(p=>p.use))list.push(await slPhoto(p));
   if(cur.learnings.some(Boolean))list.push(slLearn());
   list.push(slCTA());

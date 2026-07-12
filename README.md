@@ -15,8 +15,9 @@ Real git history — every design revision is a commit. See `git log` for the fu
 
 | Version | Commit | What it is |
 |---|---|---|
-| v2.0 (current) | `git log --oneline -1` | Salif editorial — warm beige app, charcoal cook mode, orange slides |
-| v1.0 | `git log --oneline` (2nd entry) | Neutral studio chrome, dark cook instrument, pastel Quicksand slides |
+| v2.1 (current) | `git log --oneline -1` | The Cast on the timer page — shoot ingredients while cooking, AI (Claude vision) fills soul & aromatics, manual editing, two-column cast slide |
+| v2.0 | `git log --oneline` (2nd entry) | Salif editorial — warm beige app, charcoal cook mode, orange slides |
+| v1.0 | `git log --oneline` (3rd entry) | Neutral studio chrome, dark cook instrument, pastel Quicksand slides |
 
 **Roll back:**
 ```powershell

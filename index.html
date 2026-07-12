@@ -120,6 +120,11 @@ body.cooking .row>.big-btn:first-child{width:64px; flex:none; background:none; b
 body.cooking #nextBtn{background:var(--k-text); color:var(--k-bg)}
 body.cooking #recipeBtn{background:none; border:1px solid var(--k-line); color:var(--k-muted)}
 body.cooking .big-btn.red{background:none; border:1px solid var(--k-line); color:var(--k-muted)}
+body.cooking #castLive label{color:var(--k-muted)}
+body.cooking #castLive textarea{background:rgba(255,255,255,.07); color:var(--k-text)}
+body.cooking #castLive textarea:focus{background:rgba(255,255,255,.12); border-color:var(--orange)}
+body.cooking #castLive .hint{color:var(--k-muted)}
+body.cooking #castLive .mini{background:none; border-color:var(--k-line); color:var(--k-text)}
 </style>
 </head>
 <body>
@@ -166,7 +171,18 @@ Cooking</textarea>
       <button class="big-btn" style="margin-top:0" onclick="photoIn.click()">📸</button>
       <button class="big-btn sage grow" style="margin-top:0" id="nextBtn" onclick="nextStep()">Next step ▸</button>
     </div>
-    <button class="mini" id="recipeBtn" style="width:100%;margin-top:10px;padding:10px" onclick="recipeIn.click()">📖 shoot the recipe — becomes "The Cast" slide</button>
+    <button class="mini" id="recipeBtn" style="width:100%;margin-top:10px;padding:10px" onclick="recipeIn.click()">🧄 shoot your ingredients — becomes "The Cast" slide</button>
+    <div id="castLive" style="display:none">
+      <div class="row" style="margin-top:10px">
+        <img id="castThumbLive" style="width:56px;height:56px;border-radius:12px;object-fit:cover" alt="ingredients">
+        <button class="mini grow" onclick="extractLiveCast()">✨ extract soul &amp; aromatics with AI</button>
+      </div>
+      <p class="hint" id="castStatusLive"></p>
+      <label>Soul (the substance — one per line)</label>
+      <textarea id="castSoulLive" style="min-height:56px" placeholder="500 g spaghetti&#10;3 eggs&#10;80 g guanciale"></textarea>
+      <label>Aromatics (the character — one per line)</label>
+      <textarea id="castAromaticsLive" style="min-height:56px" placeholder="60 g pecorino&#10;black pepper, lots&#10;salt"></textarea>
+    </div>
     <button class="big-btn red" onclick="finishCook()">■ Finish & build carousel</button>
     <input type="file" id="photoIn" accept="image/*" capture="environment" hidden>
     <input type="file" id="recipeIn" accept="image/*" capture="environment" hidden>
@@ -197,16 +213,18 @@ Cooking</textarea>
       <input type="file" id="galleryIn" accept="image/*" multiple hidden>
       <h3 class="sec">THE CAST · slide 2 — ingredients in two buckets</h3>
       <div class="row">
-        <button class="mini" onclick="castIn.click()">＋ recipe photo</button>
-        <img id="castThumb" style="display:none;width:72px;height:72px;border-radius:12px;border:3px solid var(--sage);object-fit:cover" alt="recipe">
+        <button class="mini" onclick="castIn.click()">＋ ingredients photo</button>
+        <img id="castThumb" style="display:none;width:72px;height:72px;border-radius:12px;border:3px solid var(--sage);object-fit:cover" alt="ingredients">
+        <button class="mini" id="castAI" style="display:none" onclick="aiExtractCast(cur,$('castStatus'),$('castSoul'),$('castAromatics'))">✨ AI</button>
         <button class="mini red" id="castDel" style="display:none" onclick="delCastPic()">✕</button>
       </div>
+      <p class="hint" id="castStatus" style="margin-top:6px"></p>
       <input type="file" id="castIn" accept="image/*" hidden>
       <label>SOUL (the substance — one per line, with amount)</label>
       <textarea id="castSoul" style="min-height:70px" placeholder="500 g spaghetti&#10;3 eggs&#10;80 g guanciale"></textarea>
       <label>AROMATICS (the character — one per line)</label>
       <textarea id="castAromatics" style="min-height:70px" placeholder="60 g pecorino&#10;black pepper, lots&#10;salt"></textarea>
-      <p class="hint">Typed buckets win the slide; the recipe photo is used when both buckets are empty.</p>
+      <p class="hint">Typed buckets win the slide; the ingredients photo is used when both buckets are empty.</p>
       <h3 class="sec">TITLE PIC · shown big on the cover slide</h3>
       <div class="row">
         <button class="mini" onclick="titleIn.click()">＋ choose title pic</button>
@@ -290,7 +308,8 @@ async function startCook(){
         steps:steps.map(n=>({name:n,sec:0,icon:''})),total:0,photos:[],notes:[],learnings:['','',''],verdict:'',
         cast:{pic:null,soul:'',aromatics:''}},
         i:0,t0:Date.now(),st0:Date.now(),stream:null,rec:null,chunks:[]};
-  $('recipeBtn').textContent='📖 shoot the recipe — becomes "The Cast" slide';
+  $('recipeBtn').textContent='🧄 shoot your ingredients — becomes "The Cast" slide';
+  $('castLive').style.display='none';$('castSoulLive').value='';$('castAromaticsLive').value='';$('castStatusLive').textContent='';
   try{live.stream=await navigator.mediaDevices.getUserMedia({audio:true});startRec();}
   catch(e){$('recInd').innerHTML='mic off — timer & photos still running';}
   try{navigator.wakeLock&&navigator.wakeLock.request('screen');}catch(e){}
@@ -340,7 +359,52 @@ $('recipeIn').addEventListener('change',async e=>{
   if(live.s.cast.pic)delBlob(live.s.cast.pic);
   const id='c'+Date.now();await putBlob(id,f);
   live.s.cast.pic=id;e.target.value='';
-  $('recipeBtn').textContent='📖 cast photo saved ✓ (tap to retake)';});
+  $('recipeBtn').textContent='🧄 ingredients photo saved ✓ (tap to retake)';
+  $('castLive').style.display='';
+  $('castThumbLive').src=URL.createObjectURL(f);
+  if(localStorage.getItem('palc_key'))extractLiveCast();
+  else $('castStatusLive').textContent='No API key saved — add one in Studio → "Polish my words" for AI extraction, or type the buckets below.';});
+$('castSoulLive').addEventListener('input',e=>{if(live)live.s.cast.soul=e.target.value;});
+$('castAromaticsLive').addEventListener('input',e=>{if(live)live.s.cast.aromatics=e.target.value;});
+
+/* ---------- cast AI extraction ---------- */
+async function blobToJpegB64(blob){
+  const img=await createImageBitmap(blob);
+  const s=Math.min(1,1200/Math.max(img.width,img.height));
+  const c=document.createElement('canvas');c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);
+  c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+  return c.toDataURL('image/jpeg',0.82).split(',')[1];
+}
+async function aiExtractCast(sess,statusEl,soulEl,aromEl){
+  const key=(localStorage.getItem('palc_key')||'').trim();
+  if(!key){statusEl.textContent='No API key saved — add one in Studio → "Polish my words", or type the buckets yourself.';return;}
+  if(!sess.cast.pic){statusEl.textContent='Shoot the ingredients first.';return;}
+  statusEl.textContent='👀 Claude is reading your ingredients…';
+  try{
+    const blob=await getBlob(sess.cast.pic);
+    const b64=await blobToJpegB64(blob);
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({
+        model:'claude-haiku-4-5-20251001',max_tokens:800,
+        output_config:{format:{type:'json_schema',schema:{type:'object',properties:{soul:{type:'string'},aromatics:{type:'string'}},required:['soul','aromatics'],additionalProperties:false}}},
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64}},
+          {type:'text',text:`This photo shows the ingredients (or the recipe) for "${sess.dish}". List every ingredient you can identify, one per line, split into two buckets:\nsoul = the substance (protein, carbs, vegetables, dairy base) — include amounts only if visible or readable;\naromatics = the character (herbs, spices, seasonings, condiments, oils, finishing touches).\nShort practical names. Never invent amounts.`}
+        ]}]
+      })});
+    const d=await r.json();
+    if(d.error)throw new Error(d.error.message);
+    if(d.stop_reason==='refusal')throw new Error('Claude declined this request');
+    const out=JSON.parse((d.content.find(b=>b.type==='text')||{}).text||'{}');
+    sess.cast.soul=(out.soul||'').trim();sess.cast.aromatics=(out.aromatics||'').trim();
+    soulEl.value=sess.cast.soul;aromEl.value=sess.cast.aromatics;
+    if(sessions.includes(sess))saveSessions();
+    statusEl.textContent='✓ extracted — edit anything that looks off';
+  }catch(e){statusEl.textContent='AI failed ('+e.message+') — type the buckets below.';}
+}
+function extractLiveCast(){if(live)aiExtractCast(live.s,$('castStatusLive'),$('castSoulLive'),$('castAromaticsLive'));}
 
 /* ---------- sessions ---------- */
 function renderSessions(){
@@ -471,7 +535,7 @@ $('castIn').addEventListener('change',async e=>{
 async function renderCast(){
   $('castSoul').value=cur.cast.soul||'';
   $('castAromatics').value=cur.cast.aromatics||'';
-  const has=!!cur.cast.pic;$('castDel').style.display=has?'':'none';
+  const has=!!cur.cast.pic;$('castDel').style.display=has?'':'none';$('castAI').style.display=has?'':'none';
   const img=$('castThumb');
   if(!has){img.style.display='none';return;}
   const b=await getBlob(cur.cast.pic);
@@ -609,13 +673,15 @@ async function slCast(){const[c,x]=newC();
   const st=(cur.cast.soul||'').split('\n').map(s=>s.trim()).filter(Boolean);
   const ar=(cur.cast.aromatics||'').split('\n').map(s=>s.trim()).filter(Boolean);
   if(st.length||ar.length){
-    let y=460;
-    const group=(title,items)=>{
-      txt(x,title,90,y,25,{col:S.orange,ls:5,w:600});y+=68;
-      items.forEach(it=>{txt(x,it,90,y,40,{w:400});y+=56;});
-      y+=36;};
-    if(st.length)group('SOUL',st);
-    if(ar.length)group('AROMATICS',ar);
+    const col=(title,items,px)=>{
+      let y=470;
+      txt(x,title,px,y,25,{col:S.orange,ls:5,w:600});
+      x.strokeStyle=S.line;x.lineWidth=2;x.beginPath();x.moveTo(px,y+22);x.lineTo(px+400,y+22);x.stroke();
+      y+=84;
+      items.forEach(it=>{y=wrap(x,it,px,y,36,400,46,{w:400})+58;});
+    };
+    if(st.length)col('SOUL',st,90);
+    if(ar.length)col('AROMATICS',ar,590);
   }else if(cur.cast.pic){
     const b=await getBlob(cur.cast.pic);
     if(b){const img=await createImageBitmap(b);

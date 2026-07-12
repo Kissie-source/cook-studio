@@ -120,11 +120,11 @@ body.cooking .row>.big-btn:first-child{width:64px; flex:none; background:none; b
 body.cooking #nextBtn{background:var(--k-text); color:var(--k-bg)}
 body.cooking #recipeBtn{background:none; border:1px solid var(--k-line); color:var(--k-muted)}
 body.cooking .big-btn.red{background:none; border:1px solid var(--k-line); color:var(--k-muted)}
-body.cooking #castLive label{color:var(--k-muted)}
-body.cooking #castLive textarea{background:rgba(255,255,255,.07); color:var(--k-text)}
-body.cooking #castLive textarea:focus{background:rgba(255,255,255,.12); border-color:var(--orange)}
-body.cooking #castLive .hint{color:var(--k-muted)}
-body.cooking #castLive .mini{background:none; border-color:var(--k-line); color:var(--k-text)}
+body.cooking #castBlock label{color:var(--k-muted)}
+body.cooking #castBlock textarea{background:rgba(255,255,255,.07); color:var(--k-text)}
+body.cooking #castBlock textarea:focus{background:rgba(255,255,255,.12); border-color:var(--orange)}
+body.cooking #castBlock .hint{color:var(--k-muted)}
+body.cooking #castBlock .mini{background:none; border-color:var(--k-line); color:var(--k-text)}
 </style>
 </head>
 <body>
@@ -156,7 +156,21 @@ body.cooking #castLive .mini{background:none; border-color:var(--k-line); color:
 MEP
 Reset
 Cooking</textarea>
-    <button class="big-btn red" onclick="startCook()">▶ Start timer & mic</button>
+    <div id="castBlock">
+      <button class="mini" id="recipeBtn" style="width:100%;margin-top:16px;padding:10px" onclick="recipeIn.click()">🧄 shoot your ingredients — becomes "The Cast" slide</button>
+      <div id="castPanel" style="display:none">
+        <div class="row" style="margin-top:10px">
+          <img id="castThumbLive" style="width:56px;height:56px;border-radius:12px;object-fit:cover" alt="ingredients">
+          <button class="mini grow" onclick="extractLiveCast()">✨ extract soul &amp; aromatics with AI</button>
+        </div>
+        <p class="hint" id="castStatusLive"></p>
+        <label>Soul (the substance — one per line)</label>
+        <textarea id="castSoulLive" style="min-height:56px" placeholder="500 g spaghetti&#10;3 eggs&#10;80 g guanciale"></textarea>
+        <label>Aromatics (the character — one per line)</label>
+        <textarea id="castAromaticsLive" style="min-height:56px" placeholder="60 g pecorino&#10;black pepper, lots&#10;salt"></textarea>
+      </div>
+    </div>
+    <button class="big-btn red" id="startBtn" onclick="startCook()">▶ Start timer & mic</button>
     <p class="hint">At each step the mic records the first 7 seconds only — say what you're doing, then cook. Those notes are your captions.</p>
   </div>
 
@@ -171,19 +185,7 @@ Cooking</textarea>
       <button class="big-btn" style="margin-top:0" onclick="photoIn.click()">📸</button>
       <button class="big-btn sage grow" style="margin-top:0" id="nextBtn" onclick="nextStep()">Next step ▸</button>
     </div>
-    <button class="mini" id="recipeBtn" style="width:100%;margin-top:10px;padding:10px" onclick="recipeIn.click()">🧄 shoot your ingredients — becomes "The Cast" slide</button>
-    <div id="castLive" style="display:none">
-      <div class="row" style="margin-top:10px">
-        <img id="castThumbLive" style="width:56px;height:56px;border-radius:12px;object-fit:cover" alt="ingredients">
-        <button class="mini grow" onclick="extractLiveCast()">✨ extract soul &amp; aromatics with AI</button>
-      </div>
-      <p class="hint" id="castStatusLive"></p>
-      <label>Soul (the substance — one per line)</label>
-      <textarea id="castSoulLive" style="min-height:56px" placeholder="500 g spaghetti&#10;3 eggs&#10;80 g guanciale"></textarea>
-      <label>Aromatics (the character — one per line)</label>
-      <textarea id="castAromaticsLive" style="min-height:56px" placeholder="60 g pecorino&#10;black pepper, lots&#10;salt"></textarea>
-    </div>
-    <button class="big-btn red" onclick="finishCook()">■ Finish & build carousel</button>
+    <button class="big-btn red" id="finishBtn" onclick="finishCook()">■ Finish & build carousel</button>
     <input type="file" id="photoIn" accept="image/*" capture="environment" hidden>
     <input type="file" id="recipeIn" accept="image/*" capture="environment" hidden>
   </div>
@@ -308,8 +310,12 @@ async function startCook(){
         steps:steps.map(n=>({name:n,sec:0,icon:''})),total:0,photos:[],notes:[],learnings:['','',''],verdict:'',
         cast:{pic:null,soul:'',aromatics:''}},
         i:0,t0:Date.now(),st0:Date.now(),stream:null,rec:null,chunks:[]};
-  $('recipeBtn').textContent='🧄 shoot your ingredients — becomes "The Cast" slide';
-  $('castLive').style.display='none';$('castSoulLive').value='';$('castAromaticsLive').value='';$('castStatusLive').textContent='';
+  if(pendingCast.pic||pendingCast.soul.trim()||pendingCast.aromatics.trim()){
+    live.s.cast={...pendingCast};pendingCast={pic:null,soul:'',aromatics:''};
+  }else{
+    resetCastPanel();
+  }
+  $('liveCard').insertBefore($('castBlock'),$('finishBtn'));
   try{live.stream=await navigator.mediaDevices.getUserMedia({audio:true});startRec();}
   catch(e){$('recInd').innerHTML='mic off — timer & photos still running';}
   try{navigator.wakeLock&&navigator.wakeLock.request('screen');}catch(e){}
@@ -349,23 +355,33 @@ async function finishCook(){
   const id=live.s.id;live=null;
   document.body.classList.remove('cooking','slowround');setTheme('#EDE7DD');
   $('setupCard').style.display='';$('liveCard').style.display='none';
+  $('setupCard').insertBefore($('castBlock'),$('startBtn'));
+  resetCastPanel();
   openStudio(id);
 }
 $('photoIn').addEventListener('change',async e=>{
   for(const f of e.target.files){const id='p'+Date.now()+Math.random().toString(36).slice(2,6);await putBlob(id,f);live.s.photos.push({id,stepIdx:live.i,use:true});}
   e.target.value='';});
+let pendingCast={pic:null,soul:'',aromatics:''};
+const activeCast=()=>live?live.s.cast:pendingCast;
+function resetCastPanel(){
+  $('recipeBtn').textContent='🧄 shoot your ingredients — becomes "The Cast" slide';
+  $('castPanel').style.display='none';
+  $('castSoulLive').value='';$('castAromaticsLive').value='';$('castStatusLive').textContent='';
+}
 $('recipeIn').addEventListener('change',async e=>{
-  const f=e.target.files[0];if(!f||!live)return;
-  if(live.s.cast.pic)delBlob(live.s.cast.pic);
+  const f=e.target.files[0];if(!f)return;
+  const cast=activeCast();
+  if(cast.pic)delBlob(cast.pic);
   const id='c'+Date.now();await putBlob(id,f);
-  live.s.cast.pic=id;e.target.value='';
+  cast.pic=id;e.target.value='';
   $('recipeBtn').textContent='🧄 ingredients photo saved ✓ (tap to retake)';
-  $('castLive').style.display='';
+  $('castPanel').style.display='';
   $('castThumbLive').src=URL.createObjectURL(f);
-  if(localStorage.getItem('palc_key'))extractLiveCast();
-  else $('castStatusLive').textContent='No API key saved — add one in Studio → "Polish my words" for AI extraction, or type the buckets below.';});
-$('castSoulLive').addEventListener('input',e=>{if(live)live.s.cast.soul=e.target.value;});
-$('castAromaticsLive').addEventListener('input',e=>{if(live)live.s.cast.aromatics=e.target.value;});
+  if((localStorage.getItem('palc_key')||'').trim())extractLiveCast();
+  else $('castStatusLive').textContent='Tap ✨ to extract with AI (asks for your API key once), or type the buckets below.';});
+$('castSoulLive').addEventListener('input',e=>{activeCast().soul=e.target.value;});
+$('castAromaticsLive').addEventListener('input',e=>{activeCast().aromatics=e.target.value;});
 
 /* ---------- cast AI extraction ---------- */
 async function blobToJpegB64(blob){
@@ -376,8 +392,12 @@ async function blobToJpegB64(blob){
   return c.toDataURL('image/jpeg',0.82).split(',')[1];
 }
 async function aiExtractCast(sess,statusEl,soulEl,aromEl){
-  const key=(localStorage.getItem('palc_key')||'').trim();
-  if(!key){statusEl.textContent='No API key saved — add one in Studio → "Polish my words", or type the buckets yourself.';return;}
+  let key=(localStorage.getItem('palc_key')||'').trim();
+  if(!key){
+    const k=prompt('Anthropic API key (sk-ant-…) — stored only on this device:');
+    if(!k||!k.trim()){statusEl.textContent='No API key — type the buckets yourself, or tap ✨ again to add a key.';return;}
+    key=k.trim();localStorage.setItem('palc_key',key);
+  }
   if(!sess.cast.pic){statusEl.textContent='Shoot the ingredients first.';return;}
   statusEl.textContent='👀 Claude is reading your ingredients…';
   try{
@@ -387,7 +407,7 @@ async function aiExtractCast(sess,statusEl,soulEl,aromEl){
       method:'POST',
       headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({
-        model:'claude-haiku-4-5-20251001',max_tokens:800,
+        model:'claude-opus-4-8',max_tokens:1500,
         output_config:{format:{type:'json_schema',schema:{type:'object',properties:{soul:{type:'string'},aromatics:{type:'string'}},required:['soul','aromatics'],additionalProperties:false}}},
         messages:[{role:'user',content:[
           {type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64}},
@@ -395,16 +415,20 @@ async function aiExtractCast(sess,statusEl,soulEl,aromEl){
         ]}]
       })});
     const d=await r.json();
-    if(d.error)throw new Error(d.error.message);
+    if(d.error)throw new Error(d.error.message||('HTTP '+r.status));
+    if(!r.ok)throw new Error('HTTP '+r.status);
     if(d.stop_reason==='refusal')throw new Error('Claude declined this request');
     const out=JSON.parse((d.content.find(b=>b.type==='text')||{}).text||'{}');
     sess.cast.soul=(out.soul||'').trim();sess.cast.aromatics=(out.aromatics||'').trim();
     soulEl.value=sess.cast.soul;aromEl.value=sess.cast.aromatics;
     if(sessions.includes(sess))saveSessions();
     statusEl.textContent='✓ extracted — edit anything that looks off';
-  }catch(e){statusEl.textContent='AI failed ('+e.message+') — type the buckets below.';}
+  }catch(e){statusEl.textContent='AI failed ('+e.message+') — type the buckets below, or tap ✨ to retry.';}
 }
-function extractLiveCast(){if(live)aiExtractCast(live.s,$('castStatusLive'),$('castSoulLive'),$('castAromaticsLive'));}
+function extractLiveCast(){
+  aiExtractCast(live?live.s:{dish:($('dish').value.trim()||'this dish'),cast:pendingCast},
+    $('castStatusLive'),$('castSoulLive'),$('castAromaticsLive'));
+}
 
 /* ---------- sessions ---------- */
 function renderSessions(){

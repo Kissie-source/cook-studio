@@ -15,9 +15,10 @@ Real git history — every design revision is a commit. See `git log` for the fu
 
 | Version | Commit | What it is |
 |---|---|---|
-| v2.1 (current) | `git log --oneline -1` | The Cast on the timer page — shoot ingredients while cooking, AI (Claude vision) fills soul & aromatics, manual editing, two-column cast slide |
-| v2.0 | `git log --oneline` (2nd entry) | Salif editorial — warm beige app, charcoal cook mode, orange slides |
-| v1.0 | `git log --oneline` (3rd entry) | Neutral studio chrome, dark cook instrument, pastel Quicksand slides |
+| v2.2 (current) | `git log --oneline -1` | Cast photo works before starting timer & mic; AI extraction fixed (Opus model, on-device key prompt, clearer errors) |
+| v2.1 | `git log --oneline` (2nd entry) | The Cast on the timer page — shoot ingredients while cooking, AI (Claude vision) fills soul & aromatics, manual editing, two-column cast slide |
+| v2.0 | `git log --oneline` (3rd entry) | Salif editorial — warm beige app, charcoal cook mode, orange slides |
+| v1.0 | `git log --oneline` (4th entry) | Neutral studio chrome, dark cook instrument, pastel Quicksand slides |
 
 **Roll back:**
 ```powershell

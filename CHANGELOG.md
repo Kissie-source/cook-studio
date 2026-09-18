@@ -3,6 +3,20 @@
 Every version is a full snapshot in `versions/index-vX.Y.html` (and a git commit).
 **Roll back:** copy the snapshot over `index.html`, re-upload to GitHub.
 
+## v2.7 — 2026-09-18
+- **Photo adjustments.** In the big view, tap "✎ adjust": ↔/↕ frame and zoom (previewed
+  as the exact 4:5 slide crop, so a half-cut dish can be re-framed), plus bright,
+  contrast, colour, warm. "✨ polish" applies the house look — a touch brighter, +8%
+  contrast, +15% colour, gently warm: positive and energetic without the cheap punch.
+  Adjustments are baked into the photo slides and follow a photo onto the cover.
+- **New colour world.** App chrome moves to blush · royal blue · sage · graphite on warm
+  porcelain; cook mode is a deep navy. The brown/orange is gone.
+- **Three looks for the slides**, picked per session in the Studio ("LOOK"):
+  Blush & Royal (default) · Silver (brushed-steel monochrome, metallic titles) ·
+  Navy & Coral. Each has its own verdict slide and pie palette.
+- Dev: `serve.ps1` gained a PUT /out/ endpoint to export rendered slides; `out/` is
+  git-ignored.
+
 ## v2.6 — 2026-09-18
 - **Brand line off every slide.** The top-left "PERFECTION À LA CARTE" is gone from the
   cover, cast, pie, steps and verdict slides too (learn had it removed in v2.4). The

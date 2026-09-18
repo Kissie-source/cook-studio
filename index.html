@@ -3,23 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#F4EFEC">
+<meta name="theme-color" content="#FAF6F0">
 <title>Perfection à la Carte — Cook Studio</title>
 <style>
 :root{
-  /* one family: blush · royal blue · sage · graphite — on warm porcelain */
-  --paper:#F4EFEC; --glass:rgba(255,255,255,.58); --glass-solid:#FBF8F6;
-  --ink:#1B2140; --muted:#7C7C7C; --line:rgba(27,33,64,.10); --line-2:rgba(27,33,64,.17);
-  --accent:#1F3C9A; --accent-soft:rgba(31,60,154,.09); --blush:#F6BAAE; --blush-soft:rgba(246,186,174,.35); --sage:#9CC4B4; --charcoal:#141C3A;
+  /* one family: navy · coral · sage — on cream (same world as the slides) */
+  --paper:#FAF6F0; --glass:rgba(255,255,255,.58); --glass-solid:#FDFAF6;
+  --ink:#14213D; --muted:#8A8F98; --line:rgba(20,33,61,.10); --line-2:rgba(20,33,61,.17);
+  --accent:#E07A5F; --accent-soft:rgba(224,122,95,.12); --blush:#F2CFC2; --blush-soft:rgba(242,207,194,.4); --sage:#9CC4B4; --charcoal:#14213D;
   /* cook mode — deep navy instrument */
-  --k-bg:#101832; --k-line:#2A3457; --k-text:#EEF1F8; --k-muted:#98A0B8; --slow:#9CC4B4;
+  --k-bg:#0F1A33; --k-line:#2A3A5E; --k-text:#F1EDE6; --k-muted:#98A0B8; --slow:#9CC4B4;
   --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,system-ui,sans-serif;
   --mono:ui-monospace,"SF Mono","Cascadia Code","Roboto Mono",monospace;
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
 body{margin:0; font-family:var(--ui); background:var(--paper); color:var(--ink); -webkit-font-smoothing:antialiased}
 body::before{content:''; position:fixed; top:-140px; right:-160px; width:420px; height:420px; border-radius:50%;
-  background:radial-gradient(circle, rgba(246,186,174,.75), rgba(246,186,174,0) 68%); filter:blur(40px); pointer-events:none; z-index:0}
+  background:radial-gradient(circle, rgba(224,122,95,.45), rgba(224,122,95,0) 68%); filter:blur(40px); pointer-events:none; z-index:0}
 header,nav,main{position:relative; z-index:1}
 header{padding:26px 20px 4px}
 header h1{margin:0; font:400 26px var(--ui); letter-spacing:-.3px}
@@ -40,7 +40,6 @@ textarea{min-height:88px; resize:vertical; line-height:1.55}
 .seg button{flex:1; padding:11px; border:none; border-radius:999px; background:none; font:500 13.5px var(--ui); color:var(--muted); cursor:pointer}
 .seg button.rushed.on{background:#fff; color:var(--accent); font-weight:600; box-shadow:0 1px 6px rgba(38,34,30,.10)}
 .seg button.slow.on{background:#fff; color:#3F7A66; font-weight:600; box-shadow:0 1px 6px rgba(38,34,30,.10)}
-.seg button.look.on{background:#fff; color:var(--accent); font-weight:600; box-shadow:0 1px 6px rgba(38,34,30,.10)}
 .big-btn{width:100%; padding:16px; margin-top:16px; border:none; border-radius:999px; background:var(--charcoal); font:500 15px var(--ui); letter-spacing:.3px; color:#F5F0E8; cursor:pointer}
 .big-btn.red{background:var(--accent); color:#fff}
 .big-btn.sage{background:rgba(255,255,255,.8); color:var(--ink); border:1px solid var(--line-2)}
@@ -64,14 +63,14 @@ textarea{min-height:88px; resize:vertical; line-height:1.55}
 .sess b{display:block; font:500 15px var(--ui)}
 .sess small{color:var(--muted); font-size:12px}
 .mini{padding:9px 15px; border:1px solid var(--line-2); border-radius:999px; background:rgba(255,255,255,.6); font:500 12.5px var(--ui); color:var(--ink); cursor:pointer}
-.mini.red{background:none; color:var(--accent); border-color:rgba(31,60,154,.35)}
+.mini.red{background:none; color:var(--accent); border-color:rgba(224,122,95,.4)}
 .steprow{display:flex; gap:5px; align-items:center; margin:4px 0; flex-wrap:wrap; padding:7px 9px 5px; border-radius:15px; background:rgba(255,255,255,.42)}
 .steprow input.nm{flex:1; min-width:96px; padding:6px 12px; font:400 13.5px var(--ui); color:var(--ink);
   background:rgba(255,255,255,.85); border:1px solid var(--line); border-radius:999px}
 .steprow input.nm:focus{outline:none; border-color:var(--accent); background:#fff}
 .steprow .mini{padding:4px 0; width:27px; text-align:center; font-size:11px}
 .steprow .mini.red{width:27px}
-.steprow .mini.play{width:auto; padding:4px 9px; color:var(--accent); border-color:rgba(31,60,154,.4); font-variant-numeric:tabular-nums; white-space:nowrap}
+.steprow .mini.play{width:auto; padding:4px 9px; color:var(--accent); border-color:rgba(224,122,95,.45); font-variant-numeric:tabular-nums; white-space:nowrap}
 .steprow .mini.play.on{background:var(--accent); border-color:var(--accent); color:#fff}
 .planrow{margin:5px 0}
 .planrow .drag{cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; padding:4px 6px; color:var(--muted); font-size:17px; line-height:1}
@@ -286,12 +285,6 @@ Reset</textarea>
         </div>
         <div id="polishResults"></div>
       </div>
-      <h3 class="sec">LOOK · the colour world of your slides</h3>
-      <div class="seg" id="lookSeg">
-        <button class="look" data-k="royal" onclick="setLookFor('royal')">Blush &amp; Royal</button>
-        <button class="look" data-k="silver" onclick="setLookFor('silver')">Silver</button>
-        <button class="look" data-k="coral" onclick="setLookFor('coral')">Navy &amp; Coral</button>
-      </div>
       <button class="big-btn sage" onclick="buildSlides()">🎨 Generate carousel</button>
     </div>
     <div class="card">
@@ -333,9 +326,9 @@ Reset</textarea>
 <script>
 'use strict';
 const HANDLE='@perfection.a.la.carte';
-const PIE=['#1F3C9A','#F6BAAE','#9CC4B4','#141C3A','#7C7C7C','#C9D4F0','#D98C7A','#5A6B85'];
-const PIE_DARK=new Set(['#1F3C9A','#141C3A','#7C7C7C','#5A6B85']);
-const pieText=i=>PIE_DARK.has(PIE[i%PIE.length])?'#FBF8F6':'#1B2140';
+const PIE=['#14213D','#E07A5F','#F2CFC2','#8A8F98','#3D5A80','#EADFD3','#9CC4B4','#B85C45'];
+const PIE_DARK=new Set(['#14213D','#E07A5F','#8A8F98','#3D5A80','#B85C45']);
+const pieText=i=>PIE_DARK.has(PIE[i%PIE.length])?'#FAF6F0':'#14213D';
 const ICONS=['🍳','🔪','🧄','🧅','🍅','🧂','🔥','⏱','🌿','🥄','🧀','🍝','🥩','🥚','🫒','🍞','🥕','🍋','🍫','🥣','💧','🍚'];
 
 if(!window.isSecureContext) document.getElementById('httpsWarn').style.display='block';
@@ -383,7 +376,7 @@ async function startCook(){
   catch(e){$('recInd').innerHTML='mic off — timer & photos still running';}
   try{navigator.wakeLock&&navigator.wakeLock.request('screen').catch(()=>{});}catch(e){}
   $('setupCard').style.display='none';$('liveCard').style.display='';
-  document.body.classList.add('cooking');document.body.classList.toggle('slowround',round==='SLOW');setTheme('#101832');
+  document.body.classList.add('cooking');document.body.classList.toggle('slowround',round==='SLOW');setTheme('#0F1A33');
   $('liveBadge').textContent=round;$('liveBadge').className='badge '+round;
   live.int=setInterval(tick,500);renderLive();
 }
@@ -416,7 +409,7 @@ async function finishCook(){
   live.s.total=live.s.steps.reduce((a,b)=>a+b.sec,0)||1;
   sessions.unshift(live.s);saveSessions();
   const id=live.s.id;live=null;
-  document.body.classList.remove('cooking','slowround');setTheme('#F4EFEC');
+  document.body.classList.remove('cooking','slowround');setTheme('#FAF6F0');
   $('setupCard').style.display='';$('liveCard').style.display='none';
   $('setupCard').insertBefore($('castBlock'),$('startBtn'));
   resetCastPanel();
@@ -528,15 +521,13 @@ $('verdict').addEventListener('input',e=>{if(cur){cur.verdict=e.target.value;sav
 function renderStudio(){
   $('stTitle').textContent=cur.dish+' · '+cur.round;
   $('stTotal').textContent='total locked · '+fmt(cur.total);
-  renderPie();renderSteps();renderNotes();renderPhotos();renderTitlePic();renderCast();renderLook();
+  renderPie();renderSteps();renderNotes();renderPhotos();renderTitlePic();renderCast();
 }
-function renderLook(){[...$('lookSeg').children].forEach(b=>b.classList.toggle('on',b.dataset.k===(cur.look||'royal')));}
-function setLookFor(k){cur.look=k;saveSessions();renderLook();buildSlides();}
 function renderPie(){
   const size=164,r=70,cx=size/2,cy=size/2;let a=-Math.PI/2,ps='',ls='';
   cur.steps.forEach((s,i)=>{const f=s.sec/cur.total,a2=a+f*2*Math.PI;
     const x1=cx+r*Math.cos(a),y1=cy+r*Math.sin(a),x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2);
-    ps+=`<path d="M${cx} ${cy} L${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 ${f>.5?1:0} 1 ${x2.toFixed(1)} ${y2.toFixed(1)} Z" fill="${PIE[i%PIE.length]}" stroke="#F4EFEC" stroke-width="2.5"/>`;
+    ps+=`<path d="M${cx} ${cy} L${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 ${f>.5?1:0} 1 ${x2.toFixed(1)} ${y2.toFixed(1)} Z" fill="${PIE[i%PIE.length]}" stroke="#FAF6F0" stroke-width="2.5"/>`;
     const mid=(a+a2)/2,pct=Math.round(f*100);
     if(pct>=8)ls+=`<text x="${(cx+Math.cos(mid)*r*0.62).toFixed(1)}" y="${(cy+Math.sin(mid)*r*0.62+4).toFixed(1)}" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="600" font-size="12" fill="${pieText(i)}">${pct}%</text>`;
     a=a2;});
@@ -685,7 +676,7 @@ async function openLightbox(i){
   const t=$('lbTitle');t.style.display='';t.classList.toggle('on',cur.titlePicFrom===p.id);t.textContent=cur.titlePicFrom===p.id?'★ is the title pic':'☆ make title pic';
   $('lightbox').style.display='flex';setTheme('#0E1326');
 }
-function closeLightbox(){lbIdx=-1;$('lightbox').style.display='none';setTheme('#F4EFEC');}
+function closeLightbox(){lbIdx=-1;$('lightbox').style.display='none';setTheme('#FAF6F0');}
 function stepLightbox(d){const j=lbIdx+d;if(j>=0&&j<cur.photos.length)openLightbox(j);}
 function toggleLightboxUse(){
   const p=cur.photos[lbIdx];if(!p)return;
@@ -834,23 +825,11 @@ function applyPolishIdx(i){
 const W=1080,H=1350;
 /* three looks for the slides — pick per session in the Studio */
 const grad=(x,stops,diag)=>{const g=diag?x.createLinearGradient(0,0,W,H):x.createLinearGradient(0,0,0,H);stops.forEach(([o,c])=>g.addColorStop(o,c));return g;};
-const THEMES={
-  royal:{name:'Blush & Royal',paper:'#F7F2EF',ink:'#1B2140',gray:'#7C7C7C',accent:'#1F3C9A',dark:'#141C3A',line:'#E8DDD8',
-    cta:{bg:'#1F3C9A',title:'#FFFFFF',title2:'#F6BAAE',text:'#EEF1F8',label:'rgba(255,255,255,.8)'}},
-  silver:{name:'Silver',paper:'#E6E6EA',ink:'#26262B',gray:'#7A7A82',accent:'#4A5261',dark:'#2B2B31',line:'#CDCDD3',
-    /* brushed-steel sheen: soft diagonal bands of light and shade, like the side of a pot */
-    paint:x=>{x.fillStyle=grad(x,[[0,'#F1F1F3'],[.18,'#DADADF'],[.33,'#F4F4F6'],[.5,'#D2D2D8'],[.66,'#EDEDF0'],[.84,'#D7D7DC'],[1,'#F2F2F4']],true);x.fillRect(0,0,W,H);},
-    hero:x=>grad(x,[[.15,'#5C5C66'],[.45,'#9C9CA6'],[.6,'#6A6A74'],[.9,'#3E3E46']]),
-    pie:[{c:'#3E3E46',t:'#F2F2F4'},{c:'#B9BAC2',t:'#26262B'},{c:'#7A7A82',t:'#F2F2F4'},{c:'#E3E3E7',t:'#26262B'},{c:'#5A6270',t:'#F2F2F4'},{c:'#9C9CA6',t:'#26262B'}],
-    cta:{bg:'#2E2E35',title:'#F4F4F6',title2:'#B9BAC2',text:'#E2E2E7',label:'rgba(255,255,255,.75)',
-      paint:x=>{x.fillStyle=grad(x,[[0,'#3E3E46'],[.5,'#25252B'],[1,'#41414A']],true);x.fillRect(0,0,W,H);}}},
-  coral:{name:'Navy & Coral',paper:'#FAF6F0',ink:'#14213D',gray:'#8A8F98',accent:'#E07A5F',dark:'#14213D',line:'#EADFD3',
-    pie:[{c:'#14213D',t:'#FAF6F0'},{c:'#E07A5F',t:'#FAF6F0'},{c:'#F2CFC2',t:'#14213D'},{c:'#8A8F98',t:'#FAF6F0'},{c:'#3D5A80',t:'#FAF6F0'},{c:'#EADFD3',t:'#14213D'}],
-    cta:{bg:'#14213D',title:'#FAF6F0',title2:'#E07A5F',text:'#E8E4DC',label:'rgba(250,246,240,.8)'}}
-};
-let S=THEMES.royal;
-const setLook=k=>{S=THEMES[k]||THEMES.royal;};
-const hero=x=>S.hero?S.hero(x):S.accent;
+/* the one look: navy & coral on cream */
+const S={paper:'#FAF6F0',ink:'#14213D',gray:'#8A8F98',accent:'#E07A5F',dark:'#14213D',line:'#EADFD3',
+  pie:[{c:'#14213D',t:'#FAF6F0'},{c:'#E07A5F',t:'#FAF6F0'},{c:'#F2CFC2',t:'#14213D'},{c:'#8A8F98',t:'#FAF6F0'},{c:'#3D5A80',t:'#FAF6F0'},{c:'#EADFD3',t:'#14213D'}],
+  cta:{bg:'#14213D',title:'#FAF6F0',title2:'#E07A5F',text:'#E8E4DC',label:'rgba(250,246,240,.8)'}};
+const hero=()=>S.accent;
 const SANS="'Helvetica Neue',Helvetica,Arial,sans-serif";
 function newC(bg){const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
   if(!bg&&S.paint)S.paint(x);else{x.fillStyle=bg||S.paper;x.fillRect(0,0,W,H);}return[c,x];}
@@ -1031,7 +1010,7 @@ function planDragEnd(){
 function togglePlan(key){const e=cur.plan.find(x=>x.key===key);if(e)e.on=!e.on;saveSessions();renderPlan();buildSlides();}
 function resetPlan(){cur.plan=null;saveSessions();renderPlan();buildSlides();}
 async function buildSlides(){
-  await document.fonts.ready;setLook(cur.look);
+  await document.fonts.ready;
   const {byKey,plan}=syncPlan();renderPlan();
   const wrapEl=$('slides');wrapEl.innerHTML='';let n=0;
   for(const e of plan){

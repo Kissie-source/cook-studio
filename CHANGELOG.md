@@ -3,6 +3,11 @@
 Every version is a full snapshot in `versions/index-vX.Y.html` (and a git commit).
 **Roll back:** copy the snapshot over `index.html`, re-upload to GitHub.
 
+## v2.8 — 2026-09-19
+- **Navy & Coral is the one look.** The look picker is gone; slides always render in
+  navy · coral · cream. The app chrome now lives in the same world (coral accent, navy
+  ink and cook mode, cream paper), so the Studio and the slides match.
+
 ## v2.7 — 2026-09-18
 - **Photo adjustments.** In the big view, tap "✎ adjust": ↔/↕ frame and zoom (previewed
   as the exact 4:5 slide crop, so a half-cut dish can be re-framed), plus bright,

@@ -282,7 +282,7 @@ Reset</textarea>
       <button class="big-btn sage" onclick="buildSlides()">🎨 Generate carousel</button>
     </div>
     <div class="card">
-      <h2>CAROUSEL · pick & order the slides, then post as a carousel on IG</h2>
+      <h2>CAROUSEL · tick the slides, drag ☰ to order, then post on IG</h2>
       <div id="slidePlan"></div>
       <button class="mini" onclick="resetPlan()" style="margin:2px 0 10px">↺ reset to suggested</button>
       <div id="slides"></div>
@@ -929,8 +929,6 @@ function renderPlan(){
     <label style="display:flex;align-items:center;gap:8px;flex:1;margin:0">
       <input type="checkbox" ${e.on?'checked':''} onchange="togglePlan('${e.key}')" style="width:20px;height:20px">
       <span style="font-weight:700;font-size:14px">${byKey[e.key].label}</span></label>
-    <button class="mini" onclick="movePlan(${i},-1)" ${i===0?'disabled':''}>▲</button>
-    <button class="mini" onclick="movePlan(${i},1)" ${i===plan.length-1?'disabled':''}>▼</button>
   </div>`).join('');
 }
 /* drag-to-reorder slides — pointer events, so it works with a finger on the phone */
@@ -955,7 +953,6 @@ function planDragEnd(){
   saveSessions();renderPlan();buildSlides();
 }
 function togglePlan(key){const e=cur.plan.find(x=>x.key===key);if(e)e.on=!e.on;saveSessions();renderPlan();buildSlides();}
-function movePlan(i,d){const j=i+d,p=cur.plan;if(j<0||j>=p.length)return;[p[i],p[j]]=[p[j],p[i]];saveSessions();renderPlan();buildSlides();}
 function resetPlan(){cur.plan=null;saveSessions();renderPlan();buildSlides();}
 async function buildSlides(){
   await document.fonts.ready;

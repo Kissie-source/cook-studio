@@ -3,6 +3,10 @@
 Every version is a full snapshot in `versions/index-vX.Y.html` (and a git commit).
 **Roll back:** copy the snapshot over `index.html`, re-upload to GitHub.
 
+## v2.5 — 2026-09-18
+- **Slide list: ▲▼ removed.** Drag ☰ is the one way to order slides now; the card heading
+  says so. (Steps keep their arrows — no drag there yet.)
+
 ## v2.4 — 2026-09-18
 - **▶ beside each step.** The voice note for a step now plays from a button right next to
   its name field, so you can listen while you write. A second tap stops it; tapping

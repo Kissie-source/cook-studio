@@ -7,22 +7,20 @@ in your phone's browser storage.
 ## Files
 
 - `index.html` — the entire app (UI + logic)
+- `versions/` — one full snapshot per version, for rollback
+- `CHANGELOG.md` — what changed in each version
 - `serve.ps1` — local dev server only, do **not** upload
 
 ## Version history
 
 Real git history — every design revision is a commit. See `git log` for the full list.
 
-| Version | Commit | What it is |
-|---|---|---|
-| v2.2 (current) | `git log --oneline -1` | Cast photo works before starting timer & mic; AI extraction fixed (Opus model, on-device key prompt, clearer errors) |
-| v2.1 | `git log --oneline` (2nd entry) | The Cast on the timer page — shoot ingredients while cooking, AI (Claude vision) fills soul & aromatics, manual editing, two-column cast slide |
-| v2.0 | `git log --oneline` (3rd entry) | Salif editorial — warm beige app, charcoal cook mode, orange slides |
-| v1.0 | `git log --oneline` (4th entry) | Neutral studio chrome, dark cook instrument, pastel Quicksand slides |
+Full notes per version: [CHANGELOG.md](CHANGELOG.md). Every version is also a complete
+snapshot in `versions/index-vX.Y.html` — current is **v2.3**.
 
-**Roll back:**
+**Roll back** (no git needed): copy the snapshot you want over `index.html`, e.g.
 ```powershell
-git checkout <commit-hash> -- index.html
+Copy-Item versions\index-v2.2.html index.html
 ```
 Then re-upload `index.html` to GitHub (step 2 below) to publish the rollback.
 

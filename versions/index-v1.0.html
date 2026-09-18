@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F4F2ED">
+<title>Perfection à la Carte — Cook Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* app chrome — the instrument */
+  --paper:#F4F2ED; --surface:#FBFAF7; --ink:#1F1D1A; --muted:#6E6A62;
+  --line:#E6E1D8; --line-2:#D6D0C5; --accent:#C15B36; --accent-soft:#F2E4DC; --accent-ink:#7A3A22;
+  /* cook mode — the dark instrument */
+  --k-bg:#151412; --k-line:#332F29; --k-text:#F1EDE5; --k-muted:#9A948A; --live:#FF6A45; --slow:#7FB08A;
+  /* product palette — carousel & pie only */
+  --sage:#B7CDB6; --butter:#F2D8A7; --red:#D96C6C;
+  --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,system-ui,sans-serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Code","Roboto Mono",monospace;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+body{margin:0; font-family:var(--ui); background:var(--paper); color:var(--ink); -webkit-font-smoothing:antialiased}
+header{padding:22px 18px 12px}
+header h1{margin:0; font:600 17px var(--ui); letter-spacing:.4px}
+header p{margin:3px 0 0; font-size:12px; color:var(--muted); letter-spacing:.4px}
+nav{display:flex; gap:2px; padding:2px 12px 0; position:sticky; top:0; background:var(--paper); z-index:5; border-bottom:1px solid var(--line)}
+nav button{flex:1; padding:13px 6px 12px; border:none; background:none; color:var(--muted); font:600 14px var(--ui); letter-spacing:.2px; border-bottom:2px solid transparent; cursor:pointer}
+nav button.on{color:var(--ink); border-bottom-color:var(--accent)}
+main{padding:0 16px 44px; max-width:520px; margin:0 auto}
+.card{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:18px; margin:14px 0}
+.card h2{margin:0 0 14px; font:600 12px var(--ui); letter-spacing:1.4px; text-transform:uppercase; color:var(--muted)}
+label{font:600 11px var(--ui); letter-spacing:.6px; text-transform:uppercase; color:var(--muted); display:block; margin:14px 0 5px}
+input[type=text],input[type=password],textarea{width:100%; padding:11px 12px; border:1px solid var(--line-2); border-radius:10px; background:#fff; font:400 15px var(--ui); color:var(--ink)}
+input:focus,textarea:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft)}
+textarea{min-height:88px; resize:vertical; line-height:1.5}
+.seg{display:flex; gap:3px; margin-top:5px; padding:3px; border:1px solid var(--line-2); border-radius:12px; background:var(--surface)}
+.seg button{flex:1; padding:10px; border:none; border-radius:9px; background:none; font:600 13px var(--ui); letter-spacing:.4px; color:var(--muted); cursor:pointer}
+.seg button.rushed.on{background:var(--accent); color:#fff}
+.seg button.slow.on{background:var(--slow); color:#13251a}
+.big-btn{width:100%; padding:15px; margin-top:14px; border:1px solid var(--ink); border-radius:12px; background:var(--ink); font:600 15px var(--ui); letter-spacing:.3px; color:var(--paper); cursor:pointer}
+.big-btn.red{background:var(--accent); border-color:var(--accent); color:#fff}
+.big-btn.sage{background:var(--accent-soft); border-color:#E6C9BE; color:var(--accent-ink)}
+.big-btn:disabled{opacity:.4}
+#liveTotal{font:600 56px var(--mono); text-align:center; letter-spacing:1px}
+#liveStep{font:600 22px var(--ui); text-align:center; margin:6px 0 2px}
+#liveStepTime{text-align:center; color:var(--muted); font:500 13px var(--mono)}
+.badge{display:inline-block; padding:5px 13px; border-radius:999px; border:1px solid var(--line-2); font:600 11px var(--ui); letter-spacing:1.6px}
+.badge.RUSHED{background:var(--accent); color:#fff; border-color:var(--accent)}
+.badge.SLOW{background:var(--slow); color:#13251a; border-color:var(--slow)}
+.rec{color:var(--muted); font-size:12px; text-align:center; margin-top:10px; letter-spacing:.3px}
+.rec .dot{display:inline-block; width:8px; height:8px; border-radius:99px; background:var(--live); margin-right:6px; animation:bl 1.1s infinite}
+@keyframes bl{50%{opacity:.2}}
+.steplist{margin:16px 0 0; padding:0; list-style:none; font:500 14px var(--ui)}
+.steplist li{padding:8px 10px; border-radius:8px; color:var(--muted)}
+.steplist li.now{background:var(--accent-soft); color:var(--ink); font-weight:600}
+.steplist li.done{text-decoration:line-through; opacity:.45}
+.row{display:flex; gap:8px; align-items:center}
+.row .grow{flex:1}
+.sess{display:flex; justify-content:space-between; align-items:center; padding:14px 2px; border-bottom:1px solid var(--line)}
+.sess b{display:block; font:600 15px var(--ui)}
+.sess small{color:var(--muted); font-size:12px}
+.mini{padding:8px 12px; border:1px solid var(--line-2); border-radius:9px; background:var(--surface); font:600 12px var(--ui); color:var(--ink); cursor:pointer}
+.mini.red{background:none; color:var(--accent); border-color:#E6C9BE}
+.steprow{display:flex; gap:6px; align-items:center; margin:10px 0; flex-wrap:wrap}
+.steprow input.nm{flex:1; min-width:110px; padding:9px 10px}
+.cdot{width:14px; height:14px; border-radius:4px; border:1px solid var(--line-2); flex:none}
+.sharewrap{display:flex; align-items:center; gap:8px; width:100%}
+.sharewrap input[type=range]{flex:1; accent-color:var(--accent)}
+.pct{width:46px; text-align:right; font:600 13px var(--mono)}
+.mini:disabled{opacity:.3}
+.icon-btn{width:40px; height:40px; border:1px solid var(--line-2); border-radius:9px; background:var(--surface); font-size:18px; cursor:pointer}
+.total-lock{text-align:center; font:600 13px var(--ui); letter-spacing:.5px; margin:10px 0; padding:11px; background:var(--accent-soft); color:var(--accent-ink); border-radius:10px}
+.thumbs{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
+.thumbs .ph{width:72px; height:72px; border-radius:10px; border:2px solid var(--line-2); object-fit:cover; opacity:.35}
+.thumbs .ph.use{opacity:1; border-color:var(--accent)}
+.notes button{display:block; width:100%; text-align:left; margin:5px 0; padding:9px 11px; border:1px solid var(--line-2); border-radius:9px; background:#fff; font:500 13px var(--ui); color:var(--ink); cursor:pointer}
+#pieWrap{display:flex; gap:14px; align-items:center; justify-content:center}
+.legend{font-size:12px}
+.legend div{margin:3px 0}
+.legend i{display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:6px}
+#slides{display:flex; gap:12px; overflow-x:auto; padding:10px 0}
+#slides .slide{flex:0 0 auto; text-align:center}
+#slides canvas{width:190px; border-radius:10px; border:1px solid var(--line-2); display:block}
+#picker{position:fixed; inset:0; background:rgba(20,18,16,.5); display:none; align-items:end; z-index:20}
+#picker .sheet{background:var(--surface); border-radius:18px 18px 0 0; padding:20px; width:100%; max-width:520px; margin:0 auto}
+#picker .grid{display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-top:12px}
+#picker .grid button{font-size:24px; padding:9px; border:1px solid var(--line-2); border-radius:11px; background:#fff; cursor:pointer}
+.pol{border:1px solid var(--line-2); border-radius:12px; padding:11px 13px; margin:8px 0; background:var(--surface)}
+.pol small{color:var(--muted); letter-spacing:.8px; font:600 11px var(--ui); text-transform:uppercase}
+.pol .was{color:var(--muted); text-decoration:line-through; font-size:13px; margin:5px 0}
+.pol .now{background:var(--accent-soft); border-radius:8px; padding:7px 9px; font-size:14px; margin:5px 0 9px; color:#3a2a22}
+.pol.done{opacity:.4}
+.mini.sagebg{background:var(--accent-soft); border-color:#E6C9BE; color:var(--accent-ink)}
+#polishBox textarea{min-height:70px}
+.warn{background:#8a2b17; color:#fff; border-radius:10px; padding:11px 12px; font-size:13px; margin:12px 0; display:none}
+.hint{font-size:12px; color:var(--muted); margin-top:7px; line-height:1.5}
+h3.sec{font:600 11px var(--ui); letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin:22px 0 6px; padding-top:16px; border-top:1px solid var(--line)}
+
+/* ===== COOK MODE — dark full-screen instrument ===== */
+body.cooking{background:var(--k-bg)}
+body.cooking header, body.cooking nav{display:none}
+body.cooking main{padding:0; max-width:none}
+body.cooking #liveCard{background:var(--k-bg); border:none; border-radius:0; margin:0; color:var(--k-text);
+  padding:30px 24px calc(26px + env(safe-area-inset-bottom)); min-height:100vh; min-height:100dvh; display:flex; flex-direction:column}
+body.cooking #liveCard>div:first-child{margin-bottom:4px}
+body.cooking #liveBadge{background:none; border-color:var(--k-line); color:var(--k-muted)}
+body.cooking #liveBadge.RUSHED{color:var(--live); border-color:var(--live)}
+body.cooking #liveBadge.SLOW{color:var(--slow); border-color:var(--slow)}
+body.cooking #liveTotal{font-size:86px; color:var(--k-text); margin-top:20px}
+body.cooking #liveStep{font-size:30px; color:var(--k-text); margin-top:10px}
+body.cooking #liveStepTime{color:var(--k-muted); font-size:14px}
+body.cooking .rec{color:var(--k-muted)}
+body.cooking .steplist{flex:1; margin-top:22px}
+body.cooking .steplist li{color:var(--k-muted); padding:9px 12px}
+body.cooking .steplist li.now{background:none; color:var(--k-text); border-left:2px solid var(--live); border-radius:0}
+body.cooking.slowround .steplist li.now{border-left-color:var(--slow)}
+body.cooking .big-btn{border-radius:12px; padding:17px; font-size:16px}
+body.cooking .row>.big-btn:first-child{width:64px; flex:none; background:none; border:1px solid var(--k-line); color:var(--k-text)}
+body.cooking #nextBtn{background:var(--k-text); border:none; color:#151412}
+body.cooking #recipeBtn{background:none; border:1px solid var(--k-line); color:var(--k-muted)}
+body.cooking .big-btn.red{background:none; border:1px solid var(--k-line); color:var(--k-muted)}
+</style>
+</head>
+<body>
+<header>
+  <h1>perfection à la carte</h1>
+  <p>the cook studio</p>
+</header>
+<nav>
+  <button id="nav-cook" class="on" onclick="showTab('cook')">Cook</button>
+  <button id="nav-sessions" onclick="showTab('sessions')">Sessions</button>
+  <button id="nav-studio" onclick="showTab('studio')">Studio</button>
+</nav>
+<main>
+<div class="warn" id="httpsWarn">⚠️ Voice recording needs HTTPS. Photos & timer still work.</div>
+
+<!-- COOK -->
+<section id="tab-cook">
+  <div class="card" id="setupCard">
+    <h2>NEW COOK</h2>
+    <label>Dish</label>
+    <input type="text" id="dish" placeholder="Carbonara">
+    <label>Round</label>
+    <div class="seg">
+      <button class="rushed on" id="segR" onclick="setRound('RUSHED')">⏱ RUSHED</button>
+      <button class="slow" id="segS" onclick="setRound('SLOW')">🌿 SLOW</button>
+    </div>
+    <label>Steps (one per line — tap "next step" while cooking; switching the round resets to your standards)</label>
+    <textarea id="stepsIn">Recipe Reading
+MEP
+Reset
+Cooking</textarea>
+    <button class="big-btn red" onclick="startCook()">▶ Start timer & mic</button>
+    <p class="hint">At each step the mic records the first 7 seconds only — say what you're doing, then cook. Those notes are your captions.</p>
+  </div>
+
+  <div class="card" id="liveCard" style="display:none">
+    <div style="text-align:center"><span class="badge" id="liveBadge">RUSHED</span></div>
+    <div id="liveTotal">0:00</div>
+    <div id="liveStep">Prep</div>
+    <div id="liveStepTime">step · 0:00</div>
+    <div class="rec" id="recInd"><span class="dot"></span> recording voice note…</div>
+    <ul class="steplist" id="liveList"></ul>
+    <div class="row" style="margin-top:12px">
+      <button class="big-btn" style="margin-top:0" onclick="photoIn.click()">📸</button>
+      <button class="big-btn sage grow" style="margin-top:0" id="nextBtn" onclick="nextStep()">Next step ▸</button>
+    </div>
+    <button class="mini" id="recipeBtn" style="width:100%;margin-top:10px;padding:10px" onclick="recipeIn.click()">📖 shoot the recipe — becomes "The Cast" slide</button>
+    <button class="big-btn red" onclick="finishCook()">■ Finish & build carousel</button>
+    <input type="file" id="photoIn" accept="image/*" capture="environment" hidden>
+    <input type="file" id="recipeIn" accept="image/*" capture="environment" hidden>
+  </div>
+</section>
+
+<!-- SESSIONS -->
+<section id="tab-sessions" style="display:none">
+  <div class="card"><h2>SESSIONS</h2><div id="sessList"></div></div>
+</section>
+
+<!-- STUDIO -->
+<section id="tab-studio" style="display:none">
+  <div class="card" id="studioEmpty"><h2>STUDIO</h2><p class="hint">Finish a cook or pick a session to build its carousel.</p></div>
+  <div id="studioBody" style="display:none">
+    <div class="card">
+      <h2 id="stTitle">—</h2>
+      <div class="total-lock" id="stTotal">total locked · 0:00</div>
+      <div id="pieWrap" style="justify-content:center"><div id="pieSvg"></div></div>
+      <h3 class="sec">STEPS · reorder with ▲▼, slide the share — total never changes</h3>
+      <div id="stSteps"></div>
+      <button class="mini" onclick="addStep()">＋ add step</button>
+      <h3 class="sec">VOICE NOTES · listen while writing your caption</h3>
+      <div class="notes" id="stNotes"></div>
+      <h3 class="sec">PHOTOS · tap to include / exclude</h3>
+      <div class="thumbs" id="stPhotos"></div>
+      <button class="mini" style="margin-top:8px" onclick="galleryIn.click()">＋ add from gallery</button>
+      <input type="file" id="galleryIn" accept="image/*" multiple hidden>
+      <h3 class="sec">THE CAST · slide 2 — ingredients in two buckets</h3>
+      <div class="row">
+        <button class="mini" onclick="castIn.click()">＋ recipe photo</button>
+        <img id="castThumb" style="display:none;width:72px;height:72px;border-radius:12px;border:3px solid var(--sage);object-fit:cover" alt="recipe">
+        <button class="mini red" id="castDel" style="display:none" onclick="delCastPic()">✕</button>
+      </div>
+      <input type="file" id="castIn" accept="image/*" hidden>
+      <label>SOUL (the substance — one per line, with amount)</label>
+      <textarea id="castSoul" style="min-height:70px" placeholder="500 g spaghetti&#10;3 eggs&#10;80 g guanciale"></textarea>
+      <label>AROMATICS (the character — one per line)</label>
+      <textarea id="castAromatics" style="min-height:70px" placeholder="60 g pecorino&#10;black pepper, lots&#10;salt"></textarea>
+      <p class="hint">Typed buckets win the slide; the recipe photo is used when both buckets are empty.</p>
+      <h3 class="sec">TITLE PIC · shown big on the cover slide</h3>
+      <div class="row">
+        <button class="mini" onclick="titleIn.click()">＋ choose title pic</button>
+        <img id="tpThumb" style="display:none;width:72px;height:72px;border-radius:12px;border:3px solid var(--butter);object-fit:cover" alt="title pic">
+        <button class="mini red" id="tpDel" style="display:none" onclick="delTitlePic()">✕</button>
+      </div>
+      <input type="file" id="titleIn" accept="image/*" hidden>
+      <h3 class="sec">LEARNINGS</h3>
+      <input type="text" id="learn0" placeholder="What I learned #1" style="margin-bottom:6px">
+      <input type="text" id="learn1" placeholder="What I learned #2" style="margin-bottom:6px">
+      <input type="text" id="learn2" placeholder="What I learned #3">
+      <h3 class="sec">VERDICT / TEASER (last slide)</h3>
+      <input type="text" id="verdict" placeholder="e.g. Friday: same dish, 90 minutes. Worth it?">
+      <h3 class="sec">POLISH · Claude tightens your words — you decide, line by line</h3>
+      <button class="mini" onclick="startPolish()">✨ Polish my words</button>
+      <div id="polishBox" style="display:none">
+        <label>Anthropic API key (stored only on this phone — leave empty to use the free copy-paste route)</label>
+        <input type="password" id="apiKey" placeholder="sk-ant-...">
+        <p class="hint" id="polishStatus"></p>
+        <div id="polishManual" style="display:none">
+          <button class="mini" onclick="copyPolishPrompt()">📋 Copy prompt for the Claude app</button>
+          <label>Paste Claude's reply here</label>
+          <textarea id="polishPaste" placeholder='[{"id":"learn-0","polished":"..."}]'></textarea>
+          <button class="mini" onclick="parsePolishPaste()">Check suggestions</button>
+        </div>
+        <div id="polishResults"></div>
+      </div>
+      <button class="big-btn sage" onclick="buildSlides()">🎨 Generate carousel</button>
+    </div>
+    <div class="card">
+      <h2>CAROUSEL · pick & order the slides, then post as a carousel on IG</h2>
+      <div id="slidePlan"></div>
+      <button class="mini" onclick="resetPlan()" style="margin:2px 0 10px">↺ reset to suggested</button>
+      <div id="slides"></div>
+      <button class="big-btn" onclick="downloadAll()">⬇ Download all slides</button>
+    </div>
+  </div>
+</section>
+</main>
+
+<div id="picker"><div class="sheet"><h2>Pick an icon</h2><div class="grid" id="pickGrid"></div></div></div>
+
+<script>
+'use strict';
+const HANDLE='@perfection.a.la.carte';
+const C={cream:'#FAF6EF',card:'#FFFDF9',sage:'#B7CDB6',red:'#D96C6C',butter:'#F2D8A7',ink:'#4A3B32',soft:'#8a7a6e'};
+const PIE=['#B7CDB6','#F2D8A7','#D96C6C','#AFC8DC','#C9B8D8','#E8B99B','#9DC3B0','#D9C16C'];
+const ICONS=['🍳','🔪','🧄','🧅','🍅','🧂','🔥','⏱','🌿','🥄','🧀','🍝','🥩','🥚','🫒','🍞','🥕','🍋','🍫','🥣','💧','🍚'];
+
+if(!window.isSecureContext) document.getElementById('httpsWarn').style.display='block';
+
+/* ---------- storage ---------- */
+let sessions=JSON.parse(localStorage.getItem('palc_sessions')||'[]');
+const saveSessions=()=>localStorage.setItem('palc_sessions',JSON.stringify(sessions));
+let db;
+const req=indexedDB.open('palc',1);
+req.onupgradeneeded=e=>e.target.result.createObjectStore('blobs');
+req.onsuccess=e=>{db=e.target.result;};
+const putBlob=(id,b)=>new Promise((res,rej)=>{const tx=db.transaction('blobs','readwrite');tx.objectStore('blobs').put(b,id);tx.oncomplete=res;tx.onerror=rej;});
+const getBlob=id=>new Promise(res=>{const r=db.transaction('blobs').objectStore('blobs').get(id);r.onsuccess=()=>res(r.result);r.onerror=()=>res(null);});
+const delBlob=id=>{try{db.transaction('blobs','readwrite').objectStore('blobs').delete(id);}catch(e){}};
+
+/* ---------- helpers ---------- */
+const $=id=>document.getElementById(id);
+function setTheme(c){const m=document.querySelector('meta[name=theme-color]');if(m)m.content=c;}
+const fmt=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
+const parseTm=v=>{const m=v.split(':');return m.length===2?(+m[0])*60+(+m[1]||0):(+v||0);};
+function showTab(t){['cook','sessions','studio'].forEach(x=>{$('tab-'+x).style.display=x===t?'':'none';$('nav-'+x).classList.toggle('on',x===t);});if(t==='sessions')renderSessions();}
+
+/* ---------- cook mode ---------- */
+let round='RUSHED', live=null;
+const STD_STEPS={RUSHED:'Recipe Reading\nMEP\nReset\nCooking',SLOW:'Recipe Reading\nMEP\nReset\nCooking\nPlating'};
+function setRound(r){round=r;$('segR').classList.toggle('on',r==='RUSHED');$('segS').classList.toggle('on',r==='SLOW');$('stepsIn').value=STD_STEPS[r];}
+async function startCook(){
+  const dish=$('dish').value.trim()||'Untitled dish';
+  const steps=$('stepsIn').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  if(!steps.length){alert('Add at least one step');return;}
+  live={s:{id:''+Date.now(),dish,round,date:new Date().toISOString().slice(0,10),
+        steps:steps.map(n=>({name:n,sec:0,icon:''})),total:0,photos:[],notes:[],learnings:['','',''],verdict:'',
+        cast:{pic:null,soul:'',aromatics:''}},
+        i:0,t0:Date.now(),st0:Date.now(),stream:null,rec:null,chunks:[]};
+  $('recipeBtn').textContent='📖 shoot the recipe — becomes "The Cast" slide';
+  try{live.stream=await navigator.mediaDevices.getUserMedia({audio:true});startRec();}
+  catch(e){$('recInd').innerHTML='mic off — timer & photos still running';}
+  try{navigator.wakeLock&&navigator.wakeLock.request('screen');}catch(e){}
+  $('setupCard').style.display='none';$('liveCard').style.display='';
+  document.body.classList.add('cooking');document.body.classList.toggle('slowround',round==='SLOW');setTheme('#151412');
+  $('liveBadge').textContent=round;$('liveBadge').className='badge '+round;
+  live.int=setInterval(tick,500);renderLive();
+}
+function startRec(){if(!live||!live.stream)return;live.chunks=[];live.rec=new MediaRecorder(live.stream);live.rec.ondataavailable=e=>live.chunks.push(e.data);live.rec.start();live.recT0=Date.now();
+  $('recInd').innerHTML='<span class="dot"></span> recording 7s step note — say what you\'re doing';
+  clearTimeout(live.recTimer);
+  live.recTimer=setTimeout(async()=>{await stopRec();if(live)$('recInd').textContent='🎙 note saved — keep cooking';},7000);}
+function stopRec(){return new Promise(async res=>{
+  if(!live||!live.rec||live.rec.state==='inactive')return res();
+  clearTimeout(live.recTimer);
+  live.rec.onstop=async()=>{const b=new Blob(live.chunks,{type:live.rec.mimeType||'audio/webm'});
+    if(b.size>200){const id='a'+Date.now();await putBlob(id,b);live.s.notes.push({id,stepIdx:live.i,sec:Math.round((Date.now()-live.recT0)/1000)});}res();};
+  live.rec.stop();});}
+function tick(){$('liveTotal').textContent=fmt((Date.now()-live.t0)/1000);$('liveStepTime').textContent='step · '+fmt((Date.now()-live.st0)/1000);}
+function renderLive(){
+  $('liveStep').textContent=live.s.steps[live.i].name;
+  $('liveList').innerHTML=live.s.steps.map((s,j)=>`<li class="${j<live.i?'done':j===live.i?'now':''}">${j+1}. ${s.name}</li>`).join('');
+  $('nextBtn').style.display=live.i>=live.s.steps.length-1?'none':'';
+}
+async function nextStep(){
+  live.s.steps[live.i].sec=Math.round((Date.now()-live.st0)/1000);
+  await stopRec();live.i++;live.st0=Date.now();startRec();renderLive();
+}
+async function finishCook(){
+  live.s.steps[live.i].sec=Math.round((Date.now()-live.st0)/1000);
+  await stopRec();
+  if(live.stream)live.stream.getTracks().forEach(t=>t.stop());
+  clearInterval(live.int);
+  live.s.steps=live.s.steps.filter(s=>s.sec>0);
+  live.s.total=live.s.steps.reduce((a,b)=>a+b.sec,0)||1;
+  sessions.unshift(live.s);saveSessions();
+  const id=live.s.id;live=null;
+  document.body.classList.remove('cooking','slowround');setTheme('#F4F2ED');
+  $('setupCard').style.display='';$('liveCard').style.display='none';
+  openStudio(id);
+}
+$('photoIn').addEventListener('change',async e=>{
+  for(const f of e.target.files){const id='p'+Date.now()+Math.random().toString(36).slice(2,6);await putBlob(id,f);live.s.photos.push({id,stepIdx:live.i,use:true});}
+  e.target.value='';});
+$('recipeIn').addEventListener('change',async e=>{
+  const f=e.target.files[0];if(!f||!live)return;
+  if(live.s.cast.pic)delBlob(live.s.cast.pic);
+  const id='c'+Date.now();await putBlob(id,f);
+  live.s.cast.pic=id;e.target.value='';
+  $('recipeBtn').textContent='📖 cast photo saved ✓ (tap to retake)';});
+
+/* ---------- sessions ---------- */
+function renderSessions(){
+  $('sessList').innerHTML=sessions.length?sessions.map(s=>`<div class="sess">
+    <div><b>${s.dish} <span class="badge ${s.round}" style="font-size:10px">${s.round}</span></b>
+    <small>${s.date} · ${fmt(s.total)} · ${s.steps.length} steps · ${s.photos.length} 📷 · ${s.notes.length} 🎙</small></div>
+    <div class="row"><button class="mini" onclick="openStudio('${s.id}')">Studio</button>
+    <button class="mini red" onclick="delSession('${s.id}')">✕</button></div></div>`).join('')
+  :'<p class="hint">No cooks yet. Your rushed carbonara awaits.</p>';
+}
+function delSession(id){
+  if(!confirm('Delete this session and its recordings?'))return;
+  const s=sessions.find(x=>x.id===id);
+  if(s){s.photos.forEach(p=>delBlob(p.id));s.notes.forEach(n=>delBlob(n.id));if(s.titlePic)delBlob(s.titlePic);if(s.cast&&s.cast.pic)delBlob(s.cast.pic);}
+  sessions=sessions.filter(x=>x.id!==id);saveSessions();renderSessions();
+}
+
+/* ---------- studio ---------- */
+let cur=null;
+function openStudio(id){cur=sessions.find(s=>s.id===id);if(!cur)return;
+  if(!cur.cast)cur.cast={pic:null,soul:'',aromatics:''};
+  showTab('studio');
+  $('studioEmpty').style.display='none';$('studioBody').style.display='';
+  $('learn0').value=cur.learnings[0]||'';$('learn1').value=cur.learnings[1]||'';$('learn2').value=cur.learnings[2]||'';
+  $('verdict').value=cur.verdict||'';renderStudio();}
+['learn0','learn1','learn2'].forEach((id,i)=>$(id).addEventListener('input',e=>{if(cur){cur.learnings[i]=e.target.value;saveSessions();}}));
+$('verdict').addEventListener('input',e=>{if(cur){cur.verdict=e.target.value;saveSessions();}});
+
+function renderStudio(){
+  $('stTitle').textContent=cur.dish+' · '+cur.round;
+  $('stTotal').textContent='total locked · '+fmt(cur.total);
+  renderPie();renderSteps();renderNotes();renderPhotos();renderTitlePic();renderCast();
+}
+function renderPie(){
+  const size=210,r=90,cx=size/2,cy=size/2;let a=-Math.PI/2,ps='',ls='';
+  cur.steps.forEach((s,i)=>{const f=s.sec/cur.total,a2=a+f*2*Math.PI;
+    const x1=cx+r*Math.cos(a),y1=cy+r*Math.sin(a),x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2);
+    ps+=`<path d="M${cx} ${cy} L${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 ${f>.5?1:0} 1 ${x2.toFixed(1)} ${y2.toFixed(1)} Z" fill="${PIE[i%PIE.length]}" stroke="${C.ink}" stroke-width="2"/>`;
+    const mid=(a+a2)/2,pct=Math.round(f*100);
+    if(pct>=7)ls+=`<text x="${(cx+Math.cos(mid)*r*0.62).toFixed(1)}" y="${(cy+Math.sin(mid)*r*0.62+5).toFixed(1)}" text-anchor="middle" font-family="Quicksand,sans-serif" font-weight="700" font-size="16" fill="${C.ink}">${pct}%</text>`;
+    a=a2;});
+  $('pieSvg').innerHTML=`<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${ps}${ls}</svg>`;
+}
+function renderSteps(){
+  $('stSteps').innerHTML=cur.steps.map((s,i)=>{
+    const pct=Math.round(s.sec/cur.total*100);
+    return `<div class="steprow">
+    <span class="cdot" style="background:${PIE[i%PIE.length]}"></span>
+    <button class="mini" onclick="moveStep(${i},-1)" ${i===0?'disabled':''}>▲</button>
+    <button class="mini" onclick="moveStep(${i},1)" ${i===cur.steps.length-1?'disabled':''}>▼</button>
+    <button class="icon-btn" onclick="pickIcon(${i})">${s.icon||'＋'}</button>
+    <input class="nm" value="${s.name.replace(/"/g,'&quot;')}" onchange="cur.steps[${i}].name=this.value;saveSessions();">
+    ${cur.steps.length>1?`<button class="mini red" onclick="rmStep(${i})">✕</button>`:''}
+    <div class="sharewrap"><input type="range" min="1" max="99" step="1" value="${pct}" oninput="slideShare(${i},this.value)" onchange="renderStudio()"><span class="pct" id="pct-${i}">${pct}%</span></div>
+    </div>`;}).join('');
+}
+function slideShare(i,pct){
+  const n=cur.steps.length;if(n<2)return;
+  let sec=Math.round(cur.total*pct/100);
+  sec=Math.min(Math.max(5,sec),cur.total-5*(n-1));
+  cur.steps[i].sec=sec;redistribute(i,cur.total-sec);
+  saveSessions();renderPie();
+  cur.steps.forEach((s,j)=>{const el=$('pct-'+j);if(el)el.textContent=Math.round(s.sec/cur.total*100)+'%';});
+}
+function moveStep(i,d){
+  const j=i+d;if(j<0||j>=cur.steps.length)return;
+  [cur.steps[i],cur.steps[j]]=[cur.steps[j],cur.steps[i]];
+  saveSessions();renderStudio();
+}
+function redistribute(exceptIdx,targetOthers){
+  const others=cur.steps.filter((_,j)=>j!==exceptIdx);
+  const old=others.reduce((a,b)=>a+b.sec,0)||1;let acc=0;
+  others.forEach((st,k)=>{if(k===others.length-1)st.sec=Math.max(5,targetOthers-acc);
+    else{st.sec=Math.max(5,Math.round(st.sec*targetOthers/old));acc+=st.sec;}});
+}
+function addStep(){
+  const name=prompt('Step name (its time is taken from the other steps — total stays locked):');if(!name)return;
+  const take=Math.max(10,Math.round(cur.total*0.1));
+  cur.steps.push({name,sec:take,icon:''});
+  redistribute(cur.steps.length-1,cur.total-take);
+  saveSessions();renderStudio();
+}
+function rmStep(i){
+  cur.steps.splice(i,1);
+  redistribute(-1,cur.total);
+  saveSessions();renderStudio();
+}
+let pickTarget=null;
+function pickIcon(i){pickTarget=i;$('pickGrid').innerHTML=ICONS.map(ic=>`<button onclick="setIcon('${ic}')">${ic}</button>`).join('')+`<button onclick="setIcon('')">✕</button>`;$('picker').style.display='flex';}
+function setIcon(ic){cur.steps[pickTarget].icon=ic;saveSessions();$('picker').style.display='none';renderStudio();}
+$('picker').addEventListener('click',e=>{if(e.target.id==='picker')e.target.style.display='none';});
+
+async function renderNotes(){
+  const el=$('stNotes');el.innerHTML='';
+  if(!cur.notes.length){el.innerHTML='<p class="hint">No voice notes for this session.</p>';return;}
+  cur.notes.forEach((n,i)=>{const b=document.createElement('button');
+    b.textContent=`▶ ${cur.steps[n.stepIdx]?cur.steps[n.stepIdx].name:'step '+(n.stepIdx+1)} · ${fmt(n.sec)}`;
+    b.onclick=async()=>{const blob=await getBlob(n.id);if(blob)new Audio(URL.createObjectURL(blob)).play();};
+    el.appendChild(b);});
+}
+async function renderPhotos(){
+  const el=$('stPhotos');el.innerHTML='';
+  for(const p of cur.photos){const blob=await getBlob(p.id);if(!blob)continue;
+    const img=document.createElement('img');img.className='ph'+(p.use?' use':'');img.src=URL.createObjectURL(blob);
+    img.onclick=()=>{p.use=!p.use;saveSessions();img.classList.toggle('use',p.use);};el.appendChild(img);}
+}
+$('galleryIn').addEventListener('change',async e=>{
+  for(const f of e.target.files){const id='p'+Date.now()+Math.random().toString(36).slice(2,6);await putBlob(id,f);cur.photos.push({id,stepIdx:-1,use:true});}
+  e.target.value='';saveSessions();renderPhotos();});
+$('titleIn').addEventListener('change',async e=>{
+  const f=e.target.files[0];if(!f)return;
+  if(cur.titlePic)delBlob(cur.titlePic);
+  const id='t'+Date.now();await putBlob(id,f);
+  cur.titlePic=id;saveSessions();e.target.value='';renderTitlePic();});
+async function renderTitlePic(){
+  const has=!!cur.titlePic;$('tpDel').style.display=has?'':'none';
+  const img=$('tpThumb');
+  if(!has){img.style.display='none';return;}
+  const b=await getBlob(cur.titlePic);
+  if(b){img.src=URL.createObjectURL(b);img.style.display='';}else{img.style.display='none';}
+}
+function delTitlePic(){if(cur.titlePic)delBlob(cur.titlePic);cur.titlePic=null;saveSessions();renderTitlePic();}
+$('castIn').addEventListener('change',async e=>{
+  const f=e.target.files[0];if(!f)return;
+  if(cur.cast.pic)delBlob(cur.cast.pic);
+  const id='c'+Date.now();await putBlob(id,f);
+  cur.cast.pic=id;saveSessions();e.target.value='';renderCast();});
+async function renderCast(){
+  $('castSoul').value=cur.cast.soul||'';
+  $('castAromatics').value=cur.cast.aromatics||'';
+  const has=!!cur.cast.pic;$('castDel').style.display=has?'':'none';
+  const img=$('castThumb');
+  if(!has){img.style.display='none';return;}
+  const b=await getBlob(cur.cast.pic);
+  if(b){img.src=URL.createObjectURL(b);img.style.display='';}else{img.style.display='none';}
+}
+function delCastPic(){if(cur.cast.pic)delBlob(cur.cast.pic);cur.cast.pic=null;saveSessions();renderCast();}
+$('castSoul').addEventListener('input',e=>{if(cur){cur.cast.soul=e.target.value;saveSessions();}});
+$('castAromatics').addEventListener('input',e=>{if(cur){cur.cast.aromatics=e.target.value;saveSessions();}});
+
+/* ---------- polish (AI copy editor) ---------- */
+const POLISH_RULES=`You are the copy editor for @perfection.a.la.carte, an Instagram channel where one dish is cooked twice: once rushed against a timer, once slow with unlimited time. Polish each item of carousel text: fix grammar (the writer is a German native writing English), make it as short as possible, readable and practical — never influencer hype, never like a generic recipe app. Voice: dry wink; at most ONE line per set may go properly cheeky by personifying the food or the equipment (example: instead of "keep the airfryer moderate or the chicken dries out" write "not your show-off day, dear airfryer — keep the chicken chill"). The rest stay clean and useful; the practical tip must survive the joke. Keep the writer's meaning and personality. Banned words: yummy, delicious, easy peasy, foodie, elevate, game-changer. No exclamation marks. If an item is already great, return it unchanged.
+VERDICT: always include a suggestion for id "verdict" — catchy and specific to THIS session, built from the session facts provided (dish, round, times, time split, learnings). If the writer's verdict is empty, invent one; otherwise sharpen theirs. Occasionally overarching (done vs. perfect) is fine, but default to something only this session could produce.`;
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function polishItems(){
+  const items=[];
+  cur.steps.forEach((s,i)=>{if(s.name.trim().split(/\s+/).length>2)items.push({id:'step-'+i,label:'STEP '+(i+1),text:s.name.trim()});});
+  (cur.learnings||[]).forEach((l,i)=>{if(l&&l.trim())items.push({id:'learn-'+i,label:'LEARNING '+(i+1),text:l.trim()});});
+  items.push({id:'verdict',label:'VERDICT SLIDE',text:(cur.verdict||'').trim()});
+  return items;
+}
+function sessionContext(){
+  const shares=cur.steps.map(s=>`${s.name} ${Math.round(s.sec/cur.total*100)}%`).join(', ');
+  return `Session facts: dish=${cur.dish}; round=${cur.round}; total time=${fmt(cur.total)}; time split: ${shares}; learnings: ${(cur.learnings||[]).filter(Boolean).join(' | ')||'none yet'}.`;
+}
+async function startPolish(){
+  $('polishBox').style.display='';
+  const saved=localStorage.getItem('palc_key')||'';
+  if(saved&&!$('apiKey').value)$('apiKey').value=saved;
+  const items=polishItems();
+  if(!items.length){$('polishStatus').textContent='Nothing to polish yet — write a learning or a verdict line first.';return;}
+  const key=$('apiKey').value.trim();
+  if(!key){
+    $('polishStatus').textContent='No API key — free route: copy the prompt, paste it into the Claude app, paste the reply back below.';
+    $('polishManual').style.display='';return;
+  }
+  localStorage.setItem('palc_key',key);
+  $('polishStatus').textContent='Asking Claude…';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({
+        model:'claude-opus-4-8',max_tokens:2000,system:POLISH_RULES,
+        output_config:{format:{type:'json_schema',schema:{type:'object',properties:{suggestions:{type:'array',items:{type:'object',properties:{id:{type:'string'},polished:{type:'string'}},required:['id','polished'],additionalProperties:false}}},required:['suggestions'],additionalProperties:false}}},
+        messages:[{role:'user',content:'Polish these items:\n'+JSON.stringify(items.map(({id,text})=>({id,text})))+'\n\n'+sessionContext()}]
+      })});
+    const d=await r.json();
+    if(d.error)throw new Error(d.error.message);
+    if(d.stop_reason==='refusal')throw new Error('Claude declined this request');
+    const txt=(d.content.find(b=>b.type==='text')||{}).text||'{}';
+    showPolish(items,JSON.parse(txt).suggestions||[]);
+  }catch(e){
+    $('polishStatus').textContent='API call failed ('+e.message+') — use the free copy-paste route below.';
+    $('polishManual').style.display='';
+  }
+}
+function copyPolishPrompt(){
+  const items=polishItems();
+  const p=POLISH_RULES+'\n\nReply with ONLY a JSON array like [{"id":"...","polished":"..."}].\n\n'+sessionContext()+'\n\nItems:\n'+JSON.stringify(items.map(({id,text})=>({id,text})),null,1);
+  navigator.clipboard.writeText(p);
+  $('polishManual').style.display='';
+  $('polishStatus').textContent='Prompt copied — paste it into the Claude app, then paste the reply below.';
+}
+function parsePolishPaste(){
+  try{
+    const m=$('polishPaste').value.match(/\[[\s\S]*\]/);
+    const arr=JSON.parse(m[0]);
+    showPolish(polishItems(),Array.isArray(arr)?arr:arr.suggestions);
+  }catch(e){$('polishStatus').textContent="Couldn't read that — paste Claude's JSON reply exactly as it came.";}
+}
+let polishSug=[];
+function showPolish(items,sugs){
+  polishSug=(sugs||[]).map(g=>({...g,item:items.find(x=>x.id===g.id)})).filter(g=>g.item&&g.polished&&g.polished!==g.item.text);
+  $('polishStatus').textContent=polishSug.length?'Your words vs. Claude’s — take it or keep yours, line by line.':'Claude thinks your words are already good. Suspicious, but okay.';
+  $('polishResults').innerHTML=polishSug.map((g,i)=>`<div class="pol" id="pol-${i}">
+    <small>${g.item.label}</small>
+    ${g.item.text?`<div class="was">${esc(g.item.text)}</div>`:`<div class="was" style="text-decoration:none">(you left this empty — Claude suggests:)</div>`}
+    <div class="now">${esc(g.polished)}</div>
+    <div class="row"><button class="mini sagebg" onclick="applyPolishIdx(${i})">✓ take it</button>
+    <button class="mini" onclick="$('pol-${i}').classList.add('done')">keep mine</button></div></div>`).join('');
+}
+function applyPolishIdx(i){
+  const g=polishSug[i],id=g.id,v=g.polished;
+  if(id.startsWith('step-'))cur.steps[+id.slice(5)].name=v;
+  else if(id.startsWith('learn-')){const k=+id.slice(6);cur.learnings[k]=v;$('learn'+k).value=v;}
+  else if(id==='verdict'){cur.verdict=v;$('verdict').value=v;}
+  saveSessions();$('pol-'+i).classList.add('done');renderPie();renderSteps();
+}
+
+/* ---------- carousel builder (1080x1350) ---------- */
+const W=1080,H=1350;
+function newC(){const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+  x.fillStyle=C.cream;x.fillRect(0,0,W,H);
+  x.strokeStyle=C.ink;x.lineWidth=6;rr(x,36,36,W-72,H-72,40);x.stroke();return[c,x];}
+function rr(x,a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath();}
+function txt(x,t,px,y,size,{w=700,col=C.ink,align='center',font='Quicksand'}={}){x.fillStyle=col;x.textAlign=align;x.font=`${w} ${size}px ${font},sans-serif`;x.fillText(t,px,y);}
+function footer(x){txt(x,HANDLE,W/2,H-86,32,{col:C.soft,w:500});}
+function badge(x,cx,cy,label,color,tcol){x.fillStyle=color;const bw=x.measureText(label).width;rr(x,cx-190,cy-46,380,92,46);x.fill();x.strokeStyle=C.ink;x.lineWidth=5;rr(x,cx-190,cy-46,380,92,46);x.stroke();txt(x,label,cx,cy+16,42,{col:tcol});}
+function wrap(x,t,px,y,size,maxW,lh,opts={}){x.font=`${opts.w||500} ${size}px Quicksand,sans-serif`;const words=t.split(' ');let line='',yy=y;
+  for(const wd of words){const test=line?line+' '+wd:wd;
+    if(x.measureText(test).width>maxW&&line){txt(x,line,px,yy,size,opts);line=wd;yy+=lh;}else line=test;}
+  if(line)txt(x,line,px,yy,size,opts);return yy;}
+
+async function slCover(){const[c,x]=newC();
+  const hasPic=!!cur.titlePic;
+  txt(x,'PERFECTION À LA CARTE',W/2,hasPic?150:170,34,{col:C.soft,w:500});
+  const yy=wrap(x,cur.dish,W/2,hasPic?290:540,hasPic?88:110,880,hasPic?96:120,{w:700});
+  badge(x,W/2,yy+(hasPic?95:160),(cur.round==='RUSHED'?'⏱ RUSHED':'🌿 SLOW'),cur.round==='RUSHED'?C.red:C.sage,cur.round==='RUSHED'?'#fff':C.ink);
+  if(hasPic){
+    const b=await getBlob(cur.titlePic);
+    const ix=100,iy=yy+170,iw=W-200,ih=1120-iy;
+    if(b&&ih>120){
+      const img=await createImageBitmap(b);
+      const s=Math.max(iw/img.width,ih/img.height);
+      x.save();rr(x,ix,iy,iw,ih,32);x.clip();
+      x.drawImage(img,W/2-img.width*s/2,iy+ih/2-img.height*s/2,img.width*s,img.height*s);x.restore();
+      x.strokeStyle=C.ink;x.lineWidth=5;rr(x,ix,iy,iw,ih,32);x.stroke();
+    }
+    txt(x,fmt(cur.total),W/2,1210,80,{col:cur.round==='RUSHED'?C.red:C.ink});
+  }else{
+    txt(x,fmt(cur.total),W/2,yy+400,150,{col:cur.round==='RUSHED'?C.red:C.ink});
+    txt(x,'total time — every second tracked',W/2,yy+470,32,{col:C.soft,w:500});
+  }
+  footer(x);return c;}
+async function slCast(){const[c,x]=newC();
+  txt(x,'THE CAST',W/2,170,52);
+  txt(x,cur.dish,W/2,225,34,{col:C.soft,w:500});
+  const st=(cur.cast.soul||'').split('\n').map(s=>s.trim()).filter(Boolean);
+  const ar=(cur.cast.aromatics||'').split('\n').map(s=>s.trim()).filter(Boolean);
+  if(st.length||ar.length){
+    const col=(title,items,cx0,color)=>{
+      x.fillStyle=color;rr(x,cx0,300,440,84,26);x.fill();
+      x.strokeStyle=C.ink;x.lineWidth=4;rr(x,cx0,300,440,84,26);x.stroke();
+      txt(x,title,cx0+220,356,38);
+      let y=470;items.forEach(it=>{y=wrap(x,it,cx0+220,y,32,410,40,{w:500})+58;});
+    };
+    col('SOUL',st,90,C.sage);
+    col('AROMATICS',ar,550,C.butter);
+  }else if(cur.cast.pic){
+    const b=await getBlob(cur.cast.pic);
+    if(b){const img=await createImageBitmap(b);
+      const ix=80,iy=290,iw=W-160,ih=H-290-190;
+      const s=Math.max(iw/img.width,ih/img.height);
+      x.save();rr(x,ix,iy,iw,ih,32);x.clip();
+      x.drawImage(img,W/2-img.width*s/2,iy+ih/2-img.height*s/2,img.width*s,img.height*s);x.restore();
+      x.strokeStyle=C.ink;x.lineWidth=5;rr(x,ix,iy,iw,ih,32);x.stroke();}
+  }
+  footer(x);return c;}
+function slPie(){const[c,x]=newC();
+  txt(x,'WHERE THE TIME WENT',W/2,170,52);
+  txt(x,cur.dish,W/2,225,34,{col:C.soft,w:500});
+  const cx=W/2,cy=700,r=270;let a=-Math.PI/2;
+  cur.steps.forEach((s,i)=>{const f=s.sec/cur.total,a2=a+f*2*Math.PI;
+    x.beginPath();x.moveTo(cx,cy);x.arc(cx,cy,r,a,a2);x.closePath();
+    x.fillStyle=PIE[i%PIE.length];x.fill();x.strokeStyle=C.ink;x.lineWidth=4;x.stroke();
+    a=a2;});
+  a=-Math.PI/2;
+  cur.steps.forEach((s,i)=>{const f=s.sec/cur.total,a2=a+f*2*Math.PI;
+    const mid=(a+a2)/2,pct=Math.round(f*100);
+    if(pct>=8)txt(x,pct+'%',cx+Math.cos(mid)*r*0.62,cy+Math.sin(mid)*r*0.62+16,48);
+    const cos=Math.cos(mid),sin=Math.sin(mid);
+    const lx=cx+cos*(r+42),ly=cy+sin*(r+42)+12;
+    const align=Math.abs(cos)<0.35?'center':(cos>0?'left':'right');
+    txt(x,`${s.icon?s.icon+' ':''}${s.name}${pct<8?' · '+pct+'%':''}`,lx,ly,32,{align,w:700});
+    a=a2;});
+  footer(x);return c;}
+function slSteps(){const[c,x]=newC();
+  txt(x,'THE STEPS',W/2,170,52);
+  let y=300;cur.steps.forEach((s,i)=>{
+    x.fillStyle=C.butter;rr(x,120,y-52,W-240,84,26);x.fill();x.strokeStyle=C.ink;x.lineWidth=3;rr(x,120,y-52,W-240,84,26);x.stroke();
+    txt(x,`${i+1}. ${s.icon?s.icon+' ':''}${s.name}`,160,y+6,38,{align:'left'});
+    txt(x,fmt(s.sec),W-160,y+6,38,{align:'right',col:C.red});y+=116;});
+  footer(x);return c;}
+async function slPhoto(p){const[c,x]=newC();const blob=await getBlob(p.id);
+  if(blob){const img=await createImageBitmap(blob);
+    const s=Math.max((W-120)/img.width,(H-380)/img.height);
+    x.save();rr(x,60,60,W-120,H-380,36);x.clip();
+    x.drawImage(img,W/2-img.width*s/2,(H-320)/2-img.height*s/2+60,img.width*s,img.height*s);x.restore();
+    x.strokeStyle=C.ink;x.lineWidth=6;rr(x,60,60,W-120,H-380,36);x.stroke();}
+  const stepName=p.stepIdx>=0&&cur.steps[p.stepIdx]?cur.steps[p.stepIdx].name:cur.dish;
+  txt(x,stepName,W/2,H-190,48);footer(x);return c;}
+function slLearn(){const[c,x]=newC();
+  txt(x,'WHAT I LEARNED',W/2,190,52);
+  let y=380;cur.learnings.filter(Boolean).forEach(l=>{y=wrap(x,'🌿 '+l,W/2,y,42,820,54,{w:500})+130;});
+  footer(x);return c;}
+function slCTA(){const[c,x]=newC();
+  x.fillStyle=cur.round==='RUSHED'?C.red:C.sage;rr(x,36,36,W-72,H-72,40);x.fill();
+  x.strokeStyle=C.ink;x.lineWidth=6;rr(x,36,36,W-72,H-72,40);x.stroke();
+  const tcol=cur.round==='RUSHED'?'#fff':C.ink;
+  txt(x,'WORTH IT?',W/2,430,110,{col:tcol});
+  wrap(x,cur.verdict||(cur.round==='RUSHED'?'Friday: same dish, unlimited time. Will it even taste different?':'Verdict is in. Follow for the next dish — cooked twice.'),W/2,640,50,800,66,{col:tcol,w:500});
+  txt(x,HANDLE,W/2,H-140,40,{col:tcol});return c;}
+
+function availSpecs(){
+  const s=[];
+  s.push({key:'cover',label:'Cover',render:slCover});
+  const hasCast=cur.cast&&((cur.cast.soul||'').trim()||(cur.cast.aromatics||'').trim()||cur.cast.pic);
+  s.push({key:'cast',label:'The Cast (ingredients)',render:slCast,def:!!hasCast});
+  s.push({key:'pie',label:'Time pie',render:slPie});
+  s.push({key:'steps',label:'The steps',render:slSteps});
+  (cur.photos||[]).forEach((p,i)=>s.push({key:'photo:'+p.id,label:'Photo '+(i+1),render:()=>slPhoto(p),def:p.use}));
+  s.push({key:'learn',label:'Learnings',render:slLearn,def:cur.learnings.some(Boolean)});
+  s.push({key:'cta',label:'Verdict / teaser',render:slCTA});
+  return s;
+}
+function syncPlan(){
+  const specs=availSpecs(),byKey={};specs.forEach(s=>byKey[s.key]=s);
+  let plan=(cur.plan||[]).filter(e=>byKey[e.key]);
+  const have=new Set(plan.map(e=>e.key));
+  specs.forEach(s=>{if(!have.has(s.key))plan.push({key:s.key,on:s.def!==false});});
+  cur.plan=plan;saveSessions();
+  return {byKey,plan};
+}
+function renderPlan(){
+  const {byKey,plan}=syncPlan();
+  $('slidePlan').innerHTML=plan.map((e,i)=>`<div class="steprow" style="margin:6px 0">
+    <label style="display:flex;align-items:center;gap:8px;flex:1;margin:0">
+      <input type="checkbox" ${e.on?'checked':''} onchange="togglePlan('${e.key}')" style="width:20px;height:20px">
+      <span style="font-weight:700;font-size:14px">${byKey[e.key].label}</span></label>
+    <button class="mini" onclick="movePlan(${i},-1)" ${i===0?'disabled':''}>▲</button>
+    <button class="mini" onclick="movePlan(${i},1)" ${i===plan.length-1?'disabled':''}>▼</button>
+  </div>`).join('');
+}
+function togglePlan(key){const e=cur.plan.find(x=>x.key===key);if(e)e.on=!e.on;saveSessions();renderPlan();buildSlides();}
+function movePlan(i,d){const j=i+d,p=cur.plan;if(j<0||j>=p.length)return;[p[i],p[j]]=[p[j],p[i]];saveSessions();renderPlan();buildSlides();}
+function resetPlan(){cur.plan=null;saveSessions();renderPlan();buildSlides();}
+async function buildSlides(){
+  await document.fonts.ready;
+  const {byKey,plan}=syncPlan();renderPlan();
+  const wrapEl=$('slides');wrapEl.innerHTML='';let n=0;
+  for(const e of plan){
+    if(!e.on)continue;
+    const c=await byKey[e.key].render();
+    const i=n++;const d=document.createElement('div');d.className='slide';d.appendChild(c);
+    const b=document.createElement('button');b.className='mini';b.style.marginTop='6px';b.textContent='⬇ slide '+(i+1);
+    b.onclick=()=>dl(c,i);d.appendChild(b);wrapEl.appendChild(d);
+  }
+}
+function dl(c,i){c.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);
+  a.download=`${cur.dish.replace(/\s+/g,'-').toLowerCase()}-${cur.round.toLowerCase()}-${i+1}.png`;a.click();},'image/png');}
+async function downloadAll(){const cs=$('slides').querySelectorAll('canvas');let i=0;
+  for(const c of cs){dl(c,i++);await new Promise(r=>setTimeout(r,400));}}
+</script>
+</body>
+</html>

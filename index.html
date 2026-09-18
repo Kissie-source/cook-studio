@@ -70,6 +70,11 @@ textarea{min-height:88px; resize:vertical; line-height:1.55}
 .steprow input.nm:focus{outline:none; border-color:var(--orange); background:#fff}
 .steprow .mini{padding:4px 0; width:27px; text-align:center; font-size:11px}
 .steprow .mini.red{width:27px}
+.steprow .mini.play{width:auto; padding:4px 9px; color:var(--orange); border-color:rgba(232,98,12,.4); font-variant-numeric:tabular-nums; white-space:nowrap}
+.steprow .mini.play.on{background:var(--orange); border-color:var(--orange); color:#fff}
+.planrow{margin:5px 0}
+.planrow .drag{cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; padding:4px 6px; color:var(--muted); font-size:17px; line-height:1}
+.planrow.dragging{opacity:.6; background:var(--orange-soft); box-shadow:0 4px 14px rgba(38,34,30,.14)}
 .steprow .icon-btn{width:28px; height:28px; font-size:13px}
 .cdot{width:10px; height:10px; border-radius:50%; flex:none}
 .sharewrap{display:flex; align-items:center; gap:8px; width:100%; margin-top:2px}
@@ -227,8 +232,8 @@ Reset</textarea>
       <h3 class="sec">STEPS · ▲▼ order · slider = share</h3>
       <div id="stSteps"></div>
       <button class="mini" onclick="addStep()">＋ add step</button>
-      <h3 class="sec">VOICE NOTES · listen while writing your caption</h3>
-      <div class="notes" id="stNotes"></div>
+      <h3 class="sec" id="notesHead" style="display:none">VOICE NOTES · from steps you removed</h3>
+      <div class="notes" id="stNotes" style="display:none"></div>
       <h3 class="sec">PHOTOS · tap a photo to see it big, the corner dot to include / exclude</h3>
       <div class="thumbs" id="stPhotos"></div>
       <button class="mini" style="margin-top:8px" onclick="galleryIn.click()">＋ add from gallery</button>
@@ -298,6 +303,7 @@ Reset</textarea>
     <button class="lbbtn" id="lbUse" onclick="toggleLightboxUse()">in carousel</button>
     <button class="lbbtn" id="lbNext" onclick="stepLightbox(1)">›</button>
   </div>
+  <div class="lbrow"><button class="lbbtn" id="lbTitle" onclick="photoAsTitle()">☆ make title pic</button></div>
 </div>
 
 <script>
@@ -341,7 +347,7 @@ async function startCook(){
   const steps=$('stepsIn').value.split('\n').map(s=>s.trim()).filter(Boolean);
   if(!steps.length){alert('Add at least one step');return;}
   live={s:{id:''+Date.now(),dish,round,date:new Date().toISOString().slice(0,10),
-        steps:steps.map(n=>({name:n,sec:0,icon:''})),total:0,photos:[],notes:[],learnings:['','',''],verdict:'',
+        steps:steps.map((n,i)=>({id:'s'+Date.now()+'_'+i,name:n,sec:0,icon:''})),total:0,photos:[],notes:[],learnings:['','',''],verdict:'',
         cast:{pic:null,soul:'',aromatics:''}},
         i:0,t0:Date.now(),st0:Date.now(),stream:null,rec:null,chunks:[]};
   if(pendingCast.pic||pendingCast.soul.trim()||pendingCast.aromatics.trim()){
@@ -352,7 +358,7 @@ async function startCook(){
   $('liveCard').insertBefore($('castBlock'),$('finishBtn'));
   try{live.stream=await navigator.mediaDevices.getUserMedia({audio:true});startRec();}
   catch(e){$('recInd').innerHTML='mic off — timer & photos still running';}
-  try{navigator.wakeLock&&navigator.wakeLock.request('screen');}catch(e){}
+  try{navigator.wakeLock&&navigator.wakeLock.request('screen').catch(()=>{});}catch(e){}
   $('setupCard').style.display='none';$('liveCard').style.display='';
   document.body.classList.add('cooking');document.body.classList.toggle('slowround',round==='SLOW');setTheme('#1B1815');
   $('liveBadge').textContent=round;$('liveBadge').className='badge '+round;
@@ -366,7 +372,7 @@ function stopRec(){return new Promise(async res=>{
   if(!live||!live.rec||live.rec.state==='inactive')return res();
   clearTimeout(live.recTimer);
   live.rec.onstop=async()=>{const b=new Blob(live.chunks,{type:live.rec.mimeType||'audio/webm'});
-    if(b.size>200){const id='a'+Date.now();await putBlob(id,b);live.s.notes.push({id,stepIdx:live.i,sec:Math.round((Date.now()-live.recT0)/1000)});}res();};
+    if(b.size>200){const id='a'+Date.now();await putBlob(id,b);live.s.notes.push({id,stepId:live.s.steps[live.i].id,stepIdx:live.i,sec:Math.round((Date.now()-live.recT0)/1000)});}res();};
   live.rec.stop();});}
 function tick(){$('liveTotal').textContent=fmt((Date.now()-live.t0)/1000);$('liveStepTime').textContent='step · '+fmt((Date.now()-live.st0)/1000);}
 function renderLive(){
@@ -395,7 +401,7 @@ async function finishCook(){
   openStudio(id);
 }
 $('photoIn').addEventListener('change',async e=>{
-  for(const f of e.target.files){const id='p'+Date.now()+Math.random().toString(36).slice(2,6);await putBlob(id,f);live.s.photos.push({id,stepIdx:live.i,use:true});}
+  for(const f of e.target.files){const id='p'+Date.now()+Math.random().toString(36).slice(2,6);await putBlob(id,f);live.s.photos.push({id,stepId:live.s.steps[live.i].id,stepIdx:live.i,use:true});}
   e.target.value='';});
 let pendingCast={pic:null,soul:'',aromatics:''};
 const activeCast=()=>live?live.s.cast:pendingCast;
@@ -485,6 +491,10 @@ function delSession(id){
 let cur=null;
 function openStudio(id){cur=sessions.find(s=>s.id===id);if(!cur)return;
   if(!cur.cast)cur.cast={pic:null,soul:'',aromatics:''};
+  /* migrate older sessions: steps get ids, notes/photos point at ids instead of positions */
+  cur.steps.forEach((s,i)=>{if(!s.id)s.id='s'+cur.id+'_'+i;});
+  cur.notes.forEach(n=>{if(!n.stepId&&cur.steps[n.stepIdx])n.stepId=cur.steps[n.stepIdx].id;});
+  cur.photos.forEach(p=>{if(!p.stepId&&p.stepIdx>=0&&cur.steps[p.stepIdx])p.stepId=cur.steps[p.stepIdx].id;});
   showTab('studio');
   $('studioEmpty').style.display='none';$('studioBody').style.display='';
   $('learn0').value=cur.learnings[0]||'';$('learn1').value=cur.learnings[1]||'';$('learn2').value=cur.learnings[2]||'';
@@ -516,8 +526,9 @@ function renderSteps(){
     <button class="mini" onclick="moveStep(${i},1)" ${i===cur.steps.length-1?'disabled':''}>▼</button>
     <button class="icon-btn" onclick="pickIcon(${i})">${s.icon||'＋'}</button>
     <input class="nm" value="${s.name.replace(/"/g,'&quot;')}" onchange="cur.steps[${i}].name=this.value;saveSessions();">
-    ${cur.steps.length>1?`<button class="mini red" onclick="rmStep(${i})">✕</button>`:''}
-    <div class="sharewrap"><input type="range" min="1" max="99" step="1" value="${pct}" oninput="slideShare(${i},this.value)" onchange="renderStudio()"><span class="pct" id="pct-${i}">${pct}%</span></div>
+    ${notesFor(s.id).map(n=>`<button class="mini play" data-label="▶ ${fmt(n.sec)}" title="listen to your note for this step" onclick="playNote('${n.id}',this)">▶ ${fmt(n.sec)}</button>`).join('')}
+    <div class="sharewrap"><input type="range" min="1" max="99" step="1" value="${pct}" oninput="slideShare(${i},this.value)" onchange="renderStudio()"><span class="pct" id="pct-${i}">${pct}%</span>
+    ${cur.steps.length>1?`<button class="mini red" onclick="rmStep(${i})">✕</button>`:''}</div>
     </div>`;}).join('');
 }
 /* smallest slice a step may hold — 5s normally, less on very short cooks */
@@ -545,7 +556,7 @@ function redistribute(exceptIdx,targetOthers){
 function addStep(){
   const name=prompt('Step name (its time is taken from the other steps — total stays locked):');if(!name)return;
   const take=Math.max(10,Math.round(cur.total*0.1));
-  cur.steps.push({name,sec:take,icon:''});
+  cur.steps.push({id:'s'+Date.now(),name,sec:take,icon:''});
   redistribute(cur.steps.length-1,cur.total-take);
   saveSessions();renderStudio();
 }
@@ -559,13 +570,25 @@ function pickIcon(i){pickTarget=i;$('pickGrid').innerHTML=ICONS.map(ic=>`<button
 function setIcon(ic){cur.steps[pickTarget].icon=ic;saveSessions();$('picker').style.display='none';renderStudio();}
 $('picker').addEventListener('click',e=>{if(e.target.id==='picker')e.target.style.display='none';});
 
+const stepName=stepId=>{const s=cur&&cur.steps.find(x=>x.id===stepId);return s?s.name:null;};
+const notesFor=stepId=>(cur.notes||[]).filter(n=>n.stepId===stepId);
+/* one shared player — a second ▶ stops the first */
+let noteAudio=null,noteBtn=null;
+function stopNote(){if(noteAudio){noteAudio.pause();noteAudio=null;}if(noteBtn){noteBtn.classList.remove('on');noteBtn.textContent=noteBtn.dataset.label;noteBtn=null;}}
+async function playNote(id,btn){
+  const same=noteBtn===btn;stopNote();if(same)return;
+  const blob=await getBlob(id);if(!blob)return;
+  noteAudio=new Audio(URL.createObjectURL(blob));noteBtn=btn;btn.classList.add('on');btn.textContent='■';
+  noteAudio.onended=stopNote;noteAudio.play();
+}
+/* only notes whose step no longer exists land here — everything else sits beside its step */
 async function renderNotes(){
-  const el=$('stNotes');el.innerHTML='';
-  if(!cur.notes.length){el.innerHTML='<p class="hint">No voice notes for this session.</p>';return;}
-  cur.notes.forEach((n,i)=>{const b=document.createElement('button');
-    b.textContent=`▶ ${cur.steps[n.stepIdx]?cur.steps[n.stepIdx].name:'step '+(n.stepIdx+1)} · ${fmt(n.sec)}`;
-    b.onclick=async()=>{const blob=await getBlob(n.id);if(blob)new Audio(URL.createObjectURL(blob)).play();};
-    el.appendChild(b);});
+  const el=$('stNotes');el.innerHTML='';stopNote();
+  const orphans=(cur.notes||[]).filter(n=>!cur.steps.some(s=>s.id===n.stepId));
+  $('notesHead').style.display=el.style.display=orphans.length?'':'none';
+  orphans.forEach(n=>{const b=document.createElement('button');
+    b.textContent=`▶ note from a removed step · ${fmt(n.sec)}`;
+    b.onclick=()=>playNote(n.id,b);b.dataset.label=b.textContent;el.appendChild(b);});
 }
 async function renderPhotos(){
   const el=$('stPhotos');el.innerHTML='';
@@ -590,10 +613,12 @@ async function openLightbox(i){
   const blob=await getBlob(p.id);if(!blob)return;
   lbIdx=i;
   $('lbImg').src=URL.createObjectURL(blob);
-  $('lbCap').textContent=`${i+1} / ${cur.photos.length}${p.stepIdx>=0&&cur.steps[p.stepIdx]?' · '+cur.steps[p.stepIdx].name:''}`;
+  const sn=stepName(p.stepId);
+  $('lbCap').textContent=`${i+1} / ${cur.photos.length}${sn?' · '+sn:''}`;
   $('lbPrev').disabled=i===0;$('lbNext').disabled=i===cur.photos.length-1;
   $('lbPrev').style.display=$('lbNext').style.display=cur.photos.length>1?'':'none';
   const b=$('lbUse');b.style.display='';b.classList.toggle('on',!!p.use);b.textContent=p.use?'✓ in carousel':'excluded';
+  const t=$('lbTitle');t.style.display='';t.classList.toggle('on',cur.titlePicFrom===p.id);t.textContent=cur.titlePicFrom===p.id?'★ is the title pic':'☆ make title pic';
   $('lightbox').style.display='flex';setTheme('#141210');
 }
 function closeLightbox(){lbIdx=-1;$('lightbox').style.display='none';setTheme('#EDE7DD');}
@@ -603,11 +628,20 @@ function toggleLightboxUse(){
   setPhotoUse(p,!p.use);
   const b=$('lbUse');b.classList.toggle('on',!!p.use);b.textContent=p.use?'✓ in carousel':'excluded';
 }
+/* copy the photo into its own blob, so deleting the title pic later never deletes the photo */
+async function photoAsTitle(){
+  const p=cur.photos[lbIdx];if(!p)return;
+  const blob=await getBlob(p.id);if(!blob)return;
+  if(cur.titlePic)delBlob(cur.titlePic);
+  const id='t'+Date.now();await putBlob(id,blob);
+  cur.titlePic=id;cur.titlePicFrom=p.id;saveSessions();renderTitlePic();
+  const t=$('lbTitle');t.classList.add('on');t.textContent='★ is the title pic';
+}
 async function showBig(blobId,caption){
   const blob=await getBlob(blobId);if(!blob)return;
   lbIdx=-1;
   $('lbImg').src=URL.createObjectURL(blob);$('lbCap').textContent=caption||'';
-  $('lbPrev').style.display=$('lbNext').style.display=$('lbUse').style.display='none';
+  $('lbPrev').style.display=$('lbNext').style.display=$('lbUse').style.display=$('lbTitle').style.display='none';
   $('lightbox').style.display='flex';setTheme('#141210');
 }
 $('lightbox').addEventListener('click',e=>{if(e.target.id==='lightbox')closeLightbox();});
@@ -624,7 +658,7 @@ $('titleIn').addEventListener('change',async e=>{
   const f=e.target.files[0];if(!f)return;
   if(cur.titlePic)delBlob(cur.titlePic);
   const id='t'+Date.now();await putBlob(id,f);
-  cur.titlePic=id;saveSessions();e.target.value='';renderTitlePic();});
+  cur.titlePic=id;cur.titlePicFrom=null;saveSessions();e.target.value='';renderTitlePic();});
 async function renderTitlePic(){
   const has=!!cur.titlePic;$('tpDel').style.display=has?'':'none';
   const img=$('tpThumb');
@@ -632,7 +666,7 @@ async function renderTitlePic(){
   const b=await getBlob(cur.titlePic);
   if(b){img.src=URL.createObjectURL(b);img.style.display='';}else{img.style.display='none';}
 }
-function delTitlePic(){if(cur.titlePic)delBlob(cur.titlePic);cur.titlePic=null;saveSessions();renderTitlePic();}
+function delTitlePic(){if(cur.titlePic)delBlob(cur.titlePic);cur.titlePic=null;cur.titlePicFrom=null;saveSessions();renderTitlePic();}
 $('castIn').addEventListener('change',async e=>{
   const f=e.target.files[0];if(!f)return;
   if(cur.cast.pic)delBlob(cur.cast.pic);
@@ -780,12 +814,20 @@ async function slCast(){const[c,x]=newC();
   const st=(cur.cast.soul||'').split('\n').map(s=>s.trim()).filter(Boolean);
   const ar=(cur.cast.aromatics||'').split('\n').map(s=>s.trim()).filter(Boolean);
   if(st.length||ar.length){
+    /* "500 g spaghetti" → amount "500 g" + name "spaghetti"; lines without an amount keep the whole text as the name */
+    const AMT=/^((?:\d+(?:[.,]\d+)?|[½¼¾⅓⅔]|\d+\s*\/\s*\d+)(?:\s*[–-]\s*\d+(?:[.,]\d+)?)?\s*(?:g|kg|mg|ml|cl|dl|l|tsp|tbsp|tl|el|pcs?|stk|cups?|oz|lb|bunch|cloves?|pinch|handful|slices?|sprigs?|x)?\.?)\s+(.+)$/i;
     const col=(title,items,px)=>{
+      const rows=items.map(it=>{const m=it.match(AMT);return m?{amt:m[1].trim(),name:m[2].trim()}:{amt:'',name:it};});
+      x.font=`500 30px ${SANS}`;
+      const amtW=rows.reduce((w,r)=>Math.max(w,r.amt?x.measureText(r.amt).width:0),0);
+      const nameX=amtW?px+amtW+22:px, nameW=400-(nameX-px);
       let y=470;
       txt(x,title,px,y,25,{col:S.orange,ls:5,w:600});
       x.strokeStyle=S.line;x.lineWidth=2;x.beginPath();x.moveTo(px,y+22);x.lineTo(px+400,y+22);x.stroke();
       y+=84;
-      items.forEach(it=>{y=wrap(x,it,px,y,36,400,46,{w:400})+58;});
+      rows.forEach(r=>{
+        if(r.amt)txt(x,r.amt,px+amtW,y,30,{w:500,col:S.gray,align:'right'});
+        y=wrap(x,r.name,nameX,y,36,nameW,46,{w:400})+58;});
     };
     if(st.length)col('SOUL',st,90);
     if(ar.length)col('AROMATICS',ar,590);
@@ -839,11 +881,10 @@ async function slPhoto(p){const[c,x]=newC(S.charcoal);const blob=await getBlob(p
     const gr=x.createLinearGradient(0,H-360,0,H);
     gr.addColorStop(0,'rgba(20,18,16,0)');gr.addColorStop(1,'rgba(20,18,16,.68)');
     x.fillStyle=gr;x.fillRect(0,H-360,W,360);}
-  const stepName=p.stepIdx>=0&&cur.steps[p.stepIdx]?cur.steps[p.stepIdx].name:cur.dish;
-  txt(x,stepName.toUpperCase(),90,H-104,38,{col:'#FFFFFF',w:600,ls:5});
+  const cap=stepName(p.stepId)||cur.dish;
+  txt(x,cap.toUpperCase(),90,H-104,38,{col:'#FFFFFF',w:600,ls:5});
   footer(x,'rgba(255,255,255,.8)');return c;}
 function slLearn(){const[c,x]=newC();
-  brand(x);
   txt(x,cur.dish.toUpperCase(),W-90,124,23,{col:S.gray,align:'right',ls:4,w:500});
   txt(x,'WHAT I',86,300,104,{w:800,col:S.ink,ls:1});
   txt(x,'LEARNED',86,408,104,{w:800,col:S.orange,ls:1});
@@ -883,13 +924,35 @@ function syncPlan(){
 }
 function renderPlan(){
   const {byKey,plan}=syncPlan();
-  $('slidePlan').innerHTML=plan.map((e,i)=>`<div class="steprow" style="margin:6px 0">
+  $('slidePlan').innerHTML=plan.map((e,i)=>`<div class="steprow planrow" data-key="${e.key}">
+    <span class="drag" title="drag to reorder" onpointerdown="planDragStart(event)" onpointermove="planDragMove(event)" onpointerup="planDragEnd(event)" onpointercancel="planDragEnd(event)">☰</span>
     <label style="display:flex;align-items:center;gap:8px;flex:1;margin:0">
       <input type="checkbox" ${e.on?'checked':''} onchange="togglePlan('${e.key}')" style="width:20px;height:20px">
       <span style="font-weight:700;font-size:14px">${byKey[e.key].label}</span></label>
     <button class="mini" onclick="movePlan(${i},-1)" ${i===0?'disabled':''}>▲</button>
     <button class="mini" onclick="movePlan(${i},1)" ${i===plan.length-1?'disabled':''}>▼</button>
   </div>`).join('');
+}
+/* drag-to-reorder slides — pointer events, so it works with a finger on the phone */
+let planDrag=null;
+function planDragStart(e){
+  e.preventDefault();const row=e.currentTarget.closest('.planrow');
+  e.currentTarget.setPointerCapture(e.pointerId);
+  planDrag={row};row.classList.add('dragging');
+}
+function planDragMove(e){
+  if(!planDrag)return;
+  const list=$('slidePlan'),others=[...list.children].filter(r=>r!==planDrag.row);
+  const idx=others.findIndex(r=>{const b=r.getBoundingClientRect();return e.clientY<b.top+b.height/2;});
+  const ref=idx<0?null:others[idx];
+  if(planDrag.row.nextSibling!==ref)list.insertBefore(planDrag.row,ref);
+}
+function planDragEnd(){
+  if(!planDrag)return;
+  planDrag.row.classList.remove('dragging');planDrag=null;
+  const order=[...$('slidePlan').children].map(r=>r.dataset.key);
+  cur.plan.sort((a,b)=>order.indexOf(a.key)-order.indexOf(b.key));
+  saveSessions();renderPlan();buildSlides();
 }
 function togglePlan(key){const e=cur.plan.find(x=>x.key===key);if(e)e.on=!e.on;saveSessions();renderPlan();buildSlides();}
 function movePlan(i,d){const j=i+d,p=cur.plan;if(j<0||j>=p.length)return;[p[i],p[j]]=[p[j],p[i]];saveSessions();renderPlan();buildSlides();}

@@ -3,6 +3,23 @@
 Every version is a full snapshot in `versions/index-vX.Y.html` (and a git commit).
 **Roll back:** copy the snapshot over `index.html`, re-upload to GitHub.
 
+## v2.4 — 2026-09-18
+- **▶ beside each step.** The voice note for a step now plays from a button right next to
+  its name field, so you can listen while you write. A second tap stops it; tapping
+  another note stops the first. Under the hood, notes and photos now follow their step
+  by id (they used to follow its *position*, so reordering or dropping a step attached
+  them to the wrong one). Existing sessions are migrated on open. Only notes from steps
+  you removed still show in a separate "Voice notes" section — hidden otherwise.
+- **Drag to reorder slides.** ☰ handle on every carousel row; works with a finger.
+  ▲▼ stay as a fallback.
+- **Learn slide:** the top-left brand line is gone — the handle is already bottom-right.
+- **Any photo can be the title pic.** In the big view: "☆ make title pic". It copies the
+  photo, so deleting the title pic later never deletes the photo itself.
+- **Cast slide columns.** Amounts sit in a right-aligned gray column, ingredient names
+  line up after it — per bucket. "500 g spaghetti", "3 eggs", "½ lemon" all parse; a
+  line without an amount ("salt") sits flush with the names.
+- Studio step row: ✕ moved to the end of the slider line so the name row never wraps.
+
 ## v2.3 — 2026-09-18
 - **Photos open big.** Tap any Studio photo for a full-screen view with ‹ › to flip
   through, the step name as caption, and an in-carousel / excluded toggle that stays

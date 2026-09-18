@@ -778,7 +778,6 @@ function txt(x,t,px,y,size,{w=400,col=S.ink,align='left',ls=0}={}){
   try{x.letterSpacing=ls+'px';}catch(e){}
   x.font=`${w} ${size}px ${SANS}`;x.fillText(t,px,y);
   try{x.letterSpacing='0px';}catch(e){}}
-function brand(x,col){txt(x,'PERFECTION À LA CARTE',90,122,23,{col:col||S.gray,ls:6,w:500});}
 function footer(x,col){txt(x,HANDLE,W-90,H-80,26,{col:col||S.gray,align:'right',ls:2,w:500});}
 function wrap(x,t,px,y,size,maxW,lh,opts={}){x.font=`${opts.w||400} ${size}px ${SANS}`;const words=String(t).split(' ');let line='',yy=y;
   for(const wd of words){const test=line?line+' '+wd:wd;
@@ -786,7 +785,6 @@ function wrap(x,t,px,y,size,maxW,lh,opts={}){x.font=`${opts.w||400} ${size}px ${
   if(line)txt(x,line,px,yy,size,opts);return yy;}
 
 async function slCover(){const[c,x]=newC();
-  brand(x);
   txt(x,cur.round==='RUSHED'?'ROUND 1 · RUSHED':'ROUND 2 · SLOW',W-90,124,23,{col:S.orange,align:'right',ls:4,w:600});
   const name=cur.dish.toUpperCase(),hasPic=!!cur.titlePic;
   const sz=hasPic?(name.length<=10?118:88):(name.length<=8?176:name.length<=14?134:98);
@@ -808,7 +806,6 @@ async function slCover(){const[c,x]=newC();
   }
   footer(x);return c;}
 async function slCast(){const[c,x]=newC();
-  brand(x);
   txt(x,cur.dish.toUpperCase(),W-90,124,23,{col:S.gray,align:'right',ls:4,w:500});
   txt(x,'THE CAST',86,330,150,{w:800,col:S.orange,ls:1});
   const st=(cur.cast.soul||'').split('\n').map(s=>s.trim()).filter(Boolean);
@@ -841,7 +838,6 @@ async function slCast(){const[c,x]=newC();
   }
   footer(x);return c;}
 function slPie(){const[c,x]=newC();
-  brand(x);
   txt(x,cur.dish.toUpperCase(),W-90,124,23,{col:S.gray,align:'right',ls:4,w:500});
   txt(x,'WHERE THE',86,300,104,{w:800,col:S.ink,ls:1});
   txt(x,'TIME WENT',86,408,104,{w:800,col:S.orange,ls:1});
@@ -861,7 +857,6 @@ function slPie(){const[c,x]=newC();
     a=a2;});
   footer(x);return c;}
 function slSteps(){const[c,x]=newC();
-  brand(x);
   txt(x,cur.dish.toUpperCase(),W-90,124,23,{col:S.gray,align:'right',ls:4,w:500});
   txt(x,'THE STEPS',86,330,150,{w:800,col:S.orange,ls:1});
   let y=490;
@@ -895,7 +890,6 @@ function slLearn(){const[c,x]=newC();
   });
   footer(x);return c;}
 function slCTA(){const[c,x]=newC(S.orange);
-  brand(x,'rgba(255,255,255,.8)');
   txt(x,cur.round==='RUSHED'?'ROUND 1 · RUSHED':'ROUND 2 · SLOW',W-90,124,23,{col:'rgba(255,255,255,.8)',align:'right',ls:4,w:600});
   txt(x,'WORTH',86,560,190,{w:800,col:'#FFFFFF',ls:1});
   txt(x,'IT?',86,752,190,{w:800,col:S.charcoal,ls:1});

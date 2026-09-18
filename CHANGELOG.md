@@ -3,6 +3,11 @@
 Every version is a full snapshot in `versions/index-vX.Y.html` (and a git commit).
 **Roll back:** copy the snapshot over `index.html`, re-upload to GitHub.
 
+## v2.6 — 2026-09-18
+- **Brand line off every slide.** The top-left "PERFECTION À LA CARTE" is gone from the
+  cover, cast, pie, steps and verdict slides too (learn had it removed in v2.4). The
+  @handle in the footer and the dish/round label top-right stay.
+
 ## v2.5 — 2026-09-18
 - **Slide list: ▲▼ removed.** Drag ☰ is the one way to order slides now; the card heading
   says so. (Steps keep their arrows — no drag there yet.)

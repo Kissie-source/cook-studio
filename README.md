@@ -16,7 +16,7 @@ in your phone's browser storage.
 Real git history — every design revision is a commit. See `git log` for the full list.
 
 Full notes per version: [CHANGELOG.md](CHANGELOG.md). Every version is also a complete
-snapshot in `versions/index-vX.Y.html` — current is **v2.5**.
+snapshot in `versions/index-vX.Y.html` — current is **v2.6**.
 
 **Roll back** (no git needed): copy the snapshot you want over `index.html`, e.g.
 ```powershell

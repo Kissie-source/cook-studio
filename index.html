@@ -64,20 +64,45 @@ textarea{min-height:88px; resize:vertical; line-height:1.55}
 .sess small{color:var(--muted); font-size:12px}
 .mini{padding:9px 15px; border:1px solid var(--line-2); border-radius:999px; background:rgba(255,255,255,.6); font:500 12.5px var(--ui); color:var(--ink); cursor:pointer}
 .mini.red{background:none; color:var(--orange); border-color:rgba(232,98,12,.35)}
-.steprow{display:flex; gap:6px; align-items:center; margin:12px 0; flex-wrap:wrap}
-.steprow input.nm{flex:1; min-width:110px; padding:9px 14px}
-.cdot{width:13px; height:13px; border-radius:50%; flex:none}
-.sharewrap{display:flex; align-items:center; gap:10px; width:100%}
-.sharewrap input[type=range]{flex:1; accent-color:var(--orange)}
-.pct{width:46px; text-align:right; font:500 13px var(--mono)}
+.steprow{display:flex; gap:5px; align-items:center; margin:4px 0; flex-wrap:wrap; padding:7px 9px 5px; border-radius:15px; background:rgba(255,255,255,.42)}
+.steprow input.nm{flex:1; min-width:96px; padding:6px 12px; font:400 13.5px var(--ui); color:var(--ink);
+  background:rgba(255,255,255,.85); border:1px solid var(--line); border-radius:999px}
+.steprow input.nm:focus{outline:none; border-color:var(--orange); background:#fff}
+.steprow .mini{padding:4px 0; width:27px; text-align:center; font-size:11px}
+.steprow .mini.red{width:27px}
+.steprow .mini.play{width:auto; padding:4px 9px; color:var(--orange); border-color:rgba(232,98,12,.4); font-variant-numeric:tabular-nums; white-space:nowrap}
+.steprow .mini.play.on{background:var(--orange); border-color:var(--orange); color:#fff}
+.planrow{margin:5px 0}
+.planrow .drag{cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; padding:4px 6px; color:var(--muted); font-size:17px; line-height:1}
+.planrow.dragging{opacity:.6; background:var(--orange-soft); box-shadow:0 4px 14px rgba(38,34,30,.14)}
+.steprow .icon-btn{width:28px; height:28px; font-size:13px}
+.cdot{width:10px; height:10px; border-radius:50%; flex:none}
+.sharewrap{display:flex; align-items:center; gap:8px; width:100%; margin-top:2px}
+.sharewrap input[type=range]{flex:1; accent-color:var(--orange); height:4px}
+.pct{width:36px; text-align:right; font:500 12px var(--mono)}
 .mini:disabled{opacity:.3}
 .icon-btn{width:40px; height:40px; border:1px solid var(--line-2); border-radius:50%; background:rgba(255,255,255,.6); font-size:17px; cursor:pointer}
-.total-lock{text-align:center; font:600 11px var(--ui); letter-spacing:2px; text-transform:uppercase; margin:10px 0; padding:12px; background:var(--orange-soft); color:var(--orange); border-radius:999px}
+.total-lock{text-align:center; font:600 11px var(--ui); letter-spacing:2px; text-transform:uppercase; margin:6px 0 0; padding:9px; background:var(--orange-soft); color:var(--orange); border-radius:999px}
 .thumbs{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
-.thumbs .ph{width:72px; height:72px; border-radius:18px; border:2px solid transparent; object-fit:cover; opacity:.35}
+.thumbs .ph{width:72px; height:72px; border-radius:18px; border:2px solid transparent; object-fit:cover; opacity:.35; display:block; cursor:zoom-in}
 .thumbs .ph.use{opacity:1; border-color:var(--orange)}
+.thumbwrap{position:relative; line-height:0}
+.thumbwrap .badge-use{position:absolute; top:-4px; right:-4px; width:23px; height:23px; padding:0; border-radius:50%;
+  border:1px solid var(--line-2); background:var(--glass-solid); color:var(--muted); font:600 12px var(--ui); line-height:21px; text-align:center; cursor:pointer}
+.thumbwrap .badge-use.on{background:var(--orange); border-color:var(--orange); color:#fff}
+#lightbox{position:fixed; inset:0; background:rgba(22,20,17,.985); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); display:none; z-index:30;
+  flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:20px}
+#lightbox img{max-width:94vw; max-height:74vh; border-radius:16px; object-fit:contain}
+#lightbox .lbcap{color:#F3EEE5; font:500 14px var(--ui); text-align:center}
+#lightbox .lbrow{display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap}
+#lightbox .lbbtn{padding:10px 18px; border:1px solid rgba(255,255,255,.28); border-radius:999px;
+  background:rgba(255,255,255,.08); color:#F3EEE5; font:500 13px var(--ui); cursor:pointer}
+#lightbox .lbbtn.on{background:var(--orange); border-color:var(--orange); color:#fff}
+#lightbox .lbbtn:disabled{opacity:.3}
+#lightbox .lbclose{position:absolute; top:calc(14px + env(safe-area-inset-top)); right:16px; width:42px; height:42px; border-radius:50%;
+  border:1px solid rgba(255,255,255,.28); background:rgba(255,255,255,.08); color:#F3EEE5; font-size:18px; cursor:pointer}
 .notes button{display:block; width:100%; text-align:left; margin:6px 0; padding:11px 16px; border:none; border-radius:999px; background:rgba(255,255,255,.7); font:400 13px var(--ui); color:var(--ink); cursor:pointer}
-#pieWrap{display:flex; gap:14px; align-items:center; justify-content:center}
+#pieWrap{display:flex; gap:10px; align-items:center; justify-content:center; margin:2px 0}
 #slides{display:flex; gap:12px; overflow-x:auto; padding:10px 0}
 #slides .slide{flex:0 0 auto; text-align:center}
 #slides canvas{width:190px; border-radius:14px; display:block; box-shadow:0 2px 14px rgba(38,34,30,.12)}
@@ -94,7 +119,7 @@ textarea{min-height:88px; resize:vertical; line-height:1.55}
 #polishBox textarea{min-height:70px}
 .warn{background:var(--charcoal); color:#F5F0E8; border-radius:18px; padding:12px 16px; font-size:13px; margin:12px 0; display:none}
 .hint{font-size:12px; color:var(--muted); margin-top:8px; line-height:1.55}
-h3.sec{font:600 10.5px var(--ui); letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin:24px 0 6px; padding-top:18px; border-top:1px solid var(--line)}
+h3.sec{font:600 10.5px var(--ui); letter-spacing:1.8px; text-transform:uppercase; color:var(--muted); margin:16px 0 5px; padding-top:13px; border-top:1px solid var(--line)}
 
 /* ===== COOK MODE — charcoal instrument ===== */
 body.cooking{background:var(--k-bg)}
@@ -120,11 +145,11 @@ body.cooking .row>.big-btn:first-child{width:64px; flex:none; background:none; b
 body.cooking #nextBtn{background:var(--k-text); color:var(--k-bg)}
 body.cooking #recipeBtn{background:none; border:1px solid var(--k-line); color:var(--k-muted)}
 body.cooking .big-btn.red{background:none; border:1px solid var(--k-line); color:var(--k-muted)}
-body.cooking #castLive label{color:var(--k-muted)}
-body.cooking #castLive textarea{background:rgba(255,255,255,.07); color:var(--k-text)}
-body.cooking #castLive textarea:focus{background:rgba(255,255,255,.12); border-color:var(--orange)}
-body.cooking #castLive .hint{color:var(--k-muted)}
-body.cooking #castLive .mini{background:none; border-color:var(--k-line); color:var(--k-text)}
+body.cooking #castBlock label{color:var(--k-muted)}
+body.cooking #castBlock textarea{background:rgba(255,255,255,.07); color:var(--k-text)}
+body.cooking #castBlock textarea:focus{background:rgba(255,255,255,.12); border-color:var(--orange)}
+body.cooking #castBlock .hint{color:var(--k-muted)}
+body.cooking #castBlock .mini{background:none; border-color:var(--k-line); color:var(--k-text)}
 </style>
 </head>
 <body>
@@ -151,12 +176,26 @@ body.cooking #castLive .mini{background:none; border-color:var(--k-line); color:
       <button class="rushed on" id="segR" onclick="setRound('RUSHED')">⏱ RUSHED</button>
       <button class="slow" id="segS" onclick="setRound('SLOW')">🌿 SLOW</button>
     </div>
-    <label>Steps (one per line — tap "next step" while cooking; switching the round resets to your standards)</label>
+    <label>Steps (one per line — as many as you need; the mic re-records fresh for each; edits here stick even if you switch RUSHED/SLOW)</label>
     <textarea id="stepsIn">Recipe Reading
 MEP
-Reset
-Cooking</textarea>
-    <button class="big-btn red" onclick="startCook()">▶ Start timer & mic</button>
+Cooking
+Reset</textarea>
+    <div id="castBlock">
+      <button class="mini" id="recipeBtn" style="width:100%;margin-top:16px;padding:10px" onclick="recipeIn.click()">🧄 shoot your ingredients — becomes "The Cast" slide</button>
+      <div id="castPanel" style="display:none">
+        <div class="row" style="margin-top:10px">
+          <img id="castThumbLive" style="width:56px;height:56px;border-radius:12px;object-fit:cover" alt="ingredients">
+          <button class="mini grow" onclick="extractLiveCast()">✨ extract soul &amp; aromatics with AI</button>
+        </div>
+        <p class="hint" id="castStatusLive"></p>
+        <label>Soul (the substance — one per line)</label>
+        <textarea id="castSoulLive" style="min-height:56px" placeholder="500 g spaghetti&#10;3 eggs&#10;80 g guanciale"></textarea>
+        <label>Aromatics (the character — one per line)</label>
+        <textarea id="castAromaticsLive" style="min-height:56px" placeholder="60 g pecorino&#10;black pepper, lots&#10;salt"></textarea>
+      </div>
+    </div>
+    <button class="big-btn red" id="startBtn" onclick="startCook()">▶ Start timer & mic</button>
     <p class="hint">At each step the mic records the first 7 seconds only — say what you're doing, then cook. Those notes are your captions.</p>
   </div>
 
@@ -171,19 +210,7 @@ Cooking</textarea>
       <button class="big-btn" style="margin-top:0" onclick="photoIn.click()">📸</button>
       <button class="big-btn sage grow" style="margin-top:0" id="nextBtn" onclick="nextStep()">Next step ▸</button>
     </div>
-    <button class="mini" id="recipeBtn" style="width:100%;margin-top:10px;padding:10px" onclick="recipeIn.click()">🧄 shoot your ingredients — becomes "The Cast" slide</button>
-    <div id="castLive" style="display:none">
-      <div class="row" style="margin-top:10px">
-        <img id="castThumbLive" style="width:56px;height:56px;border-radius:12px;object-fit:cover" alt="ingredients">
-        <button class="mini grow" onclick="extractLiveCast()">✨ extract soul &amp; aromatics with AI</button>
-      </div>
-      <p class="hint" id="castStatusLive"></p>
-      <label>Soul (the substance — one per line)</label>
-      <textarea id="castSoulLive" style="min-height:56px" placeholder="500 g spaghetti&#10;3 eggs&#10;80 g guanciale"></textarea>
-      <label>Aromatics (the character — one per line)</label>
-      <textarea id="castAromaticsLive" style="min-height:56px" placeholder="60 g pecorino&#10;black pepper, lots&#10;salt"></textarea>
-    </div>
-    <button class="big-btn red" onclick="finishCook()">■ Finish & build carousel</button>
+    <button class="big-btn red" id="finishBtn" onclick="finishCook()">■ Finish & build carousel</button>
     <input type="file" id="photoIn" accept="image/*" capture="environment" hidden>
     <input type="file" id="recipeIn" accept="image/*" capture="environment" hidden>
   </div>
@@ -202,19 +229,19 @@ Cooking</textarea>
       <h2 id="stTitle">—</h2>
       <div class="total-lock" id="stTotal">total locked · 0:00</div>
       <div id="pieWrap" style="justify-content:center"><div id="pieSvg"></div></div>
-      <h3 class="sec">STEPS · reorder with ▲▼, slide the share — total never changes</h3>
+      <h3 class="sec">STEPS · ▲▼ order · slider = share</h3>
       <div id="stSteps"></div>
       <button class="mini" onclick="addStep()">＋ add step</button>
-      <h3 class="sec">VOICE NOTES · listen while writing your caption</h3>
-      <div class="notes" id="stNotes"></div>
-      <h3 class="sec">PHOTOS · tap to include / exclude</h3>
+      <h3 class="sec" id="notesHead" style="display:none">VOICE NOTES · from steps you removed</h3>
+      <div class="notes" id="stNotes" style="display:none"></div>
+      <h3 class="sec">PHOTOS · tap a photo to see it big, the corner dot to include / exclude</h3>
       <div class="thumbs" id="stPhotos"></div>
       <button class="mini" style="margin-top:8px" onclick="galleryIn.click()">＋ add from gallery</button>
       <input type="file" id="galleryIn" accept="image/*" multiple hidden>
       <h3 class="sec">THE CAST · slide 2 — ingredients in two buckets</h3>
       <div class="row">
         <button class="mini" onclick="castIn.click()">＋ ingredients photo</button>
-        <img id="castThumb" style="display:none;width:72px;height:72px;border-radius:12px;border:3px solid var(--sage);object-fit:cover" alt="ingredients">
+        <img id="castThumb" style="display:none;width:72px;height:72px;border-radius:12px;border:3px solid var(--sage);object-fit:cover;cursor:zoom-in" alt="ingredients" onclick="showBig(cur.cast.pic,'The Cast — your ingredients')">
         <button class="mini" id="castAI" style="display:none" onclick="aiExtractCast(cur,$('castStatus'),$('castSoul'),$('castAromatics'))">✨ AI</button>
         <button class="mini red" id="castDel" style="display:none" onclick="delCastPic()">✕</button>
       </div>
@@ -228,7 +255,7 @@ Cooking</textarea>
       <h3 class="sec">TITLE PIC · shown big on the cover slide</h3>
       <div class="row">
         <button class="mini" onclick="titleIn.click()">＋ choose title pic</button>
-        <img id="tpThumb" style="display:none;width:72px;height:72px;border-radius:12px;border:3px solid var(--butter);object-fit:cover" alt="title pic">
+        <img id="tpThumb" style="display:none;width:72px;height:72px;border-radius:12px;border:3px solid var(--butter);object-fit:cover;cursor:zoom-in" alt="title pic" onclick="showBig(cur.titlePic,'Title pic — cover slide')">
         <button class="mini red" id="tpDel" style="display:none" onclick="delTitlePic()">✕</button>
       </div>
       <input type="file" id="titleIn" accept="image/*" hidden>
@@ -255,7 +282,7 @@ Cooking</textarea>
       <button class="big-btn sage" onclick="buildSlides()">🎨 Generate carousel</button>
     </div>
     <div class="card">
-      <h2>CAROUSEL · pick & order the slides, then post as a carousel on IG</h2>
+      <h2>CAROUSEL · tick the slides, drag ☰ to order, then post on IG</h2>
       <div id="slidePlan"></div>
       <button class="mini" onclick="resetPlan()" style="margin:2px 0 10px">↺ reset to suggested</button>
       <div id="slides"></div>
@@ -266,6 +293,18 @@ Cooking</textarea>
 </main>
 
 <div id="picker"><div class="sheet"><h2>Pick an icon</h2><div class="grid" id="pickGrid"></div></div></div>
+
+<div id="lightbox">
+  <button class="lbclose" onclick="closeLightbox()">✕</button>
+  <img id="lbImg" alt="">
+  <div class="lbcap" id="lbCap"></div>
+  <div class="lbrow">
+    <button class="lbbtn" id="lbPrev" onclick="stepLightbox(-1)">‹</button>
+    <button class="lbbtn" id="lbUse" onclick="toggleLightboxUse()">in carousel</button>
+    <button class="lbbtn" id="lbNext" onclick="stepLightbox(1)">›</button>
+  </div>
+  <div class="lbrow"><button class="lbbtn" id="lbTitle" onclick="photoAsTitle()">☆ make title pic</button></div>
+</div>
 
 <script>
 'use strict';
@@ -298,21 +337,28 @@ function showTab(t){['cook','sessions','studio'].forEach(x=>{$('tab-'+x).style.d
 
 /* ---------- cook mode ---------- */
 let round='RUSHED', live=null;
-const STD_STEPS={RUSHED:'Recipe Reading\nMEP\nReset\nCooking',SLOW:'Recipe Reading\nMEP\nReset\nCooking\nPlating'};
-function setRound(r){round=r;$('segR').classList.toggle('on',r==='RUSHED');$('segS').classList.toggle('on',r==='SLOW');$('stepsIn').value=STD_STEPS[r];}
+const STD_STEPS={RUSHED:'Recipe Reading\nMEP\nCooking\nReset',SLOW:'Recipe Reading\nMEP\nCooking\nReset\nPlating'};
+let stepsDirty=false;
+$('stepsIn').addEventListener('input',()=>{stepsDirty=true;});
+function setRound(r){round=r;$('segR').classList.toggle('on',r==='RUSHED');$('segS').classList.toggle('on',r==='SLOW');
+  if(!stepsDirty)$('stepsIn').value=STD_STEPS[r];}
 async function startCook(){
   const dish=$('dish').value.trim()||'Untitled dish';
   const steps=$('stepsIn').value.split('\n').map(s=>s.trim()).filter(Boolean);
   if(!steps.length){alert('Add at least one step');return;}
   live={s:{id:''+Date.now(),dish,round,date:new Date().toISOString().slice(0,10),
-        steps:steps.map(n=>({name:n,sec:0,icon:''})),total:0,photos:[],notes:[],learnings:['','',''],verdict:'',
+        steps:steps.map((n,i)=>({id:'s'+Date.now()+'_'+i,name:n,sec:0,icon:''})),total:0,photos:[],notes:[],learnings:['','',''],verdict:'',
         cast:{pic:null,soul:'',aromatics:''}},
         i:0,t0:Date.now(),st0:Date.now(),stream:null,rec:null,chunks:[]};
-  $('recipeBtn').textContent='🧄 shoot your ingredients — becomes "The Cast" slide';
-  $('castLive').style.display='none';$('castSoulLive').value='';$('castAromaticsLive').value='';$('castStatusLive').textContent='';
+  if(pendingCast.pic||pendingCast.soul.trim()||pendingCast.aromatics.trim()){
+    live.s.cast={...pendingCast};pendingCast={pic:null,soul:'',aromatics:''};
+  }else{
+    resetCastPanel();
+  }
+  $('liveCard').insertBefore($('castBlock'),$('finishBtn'));
   try{live.stream=await navigator.mediaDevices.getUserMedia({audio:true});startRec();}
   catch(e){$('recInd').innerHTML='mic off — timer & photos still running';}
-  try{navigator.wakeLock&&navigator.wakeLock.request('screen');}catch(e){}
+  try{navigator.wakeLock&&navigator.wakeLock.request('screen').catch(()=>{});}catch(e){}
   $('setupCard').style.display='none';$('liveCard').style.display='';
   document.body.classList.add('cooking');document.body.classList.toggle('slowround',round==='SLOW');setTheme('#1B1815');
   $('liveBadge').textContent=round;$('liveBadge').className='badge '+round;
@@ -326,7 +372,7 @@ function stopRec(){return new Promise(async res=>{
   if(!live||!live.rec||live.rec.state==='inactive')return res();
   clearTimeout(live.recTimer);
   live.rec.onstop=async()=>{const b=new Blob(live.chunks,{type:live.rec.mimeType||'audio/webm'});
-    if(b.size>200){const id='a'+Date.now();await putBlob(id,b);live.s.notes.push({id,stepIdx:live.i,sec:Math.round((Date.now()-live.recT0)/1000)});}res();};
+    if(b.size>200){const id='a'+Date.now();await putBlob(id,b);live.s.notes.push({id,stepId:live.s.steps[live.i].id,stepIdx:live.i,sec:Math.round((Date.now()-live.recT0)/1000)});}res();};
   live.rec.stop();});}
 function tick(){$('liveTotal').textContent=fmt((Date.now()-live.t0)/1000);$('liveStepTime').textContent='step · '+fmt((Date.now()-live.st0)/1000);}
 function renderLive(){
@@ -349,23 +395,34 @@ async function finishCook(){
   const id=live.s.id;live=null;
   document.body.classList.remove('cooking','slowround');setTheme('#EDE7DD');
   $('setupCard').style.display='';$('liveCard').style.display='none';
+  $('setupCard').insertBefore($('castBlock'),$('startBtn'));
+  resetCastPanel();
+  stepsDirty=false;$('stepsIn').value=STD_STEPS[round];
   openStudio(id);
 }
 $('photoIn').addEventListener('change',async e=>{
-  for(const f of e.target.files){const id='p'+Date.now()+Math.random().toString(36).slice(2,6);await putBlob(id,f);live.s.photos.push({id,stepIdx:live.i,use:true});}
+  for(const f of e.target.files){const id='p'+Date.now()+Math.random().toString(36).slice(2,6);await putBlob(id,f);live.s.photos.push({id,stepId:live.s.steps[live.i].id,stepIdx:live.i,use:true});}
   e.target.value='';});
+let pendingCast={pic:null,soul:'',aromatics:''};
+const activeCast=()=>live?live.s.cast:pendingCast;
+function resetCastPanel(){
+  $('recipeBtn').textContent='🧄 shoot your ingredients — becomes "The Cast" slide';
+  $('castPanel').style.display='none';
+  $('castSoulLive').value='';$('castAromaticsLive').value='';$('castStatusLive').textContent='';
+}
 $('recipeIn').addEventListener('change',async e=>{
-  const f=e.target.files[0];if(!f||!live)return;
-  if(live.s.cast.pic)delBlob(live.s.cast.pic);
+  const f=e.target.files[0];if(!f)return;
+  const cast=activeCast();
+  if(cast.pic)delBlob(cast.pic);
   const id='c'+Date.now();await putBlob(id,f);
-  live.s.cast.pic=id;e.target.value='';
+  cast.pic=id;e.target.value='';
   $('recipeBtn').textContent='🧄 ingredients photo saved ✓ (tap to retake)';
-  $('castLive').style.display='';
+  $('castPanel').style.display='';
   $('castThumbLive').src=URL.createObjectURL(f);
-  if(localStorage.getItem('palc_key'))extractLiveCast();
-  else $('castStatusLive').textContent='No API key saved — add one in Studio → "Polish my words" for AI extraction, or type the buckets below.';});
-$('castSoulLive').addEventListener('input',e=>{if(live)live.s.cast.soul=e.target.value;});
-$('castAromaticsLive').addEventListener('input',e=>{if(live)live.s.cast.aromatics=e.target.value;});
+  if((localStorage.getItem('palc_key')||'').trim())extractLiveCast();
+  else $('castStatusLive').textContent='Tap ✨ to extract with AI (asks for your API key once), or type the buckets below.';});
+$('castSoulLive').addEventListener('input',e=>{activeCast().soul=e.target.value;});
+$('castAromaticsLive').addEventListener('input',e=>{activeCast().aromatics=e.target.value;});
 
 /* ---------- cast AI extraction ---------- */
 async function blobToJpegB64(blob){
@@ -376,8 +433,12 @@ async function blobToJpegB64(blob){
   return c.toDataURL('image/jpeg',0.82).split(',')[1];
 }
 async function aiExtractCast(sess,statusEl,soulEl,aromEl){
-  const key=(localStorage.getItem('palc_key')||'').trim();
-  if(!key){statusEl.textContent='No API key saved — add one in Studio → "Polish my words", or type the buckets yourself.';return;}
+  let key=(localStorage.getItem('palc_key')||'').trim();
+  if(!key){
+    const k=prompt('Anthropic API key (sk-ant-…) — stored only on this device:');
+    if(!k||!k.trim()){statusEl.textContent='No API key — type the buckets yourself, or tap ✨ again to add a key.';return;}
+    key=k.trim();localStorage.setItem('palc_key',key);
+  }
   if(!sess.cast.pic){statusEl.textContent='Shoot the ingredients first.';return;}
   statusEl.textContent='👀 Claude is reading your ingredients…';
   try{
@@ -387,7 +448,7 @@ async function aiExtractCast(sess,statusEl,soulEl,aromEl){
       method:'POST',
       headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({
-        model:'claude-haiku-4-5-20251001',max_tokens:800,
+        model:'claude-opus-4-8',max_tokens:1500,
         output_config:{format:{type:'json_schema',schema:{type:'object',properties:{soul:{type:'string'},aromatics:{type:'string'}},required:['soul','aromatics'],additionalProperties:false}}},
         messages:[{role:'user',content:[
           {type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64}},
@@ -395,16 +456,20 @@ async function aiExtractCast(sess,statusEl,soulEl,aromEl){
         ]}]
       })});
     const d=await r.json();
-    if(d.error)throw new Error(d.error.message);
+    if(d.error)throw new Error(d.error.message||('HTTP '+r.status));
+    if(!r.ok)throw new Error('HTTP '+r.status);
     if(d.stop_reason==='refusal')throw new Error('Claude declined this request');
     const out=JSON.parse((d.content.find(b=>b.type==='text')||{}).text||'{}');
     sess.cast.soul=(out.soul||'').trim();sess.cast.aromatics=(out.aromatics||'').trim();
     soulEl.value=sess.cast.soul;aromEl.value=sess.cast.aromatics;
     if(sessions.includes(sess))saveSessions();
     statusEl.textContent='✓ extracted — edit anything that looks off';
-  }catch(e){statusEl.textContent='AI failed ('+e.message+') — type the buckets below.';}
+  }catch(e){statusEl.textContent='AI failed ('+e.message+') — type the buckets below, or tap ✨ to retry.';}
 }
-function extractLiveCast(){if(live)aiExtractCast(live.s,$('castStatusLive'),$('castSoulLive'),$('castAromaticsLive'));}
+function extractLiveCast(){
+  aiExtractCast(live?live.s:{dish:($('dish').value.trim()||'this dish'),cast:pendingCast},
+    $('castStatusLive'),$('castSoulLive'),$('castAromaticsLive'));
+}
 
 /* ---------- sessions ---------- */
 function renderSessions(){
@@ -426,6 +491,10 @@ function delSession(id){
 let cur=null;
 function openStudio(id){cur=sessions.find(s=>s.id===id);if(!cur)return;
   if(!cur.cast)cur.cast={pic:null,soul:'',aromatics:''};
+  /* migrate older sessions: steps get ids, notes/photos point at ids instead of positions */
+  cur.steps.forEach((s,i)=>{if(!s.id)s.id='s'+cur.id+'_'+i;});
+  cur.notes.forEach(n=>{if(!n.stepId&&cur.steps[n.stepIdx])n.stepId=cur.steps[n.stepIdx].id;});
+  cur.photos.forEach(p=>{if(!p.stepId&&p.stepIdx>=0&&cur.steps[p.stepIdx])p.stepId=cur.steps[p.stepIdx].id;});
   showTab('studio');
   $('studioEmpty').style.display='none';$('studioBody').style.display='';
   $('learn0').value=cur.learnings[0]||'';$('learn1').value=cur.learnings[1]||'';$('learn2').value=cur.learnings[2]||'';
@@ -439,12 +508,12 @@ function renderStudio(){
   renderPie();renderSteps();renderNotes();renderPhotos();renderTitlePic();renderCast();
 }
 function renderPie(){
-  const size=210,r=90,cx=size/2,cy=size/2;let a=-Math.PI/2,ps='',ls='';
+  const size=164,r=70,cx=size/2,cy=size/2;let a=-Math.PI/2,ps='',ls='';
   cur.steps.forEach((s,i)=>{const f=s.sec/cur.total,a2=a+f*2*Math.PI;
     const x1=cx+r*Math.cos(a),y1=cy+r*Math.sin(a),x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2);
-    ps+=`<path d="M${cx} ${cy} L${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 ${f>.5?1:0} 1 ${x2.toFixed(1)} ${y2.toFixed(1)} Z" fill="${PIE[i%PIE.length]}" stroke="#EDE7DD" stroke-width="3"/>`;
+    ps+=`<path d="M${cx} ${cy} L${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 ${f>.5?1:0} 1 ${x2.toFixed(1)} ${y2.toFixed(1)} Z" fill="${PIE[i%PIE.length]}" stroke="#EDE7DD" stroke-width="2.5"/>`;
     const mid=(a+a2)/2,pct=Math.round(f*100);
-    if(pct>=7)ls+=`<text x="${(cx+Math.cos(mid)*r*0.62).toFixed(1)}" y="${(cy+Math.sin(mid)*r*0.62+5).toFixed(1)}" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="600" font-size="15" fill="${pieText(i)}">${pct}%</text>`;
+    if(pct>=8)ls+=`<text x="${(cx+Math.cos(mid)*r*0.62).toFixed(1)}" y="${(cy+Math.sin(mid)*r*0.62+4).toFixed(1)}" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="600" font-size="12" fill="${pieText(i)}">${pct}%</text>`;
     a=a2;});
   $('pieSvg').innerHTML=`<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${ps}${ls}</svg>`;
 }
@@ -457,14 +526,18 @@ function renderSteps(){
     <button class="mini" onclick="moveStep(${i},1)" ${i===cur.steps.length-1?'disabled':''}>▼</button>
     <button class="icon-btn" onclick="pickIcon(${i})">${s.icon||'＋'}</button>
     <input class="nm" value="${s.name.replace(/"/g,'&quot;')}" onchange="cur.steps[${i}].name=this.value;saveSessions();">
-    ${cur.steps.length>1?`<button class="mini red" onclick="rmStep(${i})">✕</button>`:''}
-    <div class="sharewrap"><input type="range" min="1" max="99" step="1" value="${pct}" oninput="slideShare(${i},this.value)" onchange="renderStudio()"><span class="pct" id="pct-${i}">${pct}%</span></div>
+    ${notesFor(s.id).map(n=>`<button class="mini play" data-label="▶ ${fmt(n.sec)}" title="listen to your note for this step" onclick="playNote('${n.id}',this)">▶ ${fmt(n.sec)}</button>`).join('')}
+    <div class="sharewrap"><input type="range" min="1" max="99" step="1" value="${pct}" oninput="slideShare(${i},this.value)" onchange="renderStudio()"><span class="pct" id="pct-${i}">${pct}%</span>
+    ${cur.steps.length>1?`<button class="mini red" onclick="rmStep(${i})">✕</button>`:''}</div>
     </div>`;}).join('');
 }
+/* smallest slice a step may hold — 5s normally, less on very short cooks */
+function minSec(){const n=Math.max(1,cur.steps.length);return Math.max(1,Math.min(5,Math.floor(cur.total/(n*2))||1));}
 function slideShare(i,pct){
   const n=cur.steps.length;if(n<2)return;
+  const m=minSec(),hi=cur.total-m*(n-1);if(hi<m)return;
   let sec=Math.round(cur.total*pct/100);
-  sec=Math.min(Math.max(5,sec),cur.total-5*(n-1));
+  sec=Math.min(Math.max(m,sec),hi);
   cur.steps[i].sec=sec;redistribute(i,cur.total-sec);
   saveSessions();renderPie();
   cur.steps.forEach((s,j)=>{const el=$('pct-'+j);if(el)el.textContent=Math.round(s.sec/cur.total*100)+'%';});
@@ -476,14 +549,14 @@ function moveStep(i,d){
 }
 function redistribute(exceptIdx,targetOthers){
   const others=cur.steps.filter((_,j)=>j!==exceptIdx);
-  const old=others.reduce((a,b)=>a+b.sec,0)||1;let acc=0;
-  others.forEach((st,k)=>{if(k===others.length-1)st.sec=Math.max(5,targetOthers-acc);
-    else{st.sec=Math.max(5,Math.round(st.sec*targetOthers/old));acc+=st.sec;}});
+  const old=others.reduce((a,b)=>a+b.sec,0)||1;const m=minSec();let acc=0;
+  others.forEach((st,k)=>{if(k===others.length-1)st.sec=Math.max(m,targetOthers-acc);
+    else{st.sec=Math.max(m,Math.round(st.sec*targetOthers/old));acc+=st.sec;}});
 }
 function addStep(){
   const name=prompt('Step name (its time is taken from the other steps — total stays locked):');if(!name)return;
   const take=Math.max(10,Math.round(cur.total*0.1));
-  cur.steps.push({name,sec:take,icon:''});
+  cur.steps.push({id:'s'+Date.now(),name,sec:take,icon:''});
   redistribute(cur.steps.length-1,cur.total-take);
   saveSessions();renderStudio();
 }
@@ -497,20 +570,87 @@ function pickIcon(i){pickTarget=i;$('pickGrid').innerHTML=ICONS.map(ic=>`<button
 function setIcon(ic){cur.steps[pickTarget].icon=ic;saveSessions();$('picker').style.display='none';renderStudio();}
 $('picker').addEventListener('click',e=>{if(e.target.id==='picker')e.target.style.display='none';});
 
+const stepName=stepId=>{const s=cur&&cur.steps.find(x=>x.id===stepId);return s?s.name:null;};
+const notesFor=stepId=>(cur.notes||[]).filter(n=>n.stepId===stepId);
+/* one shared player — a second ▶ stops the first */
+let noteAudio=null,noteBtn=null;
+function stopNote(){if(noteAudio){noteAudio.pause();noteAudio=null;}if(noteBtn){noteBtn.classList.remove('on');noteBtn.textContent=noteBtn.dataset.label;noteBtn=null;}}
+async function playNote(id,btn){
+  const same=noteBtn===btn;stopNote();if(same)return;
+  const blob=await getBlob(id);if(!blob)return;
+  noteAudio=new Audio(URL.createObjectURL(blob));noteBtn=btn;btn.classList.add('on');btn.textContent='■';
+  noteAudio.onended=stopNote;noteAudio.play();
+}
+/* only notes whose step no longer exists land here — everything else sits beside its step */
 async function renderNotes(){
-  const el=$('stNotes');el.innerHTML='';
-  if(!cur.notes.length){el.innerHTML='<p class="hint">No voice notes for this session.</p>';return;}
-  cur.notes.forEach((n,i)=>{const b=document.createElement('button');
-    b.textContent=`▶ ${cur.steps[n.stepIdx]?cur.steps[n.stepIdx].name:'step '+(n.stepIdx+1)} · ${fmt(n.sec)}`;
-    b.onclick=async()=>{const blob=await getBlob(n.id);if(blob)new Audio(URL.createObjectURL(blob)).play();};
-    el.appendChild(b);});
+  const el=$('stNotes');el.innerHTML='';stopNote();
+  const orphans=(cur.notes||[]).filter(n=>!cur.steps.some(s=>s.id===n.stepId));
+  $('notesHead').style.display=el.style.display=orphans.length?'':'none';
+  orphans.forEach(n=>{const b=document.createElement('button');
+    b.textContent=`▶ note from a removed step · ${fmt(n.sec)}`;
+    b.onclick=()=>playNote(n.id,b);b.dataset.label=b.textContent;el.appendChild(b);});
 }
 async function renderPhotos(){
   const el=$('stPhotos');el.innerHTML='';
-  for(const p of cur.photos){const blob=await getBlob(p.id);if(!blob)continue;
+  for(let i=0;i<cur.photos.length;i++){
+    const p=cur.photos[i];const blob=await getBlob(p.id);if(!blob)continue;
+    const wrap=document.createElement('div');wrap.className='thumbwrap';
     const img=document.createElement('img');img.className='ph'+(p.use?' use':'');img.src=URL.createObjectURL(blob);
-    img.onclick=()=>{p.use=!p.use;saveSessions();img.classList.toggle('use',p.use);};el.appendChild(img);}
+    img.onclick=()=>openLightbox(i);
+    const badge=document.createElement('button');badge.className='badge-use'+(p.use?' on':'');
+    badge.textContent=p.use?'✓':'';badge.title='include in carousel';
+    badge.onclick=e=>{e.stopPropagation();setPhotoUse(p,!p.use);};
+    wrap.appendChild(img);wrap.appendChild(badge);el.appendChild(wrap);}
 }
+function setPhotoUse(p,on){
+  p.use=on;saveSessions();renderPhotos();
+  if(cur.plan){const e=cur.plan.find(x=>x.key==='photo:'+p.id);if(e){e.on=on;saveSessions();renderPlan();}}
+}
+/* ---------- lightbox ---------- */
+let lbIdx=-1;
+async function openLightbox(i){
+  const p=cur.photos[i];if(!p)return;
+  const blob=await getBlob(p.id);if(!blob)return;
+  lbIdx=i;
+  $('lbImg').src=URL.createObjectURL(blob);
+  const sn=stepName(p.stepId);
+  $('lbCap').textContent=`${i+1} / ${cur.photos.length}${sn?' · '+sn:''}`;
+  $('lbPrev').disabled=i===0;$('lbNext').disabled=i===cur.photos.length-1;
+  $('lbPrev').style.display=$('lbNext').style.display=cur.photos.length>1?'':'none';
+  const b=$('lbUse');b.style.display='';b.classList.toggle('on',!!p.use);b.textContent=p.use?'✓ in carousel':'excluded';
+  const t=$('lbTitle');t.style.display='';t.classList.toggle('on',cur.titlePicFrom===p.id);t.textContent=cur.titlePicFrom===p.id?'★ is the title pic':'☆ make title pic';
+  $('lightbox').style.display='flex';setTheme('#141210');
+}
+function closeLightbox(){lbIdx=-1;$('lightbox').style.display='none';setTheme('#EDE7DD');}
+function stepLightbox(d){const j=lbIdx+d;if(j>=0&&j<cur.photos.length)openLightbox(j);}
+function toggleLightboxUse(){
+  const p=cur.photos[lbIdx];if(!p)return;
+  setPhotoUse(p,!p.use);
+  const b=$('lbUse');b.classList.toggle('on',!!p.use);b.textContent=p.use?'✓ in carousel':'excluded';
+}
+/* copy the photo into its own blob, so deleting the title pic later never deletes the photo */
+async function photoAsTitle(){
+  const p=cur.photos[lbIdx];if(!p)return;
+  const blob=await getBlob(p.id);if(!blob)return;
+  if(cur.titlePic)delBlob(cur.titlePic);
+  const id='t'+Date.now();await putBlob(id,blob);
+  cur.titlePic=id;cur.titlePicFrom=p.id;saveSessions();renderTitlePic();
+  const t=$('lbTitle');t.classList.add('on');t.textContent='★ is the title pic';
+}
+async function showBig(blobId,caption){
+  const blob=await getBlob(blobId);if(!blob)return;
+  lbIdx=-1;
+  $('lbImg').src=URL.createObjectURL(blob);$('lbCap').textContent=caption||'';
+  $('lbPrev').style.display=$('lbNext').style.display=$('lbUse').style.display=$('lbTitle').style.display='none';
+  $('lightbox').style.display='flex';setTheme('#141210');
+}
+$('lightbox').addEventListener('click',e=>{if(e.target.id==='lightbox')closeLightbox();});
+document.addEventListener('keydown',e=>{
+  if($('lightbox').style.display!=='flex')return;
+  if(e.key==='Escape')closeLightbox();
+  else if(e.key==='ArrowLeft'&&lbIdx>=0)stepLightbox(-1);
+  else if(e.key==='ArrowRight'&&lbIdx>=0)stepLightbox(1);
+});
 $('galleryIn').addEventListener('change',async e=>{
   for(const f of e.target.files){const id='p'+Date.now()+Math.random().toString(36).slice(2,6);await putBlob(id,f);cur.photos.push({id,stepIdx:-1,use:true});}
   e.target.value='';saveSessions();renderPhotos();});
@@ -518,7 +658,7 @@ $('titleIn').addEventListener('change',async e=>{
   const f=e.target.files[0];if(!f)return;
   if(cur.titlePic)delBlob(cur.titlePic);
   const id='t'+Date.now();await putBlob(id,f);
-  cur.titlePic=id;saveSessions();e.target.value='';renderTitlePic();});
+  cur.titlePic=id;cur.titlePicFrom=null;saveSessions();e.target.value='';renderTitlePic();});
 async function renderTitlePic(){
   const has=!!cur.titlePic;$('tpDel').style.display=has?'':'none';
   const img=$('tpThumb');
@@ -526,7 +666,7 @@ async function renderTitlePic(){
   const b=await getBlob(cur.titlePic);
   if(b){img.src=URL.createObjectURL(b);img.style.display='';}else{img.style.display='none';}
 }
-function delTitlePic(){if(cur.titlePic)delBlob(cur.titlePic);cur.titlePic=null;saveSessions();renderTitlePic();}
+function delTitlePic(){if(cur.titlePic)delBlob(cur.titlePic);cur.titlePic=null;cur.titlePicFrom=null;saveSessions();renderTitlePic();}
 $('castIn').addEventListener('change',async e=>{
   const f=e.target.files[0];if(!f)return;
   if(cur.cast.pic)delBlob(cur.cast.pic);
@@ -547,6 +687,7 @@ $('castAromatics').addEventListener('input',e=>{if(cur){cur.cast.aromatics=e.tar
 
 /* ---------- polish (AI copy editor) ---------- */
 const POLISH_RULES=`You are the copy editor for @perfection.a.la.carte, an Instagram channel where one dish is cooked twice: once rushed against a timer, once slow with unlimited time. Polish each item of carousel text: fix grammar (the writer is a German native writing English), make it as short as possible, readable and practical — never influencer hype, never like a generic recipe app. Voice: dry wink; at most ONE line per set may go properly cheeky by personifying the food or the equipment (example: instead of "keep the airfryer moderate or the chicken dries out" write "not your show-off day, dear airfryer — keep the chicken chill"). The rest stay clean and useful; the practical tip must survive the joke. Keep the writer's meaning and personality. Banned words: yummy, delicious, easy peasy, foodie, elevate, game-changer. No exclamation marks. If an item is already great, return it unchanged.
+NUMBERS & SIGNS: always write numbers as digits (3, not three) and reach for the compact sign or abbreviation whenever it reads naturally and stays unambiguous — it is shorter, scans faster on a slide, and carries more punch. Use < > ≈ ~ = + − × ÷ % → ° and short units (s, min, h, g, kg, ml, l, °C, €). Examples: "under five minutes of active work" → "<5 min hands-on"; "about twice as fast" → "≈2× faster"; "thirty percent less" → "−30%"; "two hundred degrees" → "200 °C"; "from rushed to slow" → "rushed → slow". Ranges use an en dash (8–10 min). Keep at most two signs per line and never let one replace the verb — the line must still read as a sentence out loud, not as a formula. Never start a line with a bare digit-sign pair that reads as code.
 VERDICT: always include a suggestion for id "verdict" — catchy and specific to THIS session, built from the session facts provided (dish, round, times, time split, learnings). If the writer's verdict is empty, invent one; otherwise sharpen theirs. Occasionally overarching (done vs. perfect) is fine, but default to something only this session could produce.`;
 const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 function polishItems(){
@@ -673,12 +814,20 @@ async function slCast(){const[c,x]=newC();
   const st=(cur.cast.soul||'').split('\n').map(s=>s.trim()).filter(Boolean);
   const ar=(cur.cast.aromatics||'').split('\n').map(s=>s.trim()).filter(Boolean);
   if(st.length||ar.length){
+    /* "500 g spaghetti" → amount "500 g" + name "spaghetti"; lines without an amount keep the whole text as the name */
+    const AMT=/^((?:\d+(?:[.,]\d+)?|[½¼¾⅓⅔]|\d+\s*\/\s*\d+)(?:\s*[–-]\s*\d+(?:[.,]\d+)?)?\s*(?:g|kg|mg|ml|cl|dl|l|tsp|tbsp|tl|el|pcs?|stk|cups?|oz|lb|bunch|cloves?|pinch|handful|slices?|sprigs?|x)?\.?)\s+(.+)$/i;
     const col=(title,items,px)=>{
+      const rows=items.map(it=>{const m=it.match(AMT);return m?{amt:m[1].trim(),name:m[2].trim()}:{amt:'',name:it};});
+      x.font=`500 30px ${SANS}`;
+      const amtW=rows.reduce((w,r)=>Math.max(w,r.amt?x.measureText(r.amt).width:0),0);
+      const nameX=amtW?px+amtW+22:px, nameW=400-(nameX-px);
       let y=470;
       txt(x,title,px,y,25,{col:S.orange,ls:5,w:600});
       x.strokeStyle=S.line;x.lineWidth=2;x.beginPath();x.moveTo(px,y+22);x.lineTo(px+400,y+22);x.stroke();
       y+=84;
-      items.forEach(it=>{y=wrap(x,it,px,y,36,400,46,{w:400})+58;});
+      rows.forEach(r=>{
+        if(r.amt)txt(x,r.amt,px+amtW,y,30,{w:500,col:S.gray,align:'right'});
+        y=wrap(x,r.name,nameX,y,36,nameW,46,{w:400})+58;});
     };
     if(st.length)col('SOUL',st,90);
     if(ar.length)col('AROMATICS',ar,590);
@@ -732,11 +881,10 @@ async function slPhoto(p){const[c,x]=newC(S.charcoal);const blob=await getBlob(p
     const gr=x.createLinearGradient(0,H-360,0,H);
     gr.addColorStop(0,'rgba(20,18,16,0)');gr.addColorStop(1,'rgba(20,18,16,.68)');
     x.fillStyle=gr;x.fillRect(0,H-360,W,360);}
-  const stepName=p.stepIdx>=0&&cur.steps[p.stepIdx]?cur.steps[p.stepIdx].name:cur.dish;
-  txt(x,stepName.toUpperCase(),90,H-104,38,{col:'#FFFFFF',w:600,ls:5});
+  const cap=stepName(p.stepId)||cur.dish;
+  txt(x,cap.toUpperCase(),90,H-104,38,{col:'#FFFFFF',w:600,ls:5});
   footer(x,'rgba(255,255,255,.8)');return c;}
 function slLearn(){const[c,x]=newC();
-  brand(x);
   txt(x,cur.dish.toUpperCase(),W-90,124,23,{col:S.gray,align:'right',ls:4,w:500});
   txt(x,'WHAT I',86,300,104,{w:800,col:S.ink,ls:1});
   txt(x,'LEARNED',86,408,104,{w:800,col:S.orange,ls:1});
@@ -776,16 +924,35 @@ function syncPlan(){
 }
 function renderPlan(){
   const {byKey,plan}=syncPlan();
-  $('slidePlan').innerHTML=plan.map((e,i)=>`<div class="steprow" style="margin:6px 0">
+  $('slidePlan').innerHTML=plan.map((e,i)=>`<div class="steprow planrow" data-key="${e.key}">
+    <span class="drag" title="drag to reorder" onpointerdown="planDragStart(event)" onpointermove="planDragMove(event)" onpointerup="planDragEnd(event)" onpointercancel="planDragEnd(event)">☰</span>
     <label style="display:flex;align-items:center;gap:8px;flex:1;margin:0">
       <input type="checkbox" ${e.on?'checked':''} onchange="togglePlan('${e.key}')" style="width:20px;height:20px">
       <span style="font-weight:700;font-size:14px">${byKey[e.key].label}</span></label>
-    <button class="mini" onclick="movePlan(${i},-1)" ${i===0?'disabled':''}>▲</button>
-    <button class="mini" onclick="movePlan(${i},1)" ${i===plan.length-1?'disabled':''}>▼</button>
   </div>`).join('');
 }
+/* drag-to-reorder slides — pointer events, so it works with a finger on the phone */
+let planDrag=null;
+function planDragStart(e){
+  e.preventDefault();const row=e.currentTarget.closest('.planrow');
+  e.currentTarget.setPointerCapture(e.pointerId);
+  planDrag={row};row.classList.add('dragging');
+}
+function planDragMove(e){
+  if(!planDrag)return;
+  const list=$('slidePlan'),others=[...list.children].filter(r=>r!==planDrag.row);
+  const idx=others.findIndex(r=>{const b=r.getBoundingClientRect();return e.clientY<b.top+b.height/2;});
+  const ref=idx<0?null:others[idx];
+  if(planDrag.row.nextSibling!==ref)list.insertBefore(planDrag.row,ref);
+}
+function planDragEnd(){
+  if(!planDrag)return;
+  planDrag.row.classList.remove('dragging');planDrag=null;
+  const order=[...$('slidePlan').children].map(r=>r.dataset.key);
+  cur.plan.sort((a,b)=>order.indexOf(a.key)-order.indexOf(b.key));
+  saveSessions();renderPlan();buildSlides();
+}
 function togglePlan(key){const e=cur.plan.find(x=>x.key===key);if(e)e.on=!e.on;saveSessions();renderPlan();buildSlides();}
-function movePlan(i,d){const j=i+d,p=cur.plan;if(j<0||j>=p.length)return;[p[i],p[j]]=[p[j],p[i]];saveSessions();renderPlan();buildSlides();}
 function resetPlan(){cur.plan=null;saveSessions();renderPlan();buildSlides();}
 async function buildSlides(){
   await document.fonts.ready;

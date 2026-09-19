@@ -3,6 +3,21 @@
 Every version is a full snapshot in `versions/index-vX.Y.html` (and a git commit).
 **Roll back:** copy the snapshot over `index.html`, re-upload to GitHub.
 
+## v3.0 — 2026-09-19
+- **Fine-line icons everywhere.** Every emoji in the interface is now a stroked SVG on
+  one weight (clock, camera, mic, play/stop, sparkle, star, pencil, check, chevrons,
+  download, refresh…). The emoji step-icon picker is gone — it was decorative and never
+  appeared on a slide.
+- **Cover: time ring.** A thin circle holding the total time sits on the title photo
+  (dark scrim + white ring so it reads on any picture); without a photo the ring sits
+  beside "every second tracked · door to bowl".
+- **Method slide.** "THE STEPS" is now METHOD: each step shows its duration (`4 min` /
+  `45 s`) in coral on the left, a dot on a dotted vertical rail, then the step name.
+  No more "01 / 02" numbering, no right-hand time column. Footer line: total, door to bowl.
+- **Where the time went: donut.** The pie is now a donut with the total time and the round
+  in the hole, and a dry one-liner underneath — e.g. "30% of the clock went to airfryer
+  to 200 · 20% to recipe reading."
+
 ## v2.9 — 2026-09-19
 - **Crash insurance for a running cook.** The phone reloading the page (screen lock,
   charging, memory pressure, Safari backgrounding the tab) used to wipe the session —

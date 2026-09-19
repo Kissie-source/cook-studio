@@ -17,6 +17,11 @@
   --mono:ui-monospace,"SF Mono","Cascadia Code","Roboto Mono",monospace;
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+/* fine-line icon system — one stroke weight everywhere */
+.ic{display:inline-block; width:1.05em; height:1.05em; vertical-align:-.16em; flex:none; margin-right:.45em}
+.ic.solo{margin-right:0}
+.ic svg{display:block; width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round}
+.big-btn .ic{width:1.2em; height:1.2em; vertical-align:-.22em}
 body{margin:0; font-family:var(--ui); background:var(--paper); color:var(--ink); -webkit-font-smoothing:antialiased}
 body::before{content:''; position:fixed; top:-140px; right:-160px; width:420px; height:420px; border-radius:50%;
   background:radial-gradient(circle, rgba(224,122,95,.45), rgba(224,122,95,0) 68%); filter:blur(40px); pointer-events:none; z-index:0}
@@ -169,14 +174,14 @@ body.cooking #castBlock .mini{background:none; border-color:var(--k-line); color
   <button id="nav-studio" onclick="showTab('studio')">Studio</button>
 </nav>
 <main>
-<div class="warn" id="httpsWarn">⚠️ Voice recording needs HTTPS. Photos & timer still work.</div>
+<div class="warn" id="httpsWarn"><i class="ic" data-ic="warn"></i>Voice recording needs HTTPS. Photos & timer still work.</div>
 
 <!-- COOK -->
 <section id="tab-cook">
   <div class="card" id="resumeCard" style="display:none;border:2px solid var(--accent)">
-    <h2>⏱ COOK IN PROGRESS</h2>
+    <h2><i class="ic" data-ic="clock"></i>COOK IN PROGRESS</h2>
     <p class="hint" id="resumeInfo" style="font-size:14px;color:var(--ink)"></p>
-    <button class="big-btn red" onclick="resumeCook()">▶ Resume — timer, notes & photos intact</button>
+    <button class="big-btn red" onclick="resumeCook()"><i class="ic" data-ic="play"></i>Resume — timer, notes & photos intact</button>
     <button class="mini red" style="width:100%;margin-top:10px;padding:10px" onclick="discardLive()">throw it away</button>
   </div>
   <div class="card" id="setupCard">
@@ -185,8 +190,8 @@ body.cooking #castBlock .mini{background:none; border-color:var(--k-line); color
     <input type="text" id="dish" placeholder="Carbonara">
     <label>Round</label>
     <div class="seg">
-      <button class="rushed on" id="segR" onclick="setRound('RUSHED')">⏱ RUSHED</button>
-      <button class="slow" id="segS" onclick="setRound('SLOW')">🌿 SLOW</button>
+      <button class="rushed on" id="segR" onclick="setRound('RUSHED')"><i class="ic" data-ic="clock"></i>RUSHED</button>
+      <button class="slow" id="segS" onclick="setRound('SLOW')"><i class="ic" data-ic="leaf"></i>SLOW</button>
     </div>
     <label>Steps (one per line — as many as you need; the mic re-records fresh for each; edits here stick even if you switch RUSHED/SLOW)</label>
     <textarea id="stepsIn">Recipe Reading
@@ -194,11 +199,11 @@ MEP
 Cooking
 Reset</textarea>
     <div id="castBlock">
-      <button class="mini" id="recipeBtn" style="width:100%;margin-top:16px;padding:10px" onclick="recipeIn.click()">🧄 shoot your ingredients — becomes "The Cast" slide</button>
+      <button class="mini" id="recipeBtn" style="width:100%;margin-top:16px;padding:10px" onclick="recipeIn.click()"><i class="ic" data-ic="image"></i>shoot your ingredients — becomes "The Cast" slide</button>
       <div id="castPanel" style="display:none">
         <div class="row" style="margin-top:10px">
           <img id="castThumbLive" style="width:56px;height:56px;border-radius:12px;object-fit:cover" alt="ingredients">
-          <button class="mini grow" onclick="extractLiveCast()">✨ extract soul &amp; aromatics with AI</button>
+          <button class="mini grow" onclick="extractLiveCast()"><i class="ic" data-ic="sparkle"></i>extract soul &amp; aromatics with AI</button>
         </div>
         <p class="hint" id="castStatusLive"></p>
         <label>Soul (the substance — one per line)</label>
@@ -207,7 +212,7 @@ Reset</textarea>
         <textarea id="castAromaticsLive" style="min-height:56px" placeholder="60 g pecorino&#10;black pepper, lots&#10;salt"></textarea>
       </div>
     </div>
-    <button class="big-btn red" id="startBtn" onclick="startCook()">▶ Start timer & mic</button>
+    <button class="big-btn red" id="startBtn" onclick="startCook()"><i class="ic" data-ic="play"></i>Start timer &amp; mic</button>
     <p class="hint">At each step the mic records the first 7 seconds only — say what you're doing, then cook. Those notes are your captions.</p>
   </div>
 
@@ -219,10 +224,10 @@ Reset</textarea>
     <div class="rec" id="recInd"><span class="dot"></span> recording voice note…</div>
     <ul class="steplist" id="liveList"></ul>
     <div class="row" style="margin-top:12px">
-      <button class="big-btn" style="margin-top:0" onclick="photoIn.click()">📸</button>
-      <button class="big-btn sage grow" style="margin-top:0" id="nextBtn" onclick="nextStep()">Next step ▸</button>
+      <button class="big-btn" style="margin-top:0" onclick="photoIn.click()"><i class="ic solo" data-ic="camera"></i></button>
+      <button class="big-btn sage grow" style="margin-top:0" id="nextBtn" onclick="nextStep()">Next step<i class="ic solo" data-ic="chevR" style="margin-left:.45em"></i></button>
     </div>
-    <button class="big-btn red" id="finishBtn" onclick="finishCook()">■ Finish & build carousel</button>
+    <button class="big-btn red" id="finishBtn" onclick="finishCook()"><i class="ic" data-ic="stop"></i>Finish &amp; build carousel</button>
     <input type="file" id="photoIn" accept="image/*" capture="environment" hidden>
     <input type="file" id="recipeIn" accept="image/*" capture="environment" hidden>
   </div>
@@ -241,21 +246,21 @@ Reset</textarea>
       <h2 id="stTitle">—</h2>
       <div class="total-lock" id="stTotal">total locked · 0:00</div>
       <div id="pieWrap" style="justify-content:center"><div id="pieSvg"></div></div>
-      <h3 class="sec">STEPS · ▲▼ order · slider = share</h3>
+      <h3 class="sec">STEPS · drag order with the arrows · slider = share</h3>
       <div id="stSteps"></div>
-      <button class="mini" onclick="addStep()">＋ add step</button>
+      <button class="mini" onclick="addStep()"><i class="ic" data-ic="plus"></i>add step</button>
       <h3 class="sec" id="notesHead" style="display:none">VOICE NOTES · from steps you removed</h3>
       <div class="notes" id="stNotes" style="display:none"></div>
       <h3 class="sec">PHOTOS · tap a photo to see it big, the corner dot to include / exclude</h3>
       <div class="thumbs" id="stPhotos"></div>
-      <button class="mini" style="margin-top:8px" onclick="galleryIn.click()">＋ add from gallery</button>
+      <button class="mini" style="margin-top:8px" onclick="galleryIn.click()"><i class="ic" data-ic="plus"></i>add from gallery</button>
       <input type="file" id="galleryIn" accept="image/*" multiple hidden>
       <h3 class="sec">THE CAST · slide 2 — ingredients in two buckets</h3>
       <div class="row">
-        <button class="mini" onclick="castIn.click()">＋ ingredients photo</button>
+        <button class="mini" onclick="castIn.click()"><i class="ic" data-ic="plus"></i>ingredients photo</button>
         <img id="castThumb" style="display:none;width:72px;height:72px;border-radius:12px;border:3px solid var(--sage);object-fit:cover;cursor:zoom-in" alt="ingredients" onclick="showBig(cur.cast.pic,'The Cast — your ingredients')">
-        <button class="mini" id="castAI" style="display:none" onclick="aiExtractCast(cur,$('castStatus'),$('castSoul'),$('castAromatics'))">✨ AI</button>
-        <button class="mini red" id="castDel" style="display:none" onclick="delCastPic()">✕</button>
+        <button class="mini" id="castAI" style="display:none" onclick="aiExtractCast(cur,$('castStatus'),$('castSoul'),$('castAromatics'))"><i class="ic" data-ic="sparkle"></i>AI</button>
+        <button class="mini red" id="castDel" style="display:none" onclick="delCastPic()"><i class="ic solo" data-ic="x"></i></button>
       </div>
       <p class="hint" id="castStatus" style="margin-top:6px"></p>
       <input type="file" id="castIn" accept="image/*" hidden>
@@ -266,9 +271,9 @@ Reset</textarea>
       <p class="hint">Typed buckets win the slide; the ingredients photo is used when both buckets are empty.</p>
       <h3 class="sec">TITLE PIC · shown big on the cover slide</h3>
       <div class="row">
-        <button class="mini" onclick="titleIn.click()">＋ choose title pic</button>
+        <button class="mini" onclick="titleIn.click()"><i class="ic" data-ic="plus"></i>choose title pic</button>
         <img id="tpThumb" style="display:none;width:72px;height:72px;border-radius:12px;border:3px solid var(--blush);object-fit:cover;cursor:zoom-in" alt="title pic" onclick="showBig(cur.titlePic,'Title pic — cover slide')">
-        <button class="mini red" id="tpDel" style="display:none" onclick="delTitlePic()">✕</button>
+        <button class="mini red" id="tpDel" style="display:none" onclick="delTitlePic()"><i class="ic solo" data-ic="x"></i></button>
       </div>
       <input type="file" id="titleIn" accept="image/*" hidden>
       <h3 class="sec">LEARNINGS</h3>
@@ -278,44 +283,43 @@ Reset</textarea>
       <h3 class="sec">VERDICT / TEASER (last slide)</h3>
       <input type="text" id="verdict" placeholder="e.g. Friday: same dish, 90 minutes. Worth it?">
       <h3 class="sec">POLISH · Claude tightens your words — you decide, line by line</h3>
-      <button class="mini" onclick="startPolish()">✨ Polish my words</button>
+      <button class="mini" onclick="startPolish()"><i class="ic" data-ic="sparkle"></i>Polish my words</button>
       <div id="polishBox" style="display:none">
         <label>Anthropic API key (stored only on this phone — leave empty to use the free copy-paste route)</label>
         <input type="password" id="apiKey" placeholder="sk-ant-...">
         <p class="hint" id="polishStatus"></p>
         <div id="polishManual" style="display:none">
-          <button class="mini" onclick="copyPolishPrompt()">📋 Copy prompt for the Claude app</button>
+          <button class="mini" onclick="copyPolishPrompt()"><i class="ic" data-ic="clipboard"></i>Copy prompt for the Claude app</button>
           <label>Paste Claude's reply here</label>
           <textarea id="polishPaste" placeholder='[{"id":"learn-0","polished":"..."}]'></textarea>
           <button class="mini" onclick="parsePolishPaste()">Check suggestions</button>
         </div>
         <div id="polishResults"></div>
       </div>
-      <button class="big-btn sage" onclick="buildSlides()">🎨 Generate carousel</button>
+      <button class="big-btn sage" onclick="buildSlides()"><i class="ic" data-ic="sparkle"></i>Generate carousel</button>
     </div>
     <div class="card">
-      <h2>CAROUSEL · tick the slides, drag ☰ to order, then post on IG</h2>
+      <h2>CAROUSEL · tick the slides, drag to order, then post on IG</h2>
       <div id="slidePlan"></div>
-      <button class="mini" onclick="resetPlan()" style="margin:2px 0 10px">↺ reset to suggested</button>
+      <button class="mini" onclick="resetPlan()" style="margin:2px 0 10px"><i class="ic" data-ic="refresh"></i>reset to suggested</button>
       <div id="slides"></div>
-      <button class="big-btn" onclick="downloadAll()">⬇ Download all slides</button>
+      <button class="big-btn" onclick="downloadAll()"><i class="ic" data-ic="download"></i>Download all slides</button>
     </div>
   </div>
 </section>
 </main>
 
-<div id="picker"><div class="sheet"><h2>Pick an icon</h2><div class="grid" id="pickGrid"></div></div></div>
 
 <div id="lightbox">
-  <button class="lbclose" onclick="closeLightbox()">✕</button>
+  <button class="lbclose" onclick="closeLightbox()"><i class="ic solo" data-ic="x"></i></button>
   <img id="lbImg" alt="">
   <div class="lbcap" id="lbCap"></div>
   <div class="lbrow">
-    <button class="lbbtn" id="lbPrev" onclick="stepLightbox(-1)">‹</button>
+    <button class="lbbtn" id="lbPrev" onclick="stepLightbox(-1)"><i class="ic solo" data-ic="chevL"></i></button>
     <button class="lbbtn" id="lbUse" onclick="toggleLightboxUse()">in carousel</button>
-    <button class="lbbtn" id="lbNext" onclick="stepLightbox(1)">›</button>
+    <button class="lbbtn" id="lbNext" onclick="stepLightbox(1)"><i class="ic solo" data-ic="chevR"></i></button>
   </div>
-  <div class="lbrow"><button class="lbbtn" id="lbTitle" onclick="photoAsTitle()">☆ make title pic</button><button class="lbbtn" id="lbEdit" onclick="toggleAdj()">✎ adjust</button></div>
+  <div class="lbrow"><button class="lbbtn" id="lbTitle" onclick="photoAsTitle()"><i class="ic" data-ic="star"></i>make title pic</button><button class="lbbtn" id="lbEdit" onclick="toggleAdj()"><i class="ic" data-ic="pencil"></i>adjust</button></div>
   <div class="lbadj" id="lbAdj">
     <canvas id="lbFrame" width="432" height="540"></canvas>
     <label><span>↔ frame</span><input type="range" min="0" max="1" step="0.01" data-k="fx" oninput="adjInput(this)" onchange="adjCommit()"></label>
@@ -325,7 +329,7 @@ Reset</textarea>
     <label><span>contrast</span><input type="range" min="0.7" max="1.3" step="0.01" data-k="c" oninput="adjInput(this)" onchange="adjCommit()"></label>
     <label><span>colour</span><input type="range" min="0.5" max="1.6" step="0.01" data-k="s" oninput="adjInput(this)" onchange="adjCommit()"></label>
     <label><span>warm</span><input type="range" min="-1" max="1" step="0.02" data-k="w" oninput="adjInput(this)" onchange="adjCommit()"></label>
-    <div class="lbrow"><button class="lbbtn" onclick="polishPhoto()">✨ polish</button><button class="lbbtn" onclick="resetAdj()">reset</button></div>
+    <div class="lbrow"><button class="lbbtn" onclick="polishPhoto()"><i class="ic" data-ic="sparkle"></i>polish</button><button class="lbbtn" onclick="resetAdj()">reset</button></div>
   </div>
 </div>
 
@@ -335,7 +339,34 @@ const HANDLE='@perfection.a.la.carte';
 const PIE=['#14213D','#E07A5F','#F2CFC2','#8A8F98','#3D5A80','#EADFD3','#9CC4B4','#B85C45'];
 const PIE_DARK=new Set(['#14213D','#E07A5F','#8A8F98','#3D5A80','#B85C45']);
 const pieText=i=>PIE_DARK.has(PIE[i%PIE.length])?'#FAF6F0':'#14213D';
-const ICONS=['🍳','🔪','🧄','🧅','🍅','🧂','🔥','⏱','🌿','🥄','🧀','🍝','🥩','🥚','🫒','🍞','🥕','🍋','🍫','🥣','💧','🍚'];
+/* fine-line icons — 24×24, stroke only, no fills */
+const IC={
+  clock:'<circle cx="12" cy="12" r="8.6"/><path d="M12 6.8V12l3.3 2"/>',
+  camera:'<path d="M3.2 8.9A1.7 1.7 0 0 1 4.9 7.2h1.9l1.4-2h7.6l1.4 2h1.9a1.7 1.7 0 0 1 1.7 1.7v8.4a1.7 1.7 0 0 1-1.7 1.7H4.9a1.7 1.7 0 0 1-1.7-1.7z"/><circle cx="12" cy="12.8" r="3.4"/>',
+  mic:'<rect x="9.2" y="3" width="5.6" height="10.6" rx="2.8"/><path d="M5.4 11.4a6.6 6.6 0 0 0 13.2 0M12 18v3M9 21h6"/>',
+  play:'<path d="M8.4 5.6v12.8L18.6 12z"/>',
+  stop:'<rect x="6.8" y="6.8" width="10.4" height="10.4" rx="1.8"/>',
+  sparkle:'<path d="M11.4 4l1.7 4.7 4.7 1.7-4.7 1.7-1.7 4.7-1.7-4.7L5 10.4l4.7-1.7z"/><path d="M18.4 15.2l.7 1.9 1.9.7-1.9.7-.7 1.9-.7-1.9-1.9-.7 1.9-.7z"/>',
+  plus:'<path d="M12 5.4v13.2M5.4 12h13.2"/>',
+  x:'<path d="M6.4 6.4l11.2 11.2M17.6 6.4L6.4 17.6"/>',
+  chevL:'<path d="M14.4 5.2L7.6 12l6.8 6.8"/>',
+  chevR:'<path d="M9.6 5.2L16.4 12l-6.8 6.8"/>',
+  up:'<path d="M6 14.4L12 8.4l6 6"/>',
+  down:'<path d="M6 9.6l6 6 6-6"/>',
+  star:'<path d="M12 4.2l2.4 5 5.4.8-3.9 3.8.9 5.4-4.8-2.6-4.8 2.6.9-5.4L4.2 10l5.4-.8z"/>',
+  pencil:'<path d="M4.4 19.6l4.3-1 9.6-9.6a2 2 0 0 0-2.9-2.9L5.8 15.7z"/><path d="M14.4 6.6l3 3"/>',
+  drag:'<path d="M5.4 9h13.2M5.4 15h13.2"/>',
+  download:'<path d="M12 4.4v10.8M7.6 10.8L12 15.2l4.4-4.4M4.8 19.2h14.4"/>',
+  refresh:'<path d="M19.8 12a7.8 7.8 0 1 1-2.3-5.5"/><path d="M19.8 4.6v4.6h-4.6"/>',
+  clipboard:'<rect x="6.4" y="4.6" width="11.2" height="15.4" rx="2"/><path d="M9.6 4.6V3.4h4.8v1.2"/>',
+  check:'<path d="M5.2 12.4l4.6 4.6 9-10"/>',
+  leaf:'<path d="M5 19.4c0-8 5.6-14 14.4-14 0 8.4-5.6 14-14.4 14z"/><path d="M8.6 15.8c1.8-3 4.6-5.2 7.8-6.4"/>',
+  warn:'<path d="M12 4.6l8.6 15.2H3.4z"/><path d="M12 10v4.2M12 17.2h.01"/>',
+  image:'<rect x="3.6" y="5.2" width="16.8" height="13.6" rx="2"/><path d="M3.6 15.4l4.4-4 4 3.4 3.4-3 5 4.4"/><circle cx="8.6" cy="9.6" r="1.4"/>'
+};
+const svgFor=n=>`<svg viewBox="0 0 24 24" aria-hidden="true">${IC[n]||''}</svg>`;
+const ic=(n,solo)=>`<i class="ic${solo?' solo':''}" data-ic="${n}"></i>`;
+function paintIcons(root){(root||document).querySelectorAll('i.ic[data-ic]').forEach(e=>{if(!e.firstChild)e.innerHTML=svgFor(e.dataset.ic);});}
 
 if(!window.isSecureContext) document.getElementById('httpsWarn').style.display='block';
 
@@ -403,7 +434,8 @@ function showResumeCard(){
   const d=pendingLive();const c=$('resumeCard');
   if(!d||live){c.style.display='none';return;}
   const n=d.s.notes.length,p=d.s.photos.length;
-  $('resumeInfo').innerHTML=`<b>${d.s.dish}</b> · ${d.round} · started ${fmt((Date.now()-d.t0)/1000)} ago<br>step ${d.i+1} of ${d.s.steps.length} · ${n} 🎙 · ${p} 📷 — all kept. The clock has been running the whole time.`;
+  $('resumeInfo').innerHTML=`<b>${d.s.dish}</b> · ${d.round} · started ${fmt((Date.now()-d.t0)/1000)} ago<br>step ${d.i+1} of ${d.s.steps.length} · ${n}&nbsp;${ic('mic',1)} · ${p}&nbsp;${ic('camera',1)} — all kept. The clock has been running the whole time.`;
+  paintIcons(c);
   c.style.display='';
 }
 async function resumeCook(){
@@ -415,7 +447,7 @@ async function resumeCook(){
   const cast=live.s.cast||{pic:null,soul:'',aromatics:''};live.s.cast=cast;
   $('castSoulLive').value=cast.soul||'';$('castAromaticsLive').value=cast.aromatics||'';
   resetCastPanel();
-  if(cast.pic){const b=await getBlob(cast.pic);if(b)$('castThumbLive').src=URL.createObjectURL(b);$('recipeBtn').textContent='🧄 ingredients photo saved ✓ (tap to retake)';}
+  if(cast.pic){const b=await getBlob(cast.pic);if(b)$('castThumbLive').src=URL.createObjectURL(b);$('recipeBtn').textContent=ic('image')+'ingredients photo saved — tap to retake';}
   $('castSoulLive').value=cast.soul||'';$('castAromaticsLive').value=cast.aromatics||'';
   if(cast.pic||(cast.soul||'').trim()||(cast.aromatics||'').trim())$('castPanel').style.display='';
   await enterCookMode();
@@ -432,7 +464,7 @@ window.addEventListener('pagehide',saveLive);
 function startRec(){if(!live||!live.stream)return;live.chunks=[];live.rec=new MediaRecorder(live.stream);live.rec.ondataavailable=e=>live.chunks.push(e.data);live.rec.start();live.recT0=Date.now();
   $('recInd').innerHTML='<span class="dot"></span> recording 7s step note — say what you\'re doing';
   clearTimeout(live.recTimer);
-  live.recTimer=setTimeout(async()=>{await stopRec();if(live)$('recInd').textContent='🎙 note saved — keep cooking';},7000);}
+  live.recTimer=setTimeout(async()=>{await stopRec();if(live)$('recInd').innerHTML=ic('mic')+'note saved — keep cooking';},7000);}
 function stopRec(){return new Promise(async res=>{
   if(!live||!live.rec||live.rec.state==='inactive')return res();
   clearTimeout(live.recTimer);
@@ -471,7 +503,7 @@ $('photoIn').addEventListener('change',async e=>{
 let pendingCast={pic:null,soul:'',aromatics:''};
 const activeCast=()=>live?live.s.cast:pendingCast;
 function resetCastPanel(){
-  $('recipeBtn').textContent='🧄 shoot your ingredients — becomes "The Cast" slide';
+  $('recipeBtn').textContent=ic('image')+'shoot your ingredients — becomes “The Cast” slide';
   $('castPanel').style.display='none';
   $('castSoulLive').value='';$('castAromaticsLive').value='';$('castStatusLive').textContent='';
 }
@@ -481,14 +513,14 @@ $('recipeIn').addEventListener('change',async e=>{
   if(cast.pic)delBlob(cast.pic);
   const id='c'+Date.now();await putBlob(id,f);
   cast.pic=id;e.target.value='';saveLive();
-  $('recipeBtn').textContent='🧄 ingredients photo saved ✓ (tap to retake)';
+  $('recipeBtn').textContent=ic('image')+'ingredients photo saved — tap to retake';
   $('castPanel').style.display='';
   $('castThumbLive').src=URL.createObjectURL(f);
   if((localStorage.getItem('palc_key')||'').trim())extractLiveCast();
-  else $('castStatusLive').textContent='Tap ✨ to extract with AI (asks for your API key once), or type the buckets below.';});
+  else $('castStatusLive').textContent='Tap the sparkle to extract with AI (asks for your API key once), or type the buckets below.';});
 $('castSoulLive').addEventListener('input',e=>{activeCast().soul=e.target.value;saveLive();});
 $('castAromaticsLive').addEventListener('input',e=>{activeCast().aromatics=e.target.value;saveLive();});
-showResumeCard();
+paintIcons();showResumeCard();
 
 /* ---------- cast AI extraction ---------- */
 async function blobToJpegB64(blob){
@@ -502,11 +534,11 @@ async function aiExtractCast(sess,statusEl,soulEl,aromEl){
   let key=(localStorage.getItem('palc_key')||'').trim();
   if(!key){
     const k=prompt('Anthropic API key (sk-ant-…) — stored only on this device:');
-    if(!k||!k.trim()){statusEl.textContent='No API key — type the buckets yourself, or tap ✨ again to add a key.';return;}
+    if(!k||!k.trim()){statusEl.textContent='No API key — type the buckets yourself, or tap the sparkle again to add a key.';return;}
     key=k.trim();localStorage.setItem('palc_key',key);
   }
   if(!sess.cast.pic){statusEl.textContent='Shoot the ingredients first.';return;}
-  statusEl.textContent='👀 Claude is reading your ingredients…';
+  statusEl.textContent='Claude is reading your ingredients…';
   try{
     const blob=await getBlob(sess.cast.pic);
     const b64=await blobToJpegB64(blob);
@@ -529,8 +561,8 @@ async function aiExtractCast(sess,statusEl,soulEl,aromEl){
     sess.cast.soul=(out.soul||'').trim();sess.cast.aromatics=(out.aromatics||'').trim();
     soulEl.value=sess.cast.soul;aromEl.value=sess.cast.aromatics;
     if(sessions.includes(sess))saveSessions();
-    statusEl.textContent='✓ extracted — edit anything that looks off';
-  }catch(e){statusEl.textContent='AI failed ('+e.message+') — type the buckets below, or tap ✨ to retry.';}
+    statusEl.textContent='Extracted — edit anything that looks off';
+  }catch(e){statusEl.textContent='AI failed ('+e.message+') — type the buckets below, or tap the sparkle to retry.';}
 }
 function extractLiveCast(){
   aiExtractCast(live?live.s:{dish:($('dish').value.trim()||'this dish'),cast:pendingCast},
@@ -541,10 +573,11 @@ function extractLiveCast(){
 function renderSessions(){
   $('sessList').innerHTML=sessions.length?sessions.map(s=>`<div class="sess">
     <div><b>${s.dish} <span class="badge ${s.round}" style="font-size:10px">${s.round}</span></b>
-    <small>${s.date} · ${fmt(s.total)} · ${s.steps.length} steps · ${s.photos.length} 📷 · ${s.notes.length} 🎙</small></div>
+    <small>${s.date} · ${fmt(s.total)} · ${s.steps.length} steps · ${s.photos.length}&nbsp;${ic('camera',1)} · ${s.notes.length}&nbsp;${ic('mic',1)}</small></div>
     <div class="row"><button class="mini" onclick="openStudio('${s.id}')">Studio</button>
-    <button class="mini red" onclick="delSession('${s.id}')">✕</button></div></div>`).join('')
+    <button class="mini red" onclick="delSession('${s.id}')">${ic('x',1)}</button></div></div>`).join('')
   :'<p class="hint">No cooks yet. Your rushed carbonara awaits.</p>';
+  paintIcons($('sessList'));
 }
 function delSession(id){
   if(!confirm('Delete this session and its recordings?'))return;
@@ -571,7 +604,7 @@ $('verdict').addEventListener('input',e=>{if(cur){cur.verdict=e.target.value;sav
 function renderStudio(){
   $('stTitle').textContent=cur.dish+' · '+cur.round;
   $('stTotal').textContent='total locked · '+fmt(cur.total);
-  renderPie();renderSteps();renderNotes();renderPhotos();renderTitlePic();renderCast();
+  renderPie();renderSteps();renderNotes();renderPhotos();renderTitlePic();renderCast();paintIcons();
 }
 function renderPie(){
   const size=164,r=70,cx=size/2,cy=size/2;let a=-Math.PI/2,ps='',ls='';
@@ -588,13 +621,12 @@ function renderSteps(){
     const pct=Math.round(s.sec/cur.total*100);
     return `<div class="steprow">
     <span class="cdot" style="background:${PIE[i%PIE.length]}"></span>
-    <button class="mini" onclick="moveStep(${i},-1)" ${i===0?'disabled':''}>▲</button>
-    <button class="mini" onclick="moveStep(${i},1)" ${i===cur.steps.length-1?'disabled':''}>▼</button>
-    <button class="icon-btn" onclick="pickIcon(${i})">${s.icon||'＋'}</button>
+    <button class="mini" onclick="moveStep(${i},-1)" ${i===0?'disabled':''}>${ic('up',1)}</button>
+    <button class="mini" onclick="moveStep(${i},1)" ${i===cur.steps.length-1?'disabled':''}>${ic('down',1)}</button>
     <input class="nm" value="${s.name.replace(/"/g,'&quot;')}" onchange="cur.steps[${i}].name=this.value;saveSessions();">
-    ${notesFor(s.id).map(n=>`<button class="mini play" data-label="▶ ${fmt(n.sec)}" title="listen to your note for this step" onclick="playNote('${n.id}',this)">▶ ${fmt(n.sec)}</button>`).join('')}
+    ${notesFor(s.id).map(n=>`<button class="mini play" data-t="${fmt(n.sec)}" title="listen to your note for this step" onclick="playNote('${n.id}',this)">${ic('play',1)}${fmt(n.sec)}</button>`).join('')}
     <div class="sharewrap"><input type="range" min="1" max="99" step="1" value="${pct}" oninput="slideShare(${i},this.value)" onchange="renderStudio()"><span class="pct" id="pct-${i}">${pct}%</span>
-    ${cur.steps.length>1?`<button class="mini red" onclick="rmStep(${i})">✕</button>`:''}</div>
+    ${cur.steps.length>1?`<button class="mini red" onclick="rmStep(${i})">${ic('x',1)}</button>`:''}</div>
     </div>`;}).join('');
 }
 /* smallest slice a step may hold — 5s normally, less on very short cooks */
@@ -631,20 +663,19 @@ function rmStep(i){
   redistribute(-1,cur.total);
   saveSessions();renderStudio();
 }
-let pickTarget=null;
-function pickIcon(i){pickTarget=i;$('pickGrid').innerHTML=ICONS.map(ic=>`<button onclick="setIcon('${ic}')">${ic}</button>`).join('')+`<button onclick="setIcon('')">✕</button>`;$('picker').style.display='flex';}
-function setIcon(ic){cur.steps[pickTarget].icon=ic;saveSessions();$('picker').style.display='none';renderStudio();}
-$('picker').addEventListener('click',e=>{if(e.target.id==='picker')e.target.style.display='none';});
 
 const stepName=stepId=>{const s=cur&&cur.steps.find(x=>x.id===stepId);return s?s.name:null;};
 const notesFor=stepId=>(cur.notes||[]).filter(n=>n.stepId===stepId);
-/* one shared player — a second ▶ stops the first */
+/* one shared player — a second tap stops the first */
 let noteAudio=null,noteBtn=null;
-function stopNote(){if(noteAudio){noteAudio.pause();noteAudio=null;}if(noteBtn){noteBtn.classList.remove('on');noteBtn.textContent=noteBtn.dataset.label;noteBtn=null;}}
+const noteLabel=b=>ic('play',1)+(b.dataset.t||'');
+function stopNote(){if(noteAudio){noteAudio.pause();noteAudio=null;}
+  if(noteBtn){noteBtn.classList.remove('on');noteBtn.innerHTML=noteLabel(noteBtn);paintIcons(noteBtn);noteBtn=null;}}
 async function playNote(id,btn){
   const same=noteBtn===btn;stopNote();if(same)return;
   const blob=await getBlob(id);if(!blob)return;
-  noteAudio=new Audio(URL.createObjectURL(blob));noteBtn=btn;btn.classList.add('on');btn.textContent='■';
+  noteAudio=new Audio(URL.createObjectURL(blob));noteBtn=btn;btn.classList.add('on');
+  btn.innerHTML=ic('stop',1);paintIcons(btn);
   noteAudio.onended=stopNote;noteAudio.play();
 }
 /* only notes whose step no longer exists land here — everything else sits beside its step */
@@ -653,8 +684,8 @@ async function renderNotes(){
   const orphans=(cur.notes||[]).filter(n=>!cur.steps.some(s=>s.id===n.stepId));
   $('notesHead').style.display=el.style.display=orphans.length?'':'none';
   orphans.forEach(n=>{const b=document.createElement('button');
-    b.textContent=`▶ note from a removed step · ${fmt(n.sec)}`;
-    b.onclick=()=>playNote(n.id,b);b.dataset.label=b.textContent;el.appendChild(b);});
+    b.dataset.t=`note from a removed step · ${fmt(n.sec)}`;b.innerHTML=noteLabel(b);
+    b.onclick=()=>playNote(n.id,b);el.appendChild(b);paintIcons(b);});
 }
 async function renderPhotos(){
   const el=$('stPhotos');el.innerHTML='';
@@ -665,7 +696,7 @@ async function renderPhotos(){
     img.style.filter=cssFilter(adjOf(p));
     img.onclick=()=>openLightbox(i);
     const badge=document.createElement('button');badge.className='badge-use'+(p.use?' on':'');
-    badge.textContent=p.use?'✓':'';badge.title='include in carousel';
+    badge.innerHTML=p.use?svgFor('check'):'';badge.title='include in carousel';
     badge.onclick=e=>{e.stopPropagation();setPhotoUse(p,!p.use);};
     wrap.appendChild(img);wrap.appendChild(badge);el.appendChild(wrap);}
 }
@@ -707,7 +738,7 @@ function resetAdj(){const p=cur.photos[lbIdx];if(!p)return;delete p.adj;syncAdjU
 function toggleAdj(on){
   const open=on===undefined?$('lbAdj').style.display==='none':on;
   $('lbAdj').style.display=open?'flex':'none';$('lbImg').style.display=open?'none':'';
-  $('lbEdit').textContent=open?'✓ done':'✎ adjust';$('lbEdit').classList.toggle('on',open);
+  $('lbEdit').innerHTML=open?ic('check')+'done':ic('pencil')+'adjust';$('lbEdit').classList.toggle('on',open);paintIcons($('lbEdit'));
   if(open)framePreview(cur.photos[lbIdx]);
 }
 /* ---------- lightbox ---------- */
@@ -722,16 +753,16 @@ async function openLightbox(i){
   $('lbCap').textContent=`${i+1} / ${cur.photos.length}${sn?' · '+sn:''}`;
   $('lbPrev').disabled=i===0;$('lbNext').disabled=i===cur.photos.length-1;
   $('lbPrev').style.display=$('lbNext').style.display=cur.photos.length>1?'':'none';
-  const b=$('lbUse');b.style.display='';b.classList.toggle('on',!!p.use);b.textContent=p.use?'✓ in carousel':'excluded';
-  const t=$('lbTitle');t.style.display='';t.classList.toggle('on',cur.titlePicFrom===p.id);t.textContent=cur.titlePicFrom===p.id?'★ is the title pic':'☆ make title pic';
-  $('lightbox').style.display='flex';setTheme('#0E1326');
+  const b=$('lbUse');b.style.display='';b.classList.toggle('on',!!p.use);b.innerHTML=p.use?ic('check')+'in carousel':'excluded';
+  const t=$('lbTitle');t.style.display='';t.classList.toggle('on',cur.titlePicFrom===p.id);t.innerHTML=ic('star')+(cur.titlePicFrom===p.id?'is the title pic':'make title pic');
+  $('lightbox').style.display='flex';setTheme('#0E1326');paintIcons($('lightbox'));
 }
 function closeLightbox(){lbIdx=-1;$('lightbox').style.display='none';setTheme('#FAF6F0');}
 function stepLightbox(d){const j=lbIdx+d;if(j>=0&&j<cur.photos.length)openLightbox(j);}
 function toggleLightboxUse(){
   const p=cur.photos[lbIdx];if(!p)return;
   setPhotoUse(p,!p.use);
-  const b=$('lbUse');b.classList.toggle('on',!!p.use);b.textContent=p.use?'✓ in carousel':'excluded';
+  const b=$('lbUse');b.classList.toggle('on',!!p.use);b.innerHTML=p.use?ic('check')+'in carousel':'excluded';paintIcons(b);
 }
 /* copy the photo into its own blob, so deleting the title pic later never deletes the photo */
 async function photoAsTitle(){
@@ -740,7 +771,7 @@ async function photoAsTitle(){
   if(cur.titlePic)delBlob(cur.titlePic);
   const id='t'+Date.now();await putBlob(id,blob);
   cur.titlePic=id;cur.titlePicFrom=p.id;cur.titleAdj=p.adj?{...p.adj}:null;saveSessions();renderTitlePic();
-  const t=$('lbTitle');t.classList.add('on');t.textContent='★ is the title pic';
+  const t=$('lbTitle');t.classList.add('on');t.innerHTML=ic('star')+'is the title pic';paintIcons(t);
 }
 async function showBig(blobId,caption){
   const blob=await getBlob(blobId);if(!blob)return;
@@ -860,7 +891,7 @@ function showPolish(items,sugs){
     <small>${g.item.label}</small>
     ${g.item.text?`<div class="was">${esc(g.item.text)}</div>`:`<div class="was" style="text-decoration:none">(you left this empty — Claude suggests:)</div>`}
     <div class="now">${esc(g.polished)}</div>
-    <div class="row"><button class="mini sagebg" onclick="applyPolishIdx(${i})">✓ take it</button>
+    <div class="row"><button class="mini sagebg" onclick="applyPolishIdx(${i})">${ic('check')}take it</button>
     <button class="mini" onclick="$('pol-${i}').classList.add('done')">keep mine</button></div></div>`).join('');
 }
 function applyPolishIdx(i){
@@ -907,14 +938,25 @@ async function slCover(){const[c,x]=newC();
       const img=await createImageBitmap(b);
       x.save();rr(x,90,iy,900,ih,26);x.clip();
       drawAdjusted(x,img,90,iy,900,ih,adjOf({adj:cur.titleAdj}));x.restore();
+      timeRing(x,90+134,iy+134,96,'#FFFFFF',true);
+    }else{
+      timeRing(x,90+134,iy+134,96,S.accent);
     }
-    txt(x,'TOTAL TIME',92,1130,22,{col:S.gray,ls:4,w:500});
-    txt(x,fmt(cur.total),86,1245,120,{w:200,col:S.ink,ls:-2});
   }else{
-    txt(x,'TOTAL TIME — EVERY SECOND TRACKED',92,yy+120,22,{col:S.gray,ls:4,w:500});
-    txt(x,fmt(cur.total),82,yy+300,180,{w:200,col:S.ink,ls:-3});
+    timeRing(x,210,yy+250,152,S.accent);
+    txt(x,'EVERY SECOND TRACKED',400,yy+240,24,{col:S.gray,ls:4,w:500});
+    txt(x,'DOOR TO BOWL',400,yy+290,24,{col:S.gray,ls:4,w:500});
   }
   footer(x);return c;}
+/* thin ring with the total time inside — the cover's stamp */
+function timeRing(x,cx,cy,r,col,onPhoto){
+  if(onPhoto){x.beginPath();x.arc(cx,cy,r,0,7);x.fillStyle='rgba(20,33,61,.34)';x.fill();}
+  x.beginPath();x.arc(cx,cy,r,0,7);x.strokeStyle=col;x.lineWidth=3;x.stroke();
+  const t=fmt(cur.total),size=t.length>4?r*0.52:r*0.62;
+  x.textBaseline='middle';
+  txt(x,t,cx,cy+2,size,{align:'center',w:300,col,ls:-1});
+  x.textBaseline='alphabetic';
+}
 async function slCast(){const[c,x]=newC();
   txt(x,cur.dish.toUpperCase(),W-90,124,23,{col:S.gray,align:'right',ls:4,w:500});
   txt(x,'THE CAST',86,330,150,{w:800,col:S.accent,ls:1});
@@ -951,36 +993,60 @@ function slPie(){const[c,x]=newC();
   txt(x,cur.dish.toUpperCase(),W-90,124,23,{col:S.gray,align:'right',ls:4,w:500});
   txt(x,'WHERE THE',86,300,104,{w:800,col:S.ink,ls:1});
   txt(x,'TIME WENT',86,408,104,{w:800,col:S.accent,ls:1});
-  const cx=W/2,cy=830,r=280;let a=-Math.PI/2;
-  /* the slide pie follows the look; the Studio pie keeps the app palette */
+  const cx=W/2,cy=760,r=250,ri=152;let a=-Math.PI/2;
   const pc=i=>S.pie?S.pie[i%S.pie.length].c:PIE[i%PIE.length],pt=i=>S.pie?S.pie[i%S.pie.length].t:pieText(i);
   cur.steps.forEach((s,i)=>{const f=s.sec/cur.total,a2=a+f*2*Math.PI;
     x.beginPath();x.moveTo(cx,cy);x.arc(cx,cy,r,a,a2);x.closePath();
     x.fillStyle=pc(i);x.fill();x.strokeStyle=S.paper;x.lineWidth=6;x.stroke();
     a=a2;});
+  /* punch the middle out — a donut, with the total in the hole */
+  x.beginPath();x.arc(cx,cy,ri,0,7);x.fillStyle=S.paper;x.fill();
+  x.textBaseline='middle';
+  txt(x,fmt(cur.total),cx,cy-4,fmt(cur.total).length>4?74:88,{align:'center',w:300,col:S.ink,ls:-2});
+  x.textBaseline='alphabetic';
+  txt(x,cur.round==='RUSHED'?'RUSHED':'SLOW',cx,cy+64,22,{align:'center',col:S.accent,ls:5,w:600});
   a=-Math.PI/2;
+  const rmid=(r+ri)/2;
   cur.steps.forEach((s,i)=>{const f=s.sec/cur.total,a2=a+f*2*Math.PI;
     const mid=(a+a2)/2,pct=Math.round(f*100);
-    if(pct>=8)txt(x,pct+'%',cx+Math.cos(mid)*r*0.62,cy+Math.sin(mid)*r*0.62+15,44,{align:'center',w:600,col:pt(i)});
+    if(pct>=9)txt(x,pct+'%',cx+Math.cos(mid)*rmid,cy+Math.sin(mid)*rmid+13,38,{align:'center',w:600,col:pt(i)});
     const cos=Math.cos(mid),sin=Math.sin(mid);
-    const lx=cx+cos*(r+40),ly=cy+sin*(r+40)+10;
+    const lx=cx+cos*(r+38),ly=cy+sin*(r+38)+10;
     const align=Math.abs(cos)<0.35?'center':(cos>0?'left':'right');
-    txt(x,`${s.name}${pct<8?' · '+pct+'%':''}`,lx,ly,30,{align,w:500,col:S.gray});
+    txt(x,`${s.name}${pct<9?' · '+pct+'%':''}`,lx,ly,29,{align,w:500,col:S.gray});
     a=a2;});
+  wrap(x,timeInsight(),90,1140,34,900,46,{w:400,col:S.ink});
   footer(x);return c;}
+/* one dry line under the donut: where the clock actually went */
+function timeInsight(){
+  const ss=[...cur.steps].filter(s=>s.sec>0).sort((a,b)=>b.sec-a.sec);
+  if(!ss.length)return '';
+  const p=s=>Math.round(s.sec/cur.total*100);
+  const a=ss[0];
+  if(ss.length===1)return `All ${fmt(cur.total)} went to ${a.name}.`;
+  const b=ss[1];
+  return `${p(a)}% of the clock went to ${a.name.toLowerCase()} · ${p(b)}% to ${b.name.toLowerCase()}.`;
+}
 function slSteps(){const[c,x]=newC();
   txt(x,cur.dish.toUpperCase(),W-90,124,23,{col:S.gray,align:'right',ls:4,w:500});
-  txt(x,'THE STEPS',86,330,150,{w:800,col:S.accent,ls:1});
-  let y=490;
-  cur.steps.forEach((s,i)=>{
-    txt(x,String(i+1).padStart(2,'0'),90,y,28,{col:S.accent,w:600,ls:2});
-    txt(x,s.name,175,y,42,{w:500});
-    txt(x,fmt(s.sec),W-90,y,34,{align:'right',col:S.gray,w:400});
-    y+=34;
-    x.strokeStyle=S.line;x.lineWidth=2;x.beginPath();x.moveTo(90,y);x.lineTo(W-90,y);x.stroke();
-    y+=68;
+  txt(x,'METHOD',86,330,150,{w:800,col:S.accent,ls:1});
+  const st=cur.steps,n=st.length;
+  const top=500,bottom=1120,gap=n>1?Math.min(140,(bottom-top)/(n-1)):0;
+  const dotX=350,nameX=410,amtX=310;
+  /* dotted rail down the minute column */
+  if(n>1){x.save();x.beginPath();x.setLineDash([2,13]);x.lineCap='round';x.lineWidth=3;x.strokeStyle=S.gray;
+    x.moveTo(dotX,top+16);x.lineTo(dotX,top+gap*(n-1)-16);x.stroke();x.restore();}
+  st.forEach((s,i)=>{
+    const y=top+gap*i;
+    txt(x,dur(s.sec),amtX,y+11,32,{align:'right',col:S.accent,w:600,ls:1});
+    x.beginPath();x.arc(dotX,y,9,0,7);x.fillStyle=S.accent;x.fill();
+    x.beginPath();x.arc(dotX,y,9,0,7);x.strokeStyle=S.paper;x.lineWidth=4;x.stroke();
+    wrap(x,s.name,nameX,y+13,40,W-nameX-90,48,{w:500,col:S.ink});
   });
+  txt(x,`TOTAL ${fmt(cur.total)} — DOOR TO BOWL`,90,1210,24,{col:S.gray,ls:4,w:500});
   footer(x);return c;}
+/* "4 min" / "45 s" — the minute rail reads at a glance */
+const dur=sec=>sec>=60?`${Math.round(sec/60)} min`:`${sec} s`;
 async function slPhoto(p){const[c,x]=newC(S.dark);const blob=await getBlob(p.id);
   if(blob){const img=await createImageBitmap(blob);
     drawAdjusted(x,img,0,0,W,H,adjOf(p));
@@ -1030,7 +1096,7 @@ function syncPlan(){
 function renderPlan(){
   const {byKey,plan}=syncPlan();
   $('slidePlan').innerHTML=plan.map((e,i)=>`<div class="steprow planrow" data-key="${e.key}">
-    <span class="drag" title="drag to reorder" onpointerdown="planDragStart(event)" onpointermove="planDragMove(event)" onpointerup="planDragEnd(event)" onpointercancel="planDragEnd(event)">☰</span>
+    <span class="drag ic" title="drag to reorder" data-ic="drag" onpointerdown="planDragStart(event)" onpointermove="planDragMove(event)" onpointerup="planDragEnd(event)" onpointercancel="planDragEnd(event)"></span>
     <label style="display:flex;align-items:center;gap:8px;flex:1;margin:0">
       <input type="checkbox" ${e.on?'checked':''} onchange="togglePlan('${e.key}')" style="width:20px;height:20px">
       <span style="font-weight:700;font-size:14px">${byKey[e.key].label}</span></label>
@@ -1067,7 +1133,7 @@ async function buildSlides(){
     if(!e.on)continue;
     const c=await byKey[e.key].render();
     const i=n++;const d=document.createElement('div');d.className='slide';d.appendChild(c);
-    const b=document.createElement('button');b.className='mini';b.style.marginTop='6px';b.textContent='⬇ slide '+(i+1);
+    const b=document.createElement('button');b.className='mini';b.style.marginTop='6px';b.innerHTML=ic('download')+'slide '+(i+1);
     b.onclick=()=>dl(c,i);d.appendChild(b);wrapEl.appendChild(d);
   }
 }

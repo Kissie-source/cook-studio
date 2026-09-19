@@ -173,6 +173,12 @@ body.cooking #castBlock .mini{background:none; border-color:var(--k-line); color
 
 <!-- COOK -->
 <section id="tab-cook">
+  <div class="card" id="resumeCard" style="display:none;border:2px solid var(--accent)">
+    <h2>⏱ COOK IN PROGRESS</h2>
+    <p class="hint" id="resumeInfo" style="font-size:14px;color:var(--ink)"></p>
+    <button class="big-btn red" onclick="resumeCook()">▶ Resume — timer, notes & photos intact</button>
+    <button class="mini red" style="width:100%;margin-top:10px;padding:10px" onclick="discardLive()">throw it away</button>
+  </div>
   <div class="card" id="setupCard">
     <h2>NEW COOK</h2>
     <label>Dish</label>
@@ -371,15 +377,58 @@ async function startCook(){
   }else{
     resetCastPanel();
   }
+  saveLive();
+  await enterCookMode();
+}
+/* shared by a fresh start and a resume after the phone killed the page */
+async function enterCookMode(){
   $('liveCard').insertBefore($('castBlock'),$('finishBtn'));
   try{live.stream=await navigator.mediaDevices.getUserMedia({audio:true});startRec();}
   catch(e){$('recInd').innerHTML='mic off — timer & photos still running';}
-  try{navigator.wakeLock&&navigator.wakeLock.request('screen').catch(()=>{});}catch(e){}
-  $('setupCard').style.display='none';$('liveCard').style.display='';
+  wakeLock();
+  $('setupCard').style.display='none';$('liveCard').style.display='';$('resumeCard').style.display='none';
   document.body.classList.add('cooking');document.body.classList.toggle('slowround',round==='SLOW');setTheme('#0F1A33');
   $('liveBadge').textContent=round;$('liveBadge').className='badge '+round;
   live.int=setInterval(tick,500);renderLive();
 }
+let wl=null;
+function wakeLock(){try{navigator.wakeLock&&navigator.wakeLock.request('screen').then(l=>{wl=l;}).catch(()=>{});}catch(e){}}
+/* ---- crash insurance: the live session is mirrored to localStorage on every change and every 3 s;
+        the blobs are already in IndexedDB, so a reload loses nothing ---- */
+const LIVE_KEY='palc_live';
+function saveLive(){if(!live)return;try{localStorage.setItem(LIVE_KEY,JSON.stringify({s:live.s,i:live.i,t0:live.t0,st0:live.st0,round,at:Date.now()}));}catch(e){}}
+function clearLive(){localStorage.removeItem(LIVE_KEY);}
+function pendingLive(){try{const d=JSON.parse(localStorage.getItem(LIVE_KEY)||'null');return d&&d.s?d:null;}catch(e){return null;}}
+function showResumeCard(){
+  const d=pendingLive();const c=$('resumeCard');
+  if(!d||live){c.style.display='none';return;}
+  const n=d.s.notes.length,p=d.s.photos.length;
+  $('resumeInfo').innerHTML=`<b>${d.s.dish}</b> · ${d.round} · started ${fmt((Date.now()-d.t0)/1000)} ago<br>step ${d.i+1} of ${d.s.steps.length} · ${n} 🎙 · ${p} 📷 — all kept. The clock has been running the whole time.`;
+  c.style.display='';
+}
+async function resumeCook(){
+  const d=pendingLive();if(!d)return;
+  round=d.round;$('segR').classList.toggle('on',round==='RUSHED');$('segS').classList.toggle('on',round==='SLOW');
+  live={s:d.s,i:d.i,t0:d.t0,st0:d.st0,stream:null,rec:null,chunks:[]};
+  pendingCast={pic:null,soul:'',aromatics:''};
+  /* cast panel back into the state it was */
+  const cast=live.s.cast||{pic:null,soul:'',aromatics:''};live.s.cast=cast;
+  $('castSoulLive').value=cast.soul||'';$('castAromaticsLive').value=cast.aromatics||'';
+  resetCastPanel();
+  if(cast.pic){const b=await getBlob(cast.pic);if(b)$('castThumbLive').src=URL.createObjectURL(b);$('recipeBtn').textContent='🧄 ingredients photo saved ✓ (tap to retake)';}
+  $('castSoulLive').value=cast.soul||'';$('castAromaticsLive').value=cast.aromatics||'';
+  if(cast.pic||(cast.soul||'').trim()||(cast.aromatics||'').trim())$('castPanel').style.display='';
+  await enterCookMode();
+}
+function discardLive(){
+  const d=pendingLive();if(!d)return;
+  if(!confirm(`Throw away the unfinished ${d.s.dish} cook (${d.s.notes.length} notes, ${d.s.photos.length} photos)?`))return;
+  d.s.photos.forEach(p=>delBlob(p.id));d.s.notes.forEach(n=>delBlob(n.id));if(d.s.cast&&d.s.cast.pic)delBlob(d.s.cast.pic);
+  clearLive();showResumeCard();
+}
+setInterval(saveLive,3000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveLive();else if(live)wakeLock();});
+window.addEventListener('pagehide',saveLive);
 function startRec(){if(!live||!live.stream)return;live.chunks=[];live.rec=new MediaRecorder(live.stream);live.rec.ondataavailable=e=>live.chunks.push(e.data);live.rec.start();live.recT0=Date.now();
   $('recInd').innerHTML='<span class="dot"></span> recording 7s step note — say what you\'re doing';
   clearTimeout(live.recTimer);
@@ -388,7 +437,7 @@ function stopRec(){return new Promise(async res=>{
   if(!live||!live.rec||live.rec.state==='inactive')return res();
   clearTimeout(live.recTimer);
   live.rec.onstop=async()=>{const b=new Blob(live.chunks,{type:live.rec.mimeType||'audio/webm'});
-    if(b.size>200){const id='a'+Date.now();await putBlob(id,b);live.s.notes.push({id,stepId:live.s.steps[live.i].id,stepIdx:live.i,sec:Math.round((Date.now()-live.recT0)/1000)});}res();};
+    if(b.size>200){const id='a'+Date.now();await putBlob(id,b);live.s.notes.push({id,stepId:live.s.steps[live.i].id,stepIdx:live.i,sec:Math.round((Date.now()-live.recT0)/1000)});saveLive();}res();};
   live.rec.stop();});}
 function tick(){$('liveTotal').textContent=fmt((Date.now()-live.t0)/1000);$('liveStepTime').textContent='step · '+fmt((Date.now()-live.st0)/1000);}
 function renderLive(){
@@ -398,7 +447,7 @@ function renderLive(){
 }
 async function nextStep(){
   live.s.steps[live.i].sec=Math.round((Date.now()-live.st0)/1000);
-  await stopRec();live.i++;live.st0=Date.now();startRec();renderLive();
+  await stopRec();live.i++;live.st0=Date.now();saveLive();startRec();renderLive();
 }
 async function finishCook(){
   live.s.steps[live.i].sec=Math.round((Date.now()-live.st0)/1000);
@@ -408,7 +457,7 @@ async function finishCook(){
   live.s.steps=live.s.steps.filter(s=>s.sec>0);
   live.s.total=live.s.steps.reduce((a,b)=>a+b.sec,0)||1;
   sessions.unshift(live.s);saveSessions();
-  const id=live.s.id;live=null;
+  const id=live.s.id;live=null;clearLive();
   document.body.classList.remove('cooking','slowround');setTheme('#FAF6F0');
   $('setupCard').style.display='';$('liveCard').style.display='none';
   $('setupCard').insertBefore($('castBlock'),$('startBtn'));
@@ -418,7 +467,7 @@ async function finishCook(){
 }
 $('photoIn').addEventListener('change',async e=>{
   for(const f of e.target.files){const id='p'+Date.now()+Math.random().toString(36).slice(2,6);await putBlob(id,f);live.s.photos.push({id,stepId:live.s.steps[live.i].id,stepIdx:live.i,use:true});}
-  e.target.value='';});
+  e.target.value='';saveLive();});
 let pendingCast={pic:null,soul:'',aromatics:''};
 const activeCast=()=>live?live.s.cast:pendingCast;
 function resetCastPanel(){
@@ -431,14 +480,15 @@ $('recipeIn').addEventListener('change',async e=>{
   const cast=activeCast();
   if(cast.pic)delBlob(cast.pic);
   const id='c'+Date.now();await putBlob(id,f);
-  cast.pic=id;e.target.value='';
+  cast.pic=id;e.target.value='';saveLive();
   $('recipeBtn').textContent='🧄 ingredients photo saved ✓ (tap to retake)';
   $('castPanel').style.display='';
   $('castThumbLive').src=URL.createObjectURL(f);
   if((localStorage.getItem('palc_key')||'').trim())extractLiveCast();
   else $('castStatusLive').textContent='Tap ✨ to extract with AI (asks for your API key once), or type the buckets below.';});
-$('castSoulLive').addEventListener('input',e=>{activeCast().soul=e.target.value;});
-$('castAromaticsLive').addEventListener('input',e=>{activeCast().aromatics=e.target.value;});
+$('castSoulLive').addEventListener('input',e=>{activeCast().soul=e.target.value;saveLive();});
+$('castAromaticsLive').addEventListener('input',e=>{activeCast().aromatics=e.target.value;saveLive();});
+showResumeCard();
 
 /* ---------- cast AI extraction ---------- */
 async function blobToJpegB64(blob){

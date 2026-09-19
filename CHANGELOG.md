@@ -3,6 +3,19 @@
 Every version is a full snapshot in `versions/index-vX.Y.html` (and a git commit).
 **Roll back:** copy the snapshot over `index.html`, re-upload to GitHub.
 
+## v2.9 — 2026-09-19
+- **Crash insurance for a running cook.** The phone reloading the page (screen lock,
+  charging, memory pressure, Safari backgrounding the tab) used to wipe the session —
+  timer, voice notes, photos, timestamps, all of it. The live session is now mirrored
+  to localStorage on every change, every 3 s, and whenever the page is hidden. On the
+  next open, the Cook tab shows **COOK IN PROGRESS** with dish, elapsed time, current
+  step, and how many notes/photos are safe: **Resume** puts you straight back in with
+  the clock still counting from the original start, the current step and its elapsed
+  time, the cast panel (photo + typed buckets) and every note and photo intact.
+  "Throw it away" deletes it and its blobs.
+- The screen wake-lock is re-requested when the app comes back to the foreground, so a
+  lock/unlock no longer leaves the screen free to sleep mid-cook.
+
 ## v2.8 — 2026-09-19
 - **Navy & Coral is the one look.** The look picker is gone; slides always render in
   navy · coral · cream. The app chrome now lives in the same world (coral accent, navy

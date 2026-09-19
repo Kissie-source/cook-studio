@@ -59,9 +59,15 @@ textarea{min-height:88px; resize:vertical; line-height:1.55}
 .rec .dot{display:inline-block; width:8px; height:8px; border-radius:99px; background:var(--accent); margin-right:6px; animation:bl 1.1s infinite}
 @keyframes bl{50%{opacity:.2}}
 .steplist{margin:16px 0 0; padding:0; list-style:none; font:400 14.5px var(--ui)}
-.steplist li{padding:9px 14px; border-radius:999px; color:var(--muted)}
+.steplist li{padding:9px 14px; border-radius:999px; color:var(--muted); display:flex; align-items:center; gap:10px}
+.steplist li .nm{flex:1; min-width:0}
 .steplist li.now{background:rgba(255,255,255,.75); color:var(--ink); font-weight:600}
-.steplist li.done{text-decoration:line-through; opacity:.4}
+.steplist li.done{opacity:.45}
+.steplist li.done .nm{text-decoration:line-through}
+/* one dot per photo saved on that step */
+.pdots{display:inline-flex; align-items:center; gap:5px; flex:none}
+.pdots i{width:7px; height:7px; border-radius:50%; background:var(--accent); display:block}
+.pdots b{font:600 11px var(--mono); color:var(--accent); letter-spacing:.5px}
 .row{display:flex; gap:8px; align-items:center}
 .row .grow{flex:1}
 .sess{display:flex; justify-content:space-between; align-items:center; padding:15px 2px; border-bottom:1px solid var(--line)}
@@ -447,7 +453,7 @@ async function resumeCook(){
   const cast=live.s.cast||{pic:null,soul:'',aromatics:''};live.s.cast=cast;
   $('castSoulLive').value=cast.soul||'';$('castAromaticsLive').value=cast.aromatics||'';
   resetCastPanel();
-  if(cast.pic){const b=await getBlob(cast.pic);if(b)$('castThumbLive').src=URL.createObjectURL(b);$('recipeBtn').textContent=ic('image')+'ingredients photo saved — tap to retake';}
+  if(cast.pic){const b=await getBlob(cast.pic);if(b)$('castThumbLive').src=URL.createObjectURL(b);setRecipeBtn(true);}
   $('castSoulLive').value=cast.soul||'';$('castAromaticsLive').value=cast.aromatics||'';
   if(cast.pic||(cast.soul||'').trim()||(cast.aromatics||'').trim())$('castPanel').style.display='';
   await enterCookMode();
@@ -464,7 +470,8 @@ window.addEventListener('pagehide',saveLive);
 function startRec(){if(!live||!live.stream)return;live.chunks=[];live.rec=new MediaRecorder(live.stream);live.rec.ondataavailable=e=>live.chunks.push(e.data);live.rec.start();live.recT0=Date.now();
   $('recInd').innerHTML='<span class="dot"></span> recording 7s step note — say what you\'re doing';
   clearTimeout(live.recTimer);
-  live.recTimer=setTimeout(async()=>{await stopRec();if(live)$('recInd').innerHTML=ic('mic')+'note saved — keep cooking';},7000);}
+  live.recTimer=setTimeout(async()=>{await stopRec();
+    if(live){$('recInd').innerHTML=ic('mic')+'note saved — keep cooking';paintIcons($('recInd'));}},7000);}
 function stopRec(){return new Promise(async res=>{
   if(!live||!live.rec||live.rec.state==='inactive')return res();
   clearTimeout(live.recTimer);
@@ -472,9 +479,21 @@ function stopRec(){return new Promise(async res=>{
     if(b.size>200){const id='a'+Date.now();await putBlob(id,b);live.s.notes.push({id,stepId:live.s.steps[live.i].id,stepIdx:live.i,sec:Math.round((Date.now()-live.recT0)/1000)});saveLive();}res();};
   live.rec.stop();});}
 function tick(){$('liveTotal').textContent=fmt((Date.now()-live.t0)/1000);$('liveStepTime').textContent='step · '+fmt((Date.now()-live.st0)/1000);}
+function setRecipeBtn(saved){
+  $('recipeBtn').innerHTML=ic('image')+(saved?'ingredients photo saved — tap to retake':'shoot your ingredients — becomes “The Cast” slide');
+  paintIcons($('recipeBtn'));
+}
+/* a dot per photo saved on this step — past 6 it turns into "●×9" so the row never wraps */
+function photoDots(stepId){
+  const n=live.s.photos.filter(p=>p.stepId===stepId).length;
+  if(!n)return '';
+  return n<=6?`<span class="pdots">${'<i></i>'.repeat(n)}</span>`
+             :`<span class="pdots"><i></i><b>×${n}</b></span>`;
+}
 function renderLive(){
   $('liveStep').textContent=live.s.steps[live.i].name;
-  $('liveList').innerHTML=live.s.steps.map((s,j)=>`<li class="${j<live.i?'done':j===live.i?'now':''}">${j+1}. ${s.name}</li>`).join('');
+  $('liveList').innerHTML=live.s.steps.map((s,j)=>
+    `<li class="${j<live.i?'done':j===live.i?'now':''}"><span class="nm">${j+1}. ${s.name}</span>${photoDots(s.id)}</li>`).join('');
   $('nextBtn').style.display=live.i>=live.s.steps.length-1?'none':'';
 }
 async function nextStep(){
@@ -499,11 +518,11 @@ async function finishCook(){
 }
 $('photoIn').addEventListener('change',async e=>{
   for(const f of e.target.files){const id='p'+Date.now()+Math.random().toString(36).slice(2,6);await putBlob(id,f);live.s.photos.push({id,stepId:live.s.steps[live.i].id,stepIdx:live.i,use:true});}
-  e.target.value='';saveLive();});
+  e.target.value='';saveLive();renderLive();});
 let pendingCast={pic:null,soul:'',aromatics:''};
 const activeCast=()=>live?live.s.cast:pendingCast;
 function resetCastPanel(){
-  $('recipeBtn').textContent=ic('image')+'shoot your ingredients — becomes “The Cast” slide';
+  setRecipeBtn(false);
   $('castPanel').style.display='none';
   $('castSoulLive').value='';$('castAromaticsLive').value='';$('castStatusLive').textContent='';
 }
@@ -513,7 +532,7 @@ $('recipeIn').addEventListener('change',async e=>{
   if(cast.pic)delBlob(cast.pic);
   const id='c'+Date.now();await putBlob(id,f);
   cast.pic=id;e.target.value='';saveLive();
-  $('recipeBtn').textContent=ic('image')+'ingredients photo saved — tap to retake';
+  setRecipeBtn(true);
   $('castPanel').style.display='';
   $('castThumbLive').src=URL.createObjectURL(f);
   if((localStorage.getItem('palc_key')||'').trim())extractLiveCast();
@@ -754,7 +773,7 @@ async function openLightbox(i){
   $('lbPrev').disabled=i===0;$('lbNext').disabled=i===cur.photos.length-1;
   $('lbPrev').style.display=$('lbNext').style.display=cur.photos.length>1?'':'none';
   const b=$('lbUse');b.style.display='';b.classList.toggle('on',!!p.use);b.innerHTML=p.use?ic('check')+'in carousel':'excluded';
-  const t=$('lbTitle');t.style.display='';t.classList.toggle('on',cur.titlePicFrom===p.id);t.innerHTML=ic('star')+(cur.titlePicFrom===p.id?'is the title pic':'make title pic');
+  const t=$('lbTitle');t.style.display='';t.classList.toggle('on',cur.titlePicFrom===p.id);t.innerHTML=ic('star')+(cur.titlePicFrom===p.id?'is the title pic':'make title pic');paintIcons(t);
   $('lightbox').style.display='flex';setTheme('#0E1326');paintIcons($('lightbox'));
 }
 function closeLightbox(){lbIdx=-1;$('lightbox').style.display='none';setTheme('#FAF6F0');}
@@ -1133,7 +1152,7 @@ async function buildSlides(){
     if(!e.on)continue;
     const c=await byKey[e.key].render();
     const i=n++;const d=document.createElement('div');d.className='slide';d.appendChild(c);
-    const b=document.createElement('button');b.className='mini';b.style.marginTop='6px';b.innerHTML=ic('download')+'slide '+(i+1);
+    const b=document.createElement('button');b.className='mini';b.style.marginTop='6px';b.innerHTML=ic('download')+'slide '+(i+1);paintIcons(b);
     b.onclick=()=>dl(c,i);d.appendChild(b);wrapEl.appendChild(d);
   }
 }

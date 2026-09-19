@@ -3,6 +3,14 @@
 Every version is a full snapshot in `versions/index-vX.Y.html` (and a git commit).
 **Roll back:** copy the snapshot over `index.html`, re-upload to GitHub.
 
+## v3.1 — 2026-09-19
+- **Photo dots while timing.** The live step list now shows one coral dot per photo saved
+  on that step, updating the moment you shoot — so you can see at a glance which steps
+  are covered and which have nothing. Past 6 photos it collapses to a dot + "×9" so the
+  row never wraps.
+- Fixes from the icon sweep: the cast button was printing its own markup as text, and the
+  mic glyph on "note saved" was never drawn.
+
 ## v3.0 — 2026-09-19
 - **Fine-line icons everywhere.** Every emoji in the interface is now a stroked SVG on
   one weight (clock, camera, mic, play/stop, sparkle, star, pencil, check, chevrons,

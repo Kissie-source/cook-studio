@@ -219,7 +219,7 @@ Reset</textarea>
       </div>
     </div>
     <button class="big-btn red" id="startBtn" onclick="startCook()"><i class="ic" data-ic="play"></i>Start timer &amp; mic</button>
-    <p class="hint">At each step the mic records the first 7 seconds only — say what you're doing, then cook. Those notes are your captions.</p>
+    <p class="hint">At each step the mic records the first 12 seconds only — say what you're doing, then cook. Those notes are your captions.</p>
   </div>
 
   <div class="card" id="liveCard" style="display:none">
@@ -467,17 +467,36 @@ function discardLive(){
 setInterval(saveLive,3000);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveLive();else if(live)wakeLock();});
 window.addEventListener('pagehide',saveLive);
+/* how long the mic listens at the top of each step */
+const NOTE_SEC=12;
 function startRec(){if(!live||!live.stream)return;live.chunks=[];live.rec=new MediaRecorder(live.stream);live.rec.ondataavailable=e=>live.chunks.push(e.data);live.rec.start();live.recT0=Date.now();
-  $('recInd').innerHTML='<span class="dot"></span> recording 7s step note — say what you\'re doing';
+  $('recInd').innerHTML=`<span class="dot"></span> recording ${NOTE_SEC}s step note — say what you're doing`;
   clearTimeout(live.recTimer);
   live.recTimer=setTimeout(async()=>{await stopRec();
-    if(live){$('recInd').innerHTML=ic('mic')+'note saved — keep cooking';paintIcons($('recInd'));}},7000);}
-function stopRec(){return new Promise(async res=>{
-  if(!live||!live.rec||live.rec.state==='inactive')return res();
+    if(live){$('recInd').innerHTML=ic('mic')+'note saved — keep cooking';paintIcons($('recInd'));}},NOTE_SEC*1000);}
+function stopRec(){
+  /* already stopped (the auto-timer got there first) — its note may still be being written, so wait for that */
+  if(!live||!live.rec||live.rec.state==='inactive')return Promise.resolve(live&&live.saving).catch(()=>{}).then(()=>{});
   clearTimeout(live.recTimer);
-  live.rec.onstop=async()=>{const b=new Blob(live.chunks,{type:live.rec.mimeType||'audio/webm'});
-    if(b.size>200){const id='a'+Date.now();await putBlob(id,b);live.s.notes.push({id,stepId:live.s.steps[live.i].id,stepIdx:live.i,sec:Math.round((Date.now()-live.recT0)/1000)});saveLive();}res();};
-  live.rec.stop();});}
+  /* capture everything up front: by the time the write lands, the cook may be over and `live` gone */
+  const sess=live.s,stepId=live.s.steps[live.i].id,stepIdx=live.i,t0=live.recT0,
+        rec=live.rec,mime=rec.mimeType||'audio/webm',chunks=live.chunks;
+  const p=new Promise(res=>{
+    rec.onstop=()=>{
+      const b=new Blob(chunks,{type:mime});
+      if(b.size<=200)return res();
+      const id='a'+Date.now();
+      putBlob(id,b)
+        .then(()=>{sess.notes.push({id,stepId,stepIdx,sec:Math.round((Date.now()-t0)/1000)});
+                   saveLive();if(sessions.includes(sess))saveSessions();})
+        .catch(()=>{})
+        .then(res);
+    };
+  });
+  /* claim it now, not in onstop — finishing in that gap must still wait for the note */
+  live.saving=p;p.then(()=>{if(live&&live.saving===p)live.saving=null;});
+  rec.stop();
+  return p;}
 function tick(){$('liveTotal').textContent=fmt((Date.now()-live.t0)/1000);$('liveStepTime').textContent='step · '+fmt((Date.now()-live.st0)/1000);}
 function setRecipeBtn(saved){
   $('recipeBtn').innerHTML=ic('image')+(saved?'ingredients photo saved — tap to retake':'shoot your ingredients — becomes “The Cast” slide');

@@ -3,6 +3,17 @@
 Every version is a full snapshot in `versions/index-vX.Y.html` (and a git commit).
 **Roll back:** copy the snapshot over `index.html`, re-upload to GitHub.
 
+## v3.2 — 2026-09-19
+- **Voice notes are now 12 s** (was 7 s) — one constant, `NOTE_SEC`, drives the timer, the
+  on-screen indicator and the setup hint.
+- **Fix: a note could be lost when the auto-stop and finishing collided.** The save reads
+  the session *after* an async blob write, and if the cook ended in between, the write
+  threw and the note vanished — silently, since the failure also left the stop promise
+  unresolved (the "note saved" line never appeared). The recorder state is now captured
+  up front, and an in-flight save is claimed the moment the recorder stops, so "next
+  step" and "finish" wait for it. Verified with a deliberately slowed stop event: three
+  steps, three notes, none dropped.
+
 ## v3.1 — 2026-09-19
 - **Photo dots while timing.** The live step list now shows one coral dot per photo saved
   on that step, updating the moment you shoot — so you can see at a glance which steps

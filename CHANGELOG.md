@@ -3,6 +3,23 @@
 Every version is a full snapshot in `versions/index-vX.Y.html` (and a git commit).
 **Roll back:** copy the snapshot over `index.html`, re-upload to GitHub.
 
+## v3.4 — 2026-10-24
+- **Ingredient extraction stays in the app.** The copy-paste detour is gone — one tap on
+  the sparkle, the key is asked for once and kept on the device. The prompt now also reads
+  German kitchen shorthand: EL → tbsp, TL → tsp, Prise → pinch, Msp. → knife tip, Bund →
+  bunch, and it keeps the qualifier ("1 kleiner EL" → "1 small tbsp").
+- **Photo shapes.** In the photo editor: full slide (as before) or a card in 4:5, 1:1, 4:3,
+  16:9 or 3:4. The crop preview takes the chosen shape, and a card sits centred on cream
+  with the step name under it.
+- **Strict palette.** Every colour literal is now navy · coral · cream · grey or a tint of
+  them — the sage green (SLOW button, badges) and the leftover warm-brown shadows and
+  off-whites are gone.
+- **Another round of a step, mid-cook.** A "+" next to the camera inserts "MEP 2" (then
+  "MEP 3"…) right after the step you are on, so repeats get their own timing and notes.
+- **No percentage beside the step sliders** — the share is already on the chart.
+- **The line under the time chart is yours to write.** It is pre-filled with the sentence
+  the app writes; type over it, or press "write it for me" to go back to the automatic one.
+
 ## v3.3 — 2026-10-24
 - **Fix: nothing stored was reachable in the first moments after opening the app.** The
   photo/audio database opens asynchronously, and every read fired without waiting for

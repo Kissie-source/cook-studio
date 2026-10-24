@@ -3,6 +3,31 @@
 Every version is a full snapshot in `versions/index-vX.Y.html` (and a git commit).
 **Roll back:** copy the snapshot over `index.html`, re-upload to GitHub.
 
+## v3.3 — 2026-10-24
+- **Fix: nothing stored was reachable in the first moments after opening the app.** The
+  photo/audio database opens asynchronously, and every read fired without waiting for
+  it — so a session's photos could come up empty and a voice note refused to play.
+  All blob reads and writes now wait for the database. This is the cause behind both
+  "pics in saved sessions not visible" and "listening button not working".
+- **Fix: the drag handle was invisible and therefore un-draggable** — the icon painter
+  only matched `<i>` elements and the handle is a `<span>`, so it rendered as an empty,
+  zero-width box. The handle is now drawn, sits at the **right end of every slide row**,
+  and has a proper 34×34 touch target.
+- A note that cannot be played now says "no sound" on the button instead of failing mutely.
+- **Title pic no longer destroys the previous one.** Promoting a photo moves the outgoing
+  title pic into the photo strip (and skips that if it was only a copy of a photo already
+  there). Same when uploading a new one.
+- **Ingredient extraction translates.** Labels in any language come back in English, with
+  the amounts exactly as printed. Added a **no-API-key route**: copy the prompt, attach the
+  photo in the Claude app, paste the reply back.
+- **Framing is now direct.** The ↔ / ↕ / zoom sliders are gone: drag the photo to move it,
+  pinch to zoom (mouse wheel on a desktop). Brightness, contrast, colour and warmth stay
+  as sliders.
+- **"Where the time went" is the nested ring** (steps as a donut, the same split again as a
+  pie inside) for both rounds, with **three ways to show the totals**: beside the ring ·
+  rushed vs slow (pulls the other round of the same dish and shows both) · under the ring
+  (both totals and the multiplier, e.g. "4.3× the clock").
+
 ## v3.2 — 2026-09-19
 - **Voice notes are now 12 s** (was 7 s) — one constant, `NOTE_SEC`, drives the timer, the
   on-screen indicator and the setup hint.

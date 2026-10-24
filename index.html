@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#FAF6F0">
 <title>Perfection à la Carte — Cook Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..500;1,9..144,300..500&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
 :root{
   /* one family: navy · coral · sage — on cream (same world as the slides) */
@@ -218,6 +221,7 @@ Reset</textarea>
         <div class="row" style="margin-top:10px">
           <img id="castThumbLive" style="width:56px;height:56px;border-radius:12px;object-fit:cover" alt="ingredients">
           <button class="mini grow" onclick="extractLiveCast()"><i class="ic" data-ic="sparkle"></i>extract soul &amp; aromatics with AI</button>
+        <button class="mini" onclick="sendCastToClaude($('castStatusLive'))"><i class="ic" data-ic="image"></i>Claude app</button>
         </div>
         <p class="hint" id="castStatusLive"></p>
         <label>Soul (the substance — one per line)</label>
@@ -275,6 +279,7 @@ Reset</textarea>
         <button class="mini" onclick="castIn.click()"><i class="ic" data-ic="plus"></i>ingredients photo</button>
         <img id="castThumb" style="display:none;width:72px;height:72px;border-radius:12px;border:3px solid var(--sage);object-fit:cover;cursor:zoom-in" alt="ingredients" onclick="showBig(cur.cast.pic,'The Cast — your ingredients')">
         <button class="mini" id="castAI" style="display:none" onclick="aiExtractCast(cur,$('castStatus'),$('castSoul'),$('castAromatics'))"><i class="ic" data-ic="sparkle"></i>AI</button>
+        <button class="mini" id="castSend" style="display:none" onclick="sendCastToClaude($('castStatus'))"><i class="ic" data-ic="image"></i>Send to Claude</button>
         <button class="mini red" id="castDel" style="display:none" onclick="delCastPic()"><i class="ic solo" data-ic="x"></i></button>
       </div>
       <p class="hint" id="castStatus" style="margin-top:6px"></p>
@@ -312,9 +317,11 @@ Reset</textarea>
         </div>
         <div id="polishResults"></div>
       </div>
-      <h3 class="sec">TOTAL TIME · how the rushed / slow totals are shown</h3>
-      <div class="chips" id="timeLayoutChips"></div>
-      <label>Line under the chart</label>
+      <h3 class="sec">TIME SLIDE · comment and its font</h3>
+      
+      <label>Comment font</label>
+      <div class="chips" id="noteFontChips"></div>
+      <label>Comment on the time slide</label>
       <input type="text" id="timeNote" placeholder="written for you — type over it">
       <button class="mini" style="margin-top:6px" onclick="suggestTimeNote()"><i class="ic" data-ic="refresh"></i>write it for me</button>
       <button class="big-btn sage" onclick="buildSlides()"><i class="ic" data-ic="sparkle"></i>Generate carousel</button>
@@ -546,7 +553,7 @@ function addLiveStep(){
   /* sit behind the last round of the same step, so MEP · MEP 2 · MEP 3 stay in order */
   const fam=new RegExp('^'+esc+'(\\s+\\d+)?$','i');
   let at=live.i;while(at+1<live.s.steps.length&&fam.test(live.s.steps[at+1].name))at++;
-  live.s.steps.splice(at+1,0,{id:'s'+Date.now(),name:`${base} ${n}`,sec:0,icon:''});
+  live.s.steps.splice(at+1,0,{id:'s'+Date.now(),name:`${base} ${n}`,sec:0,icon:'',added:true});
   saveLive();renderLive();
   $('recInd').innerHTML=ic('plus')+`added “${base} ${n}” — it is next`;paintIcons($('recInd'));
 }
@@ -559,7 +566,11 @@ async function finishCook(){
   await stopRec();
   if(live.stream)live.stream.getTracks().forEach(t=>t.stop());
   clearInterval(live.int);
-  live.s.steps=live.s.steps.filter(s=>s.sec>0);
+  /* drop only the standard steps you never reached — anything you added by hand stays,
+     and a step that got no time still counts as one second so the charts hold up */
+  const kept=live.s.steps.filter(s=>s.sec>0||s.added);
+  live.s.steps=kept.length?kept:live.s.steps;
+  live.s.steps.forEach(s=>{if(!s.sec||s.sec<1)s.sec=1;});
   live.s.total=live.s.steps.reduce((a,b)=>a+b.sec,0)||1;
   sessions.unshift(live.s);saveSessions();
   const id=live.s.id;live=null;clearLive();
@@ -641,6 +652,25 @@ async function aiExtractCast(sess,statusEl,soulEl,aromEl){
 function castPromptText(dish){
   return `This photo shows the ingredients (or the recipe) for "${dish||'my dish'}". List every ingredient you can identify, one per line, split into two buckets. The label or packaging may be in any language — always answer in English, translating the ingredient names (keep the amounts exactly as printed):\nsoul = the substance (protein, carbs, vegetables, dairy base) — include amounts only if visible or readable;\naromatics = the character (herbs, spices, seasonings, condiments, oils, finishing touches).\nTranslate cooking shorthand into English too: EL/Essloeffel = tbsp, TL/Teeloeffel = tsp, Prise = pinch, Msp./Messerspitze = knife tip, Bund = bunch, Packung = pack, Scheibe = slice, Stueck = pcs, Dose = tin, Becher = tub. Keep metric units exactly as printed (g, kg, ml, l). Keep the qualifier when there is one: '1 kleiner EL' = '1 small tbsp', '1 gehaeufter TL' = '1 heaped tsp', 'etwas' = 'a little'. Short practical names. Never invent amounts.\nReply with ONLY this JSON: {"soul":"one per line","aromatics":"one per line"}`;
 }
+/* hands the photo AND the prompt to the Claude app through the phone's share sheet —
+   no API key, and no hunting for the picture in the gallery */
+async function sendCastToClaude(statusEl){
+  const sess=live?live.s:cur;if(!sess||!sess.cast.pic){statusEl.textContent='Shoot the ingredients first.';return;}
+  const blob=await getBlob(sess.cast.pic);if(!blob){statusEl.textContent='That photo could not be read.';return;}
+  const text=castPromptText(sess.dish);
+  const file=new File([blob],'ingredients.jpg',{type:blob.type||'image/jpeg'});
+  try{
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],text});
+      statusEl.textContent='Sent. Paste Claude’s answer into the two fields below.';
+      return;
+    }
+  }catch(e){if(e&&e.name==='AbortError')return;}
+  /* desktop or a browser without file sharing: prompt on the clipboard, Claude in a new tab */
+  try{await navigator.clipboard.writeText(text);}catch(e){}
+  window.open('https://claude.ai/new','_blank');
+  statusEl.textContent='Prompt copied and Claude opened — attach the photo there, then paste the answer below.';
+}
 function extractLiveCast(){
   aiExtractCast(live?live.s:{dish:($('dish').value.trim()||'this dish'),cast:pendingCast},
     $('castStatusLive'),$('castSoulLive'),$('castAromaticsLive'));
@@ -685,11 +715,11 @@ function renderStudio(){
 }
 function renderTimeNote(){const i=$('timeNote');i.value=cur.timeNote||'';i.placeholder=timeInsight();}
 function renderTimeChips(){
-  const now=totalStyle();
-  $('timeLayoutChips').innerHTML=TOTAL_STYLES.map(([k,label])=>
-    `<button class="mini${k===now?' on':''}" onclick="setTotalStyle('${k}')">${label}</button>`).join('');
+  const now=noteFont();
+  $('noteFontChips').innerHTML=NOTE_FONTS.map(([k,label,fam])=>
+    `<button class="mini${k===now?' on':''}" style="font-family:${fam}" onclick="setNoteFont('${k}')">${label}</button>`).join('');
 }
-function setTotalStyle(k){cur.totalStyle=k;saveSessions();renderTimeChips();buildSlides();}
+function setNoteFont(k){cur.noteFont=k;saveSessions();renderTimeChips();buildSlides();}
 function suggestTimeNote(){cur.timeNote='';saveSessions();$('timeNote').value='';$('timeNote').placeholder=timeInsight();buildSlides();}
 $('timeNote').addEventListener('input',e=>{if(cur){cur.timeNote=e.target.value;saveSessions();}});
 function renderPie(){
@@ -974,7 +1004,7 @@ $('castIn').addEventListener('change',async e=>{
 async function renderCast(){
   $('castSoul').value=cur.cast.soul||'';
   $('castAromatics').value=cur.cast.aromatics||'';
-  const has=!!cur.cast.pic;$('castDel').style.display=has?'':'none';$('castAI').style.display=has?'':'none';
+  const has=!!cur.cast.pic;$('castDel').style.display=has?'':'none';$('castAI').style.display=has?'':'none';$('castSend').style.display=has?'':'none';
   const img=$('castThumb');
   if(!has){img.style.display='none';return;}
   const b=await getBlob(cur.cast.pic);
@@ -1074,17 +1104,17 @@ const S={paper:'#FAF6F0',ink:'#14213D',gray:'#8A8F98',accent:'#E07A5F',dark:'#14
   pie:[{c:'#14213D',t:'#FAF6F0'},{c:'#E07A5F',t:'#FAF6F0'},{c:'#F2CFC2',t:'#14213D'},{c:'#8A8F98',t:'#FAF6F0'},{c:'#3D5A80',t:'#FAF6F0'},{c:'#EADFD3',t:'#14213D'}],
   cta:{bg:'#14213D',title:'#FAF6F0',title2:'#E07A5F',text:'#E8E4DC',label:'rgba(250,246,240,.8)'}};
 const hero=()=>S.accent;
-const SANS="'Helvetica Neue',Helvetica,Arial,sans-serif";
+const SANS="'Helvetica Neue',Helvetica,Arial,sans-serif";const SANSFAM=SANS;
 function newC(bg){const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
   if(!bg&&S.paint)S.paint(x);else{x.fillStyle=bg||S.paper;x.fillRect(0,0,W,H);}return[c,x];}
 function rr(x,a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath();}
-function txt(x,t,px,y,size,{w=400,col=S.ink,align='left',ls=0}={}){
+function txt(x,t,px,y,size,{w=400,col=S.ink,align='left',ls=0,fam=SANS}={}){
   x.fillStyle=col;x.textAlign=align;
   try{x.letterSpacing=ls+'px';}catch(e){}
-  x.font=`${w} ${size}px ${SANS}`;x.fillText(t,px,y);
+  x.font=`${w} ${size}px ${fam}`;x.fillText(t,px,y);
   try{x.letterSpacing='0px';}catch(e){}}
 function footer(x,col){txt(x,HANDLE,W-90,H-80,26,{col:col||S.gray,align:'right',ls:2,w:500});}
-function wrap(x,t,px,y,size,maxW,lh,opts={}){x.font=`${opts.w||400} ${size}px ${SANS}`;const words=String(t).split(' ');let line='',yy=y;
+function wrap(x,t,px,y,size,maxW,lh,opts={}){x.font=`${opts.w||400} ${size}px ${opts.fam||SANS}`;const words=String(t).split(' ');let line='',yy=y;
   for(const wd of words){const test=line?line+' '+wd:wd;
     if(x.measureText(test).width>maxW&&line){txt(x,line,px,yy,size,opts);line=wd;yy+=lh;}else line=test;}
   if(line)txt(x,line,px,yy,size,opts);return yy;}
@@ -1153,8 +1183,11 @@ async function slCast(){const[c,x]=newC();
   }
   footer(x);return c;}
 /* ---- "where the time went" — five layouts, picked per session ---- */
-const TOTAL_STYLES=[['flank','Beside the ring'],['versus','Rushed vs slow'],['below','Under the ring']];
-const totalStyle=()=>cur.totalStyle||'flank';
+/* the comment can wear one of three serifs — the rest of the slide stays on the house sans */
+const NOTE_FONTS=[['sans','House sans',SANSFAM],['fraunces','Fraunces',"'Fraunces',Georgia,serif"],
+  ['cormorant','Cormorant',"'Cormorant Garamond',Georgia,serif"],['garamond','EB Garamond',"'EB Garamond',Georgia,serif"]];
+const noteFont=()=>cur.noteFont||'sans';
+const noteFam=()=>(NOTE_FONTS.find(f=>f[0]===noteFont())||NOTE_FONTS[0])[2];
 /* the same dish in the other round, if it has been cooked */
 function counterpart(){
   const d=(cur.dish||'').trim().toLowerCase();
@@ -1193,59 +1226,52 @@ function legend(x,y){
   });
   return y+Math.ceil(cur.steps.length/2)*52;
 }
+/* a slim arrow from the rushed total to the slow one, carrying the multiplier */
+function multArrow(x,x0,x1,y,label){
+  const mid=(x0+x1)/2;
+  x.strokeStyle=S.gray;x.lineWidth=2;x.lineCap='round';
+  x.beginPath();x.moveTo(x0,y);x.lineTo(x1-16,y);x.stroke();
+  x.beginPath();x.moveTo(x1-26,y-9);x.lineTo(x1-4,y);x.lineTo(x1-26,y+9);x.stroke();
+  if(label){
+    x.font=`500 27px ${noteFam()}`;
+    const w=x.measureText(label).width+26;
+    x.fillStyle=S.paper;x.fillRect(mid-w/2,y-20,w,40);
+    txt(x,label,mid,y+9,27,{align:'center',col:S.ink,w:500,fam:noteFam()});
+  }
+}
 function slPie(){const[c,x]=newC();
   txt(x,cur.dish.toUpperCase(),W-90,124,23,{col:S.gray,align:'right',ls:4,w:500});
   txt(x,'WHERE THE',86,300,104,{w:800,col:S.ink,ls:1});
   txt(x,'TIME WENT',86,408,104,{w:800,col:S.accent,ls:1});
 
-  /* the chart: outer ring of steps, the same split again as a solid pie inside */
-  const style=totalStyle(),T=fmt(cur.total),round=cur.round==='RUSHED'?'RUSHED':'SLOW';
-  const small=style==='below',cx=W/2,cy=small?648:720,r=small?214:232,ri=small?138:150;
-  ringChart(x,cx,cy,r,ri,false);
-  ringChart(x,cx,cy,ri-16,0,false);
+  /* your comment sits above the chart, in the font you picked */
+  const noteEnd=wrap(x,timeNoteText(),90,496,31,900,44,{w:400,col:S.ink,fam:noteFam()});
 
-  const other=counterpart();
-  if(style==='flank'){
-    txt(x,'TOTAL',278,cy-16,24,{align:'right',col:S.gray,ls:5,w:600});
-    txt(x,'TIME',278,cy+22,24,{align:'right',col:S.gray,ls:5,w:600});
-    txt(x,T,802,cy+10,T.length>4?54:66,{align:'left',col:S.ink,ls:-2,w:300});
-    txt(x,round,802,cy+54,22,{align:'left',col:S.accent,ls:5,w:600});
-    legend(x,1010);
+  const other=counterpart(),T=fmt(cur.total),round=cur.round==='RUSHED'?'RUSHED':'SLOW';
+  const r=other?204:244,ri=other?132:150,cx=W/2;
+  /* the ring drops below the comment, however many lines it runs to */
+  const cy=Math.max(other?792:852,noteEnd+r+68);
 
-  }else if(style==='versus'){
-    /* this round on its own side, the other round facing it */
-    const rushed=cur.round==='RUSHED'?cur:other,slow=cur.round==='SLOW'?cur:other;
-    const side=(label,sess,px,align,mine)=>{
-      txt(x,label,px,cy-14,23,{align,col:mine?S.accent:S.gray,ls:5,w:600});
-      const v=sess?fmt(sess.total):'—';
-      txt(x,v,px,cy+40,v.length>4?48:58,{align,col:mine?S.ink:S.gray,ls:-2,w:mine?300:200});
-      if(!sess)txt(x,'not cooked yet',px,cy+76,20,{align,col:S.gray,ls:1,w:400});
-    };
-    side('RUSHED',rushed,292,'right',cur.round==='RUSHED');
-    side('SLOW',slow,788,'left',cur.round==='SLOW');
-    legend(x,1010);
-
+  /* names and shares sit around the ring — no second legend to collide with */
+  ringChart(x,cx,cy,r,ri,true);
+  if(other){
+    ringChart(x,cx,cy,ri-16,0,false);           /* the same split again, as a pie */
   }else{
-    /* legend first, then both totals as the closing line */
-    legend(x,944);
-    const y=1128;
-    x.strokeStyle=S.line;x.lineWidth=2;x.beginPath();x.moveTo(90,y-54);x.lineTo(W-90,y-54);x.stroke();
-    if(other){
-      const rushed=cur.round==='RUSHED'?cur:other,slow=cur.round==='SLOW'?cur:other;
-      const mult=rushed.total?slow.total/rushed.total:0;
-      txt(x,'RUSHED',90,y,23,{col:S.gray,ls:5,w:600});
-      txt(x,fmt(rushed.total),90,y+58,50,{col:cur.round==='RUSHED'?S.ink:S.gray,ls:-2,w:300});
-      txt(x,'SLOW',W-90,y,23,{align:'right',col:S.gray,ls:5,w:600});
-      txt(x,fmt(slow.total),W-90,y+58,50,{align:'right',col:cur.round==='SLOW'?S.ink:S.gray,ls:-2,w:300});
-      if(mult>=1.1)txt(x,`${mult>=10?Math.round(mult):mult.toFixed(1)}× the clock`,W/2,y+48,28,{align:'center',col:S.accent,ls:2,w:600});
-    }else{
-      txt(x,'TOTAL TIME',90,y,23,{col:S.gray,ls:5,w:600});
-      txt(x,T,90,y+58,54,{col:S.ink,ls:-2,w:300});
-      txt(x,round,W-90,y+58,23,{align:'right',col:S.accent,ls:5,w:600});
-    }
+    x.beginPath();x.arc(cx,cy,ri,0,7);x.fillStyle=S.paper;x.fill();
+    x.textBaseline='middle';txt(x,T,cx,cy-4,T.length>4?74:88,{align:'center',w:300,col:S.ink,ls:-2});x.textBaseline='alphabetic';
+    txt(x,round,cx,cy+64,22,{align:'center',col:S.gray,ls:5,w:600});
   }
 
-  if(style!=='below')wrap(x,timeNoteText(),90,1190,30,900,42,{w:400,col:S.ink});
+  if(other){
+    const rushed=cur.round==='RUSHED'?cur:other,slow=cur.round==='SLOW'?cur:other;
+    const mult=rushed.total?slow.total/rushed.total:0,y=1136;
+    x.strokeStyle=S.line;x.lineWidth=2;x.beginPath();x.moveTo(90,y-58);x.lineTo(W-90,y-58);x.stroke();
+    txt(x,'RUSHED',90,y,23,{col:S.gray,ls:5,w:600});
+    txt(x,fmt(rushed.total),90,y+56,50,{col:S.ink,ls:-2,w:300});
+    txt(x,'SLOW',W-90,y,23,{align:'right',col:S.gray,ls:5,w:600});
+    txt(x,fmt(slow.total),W-90,y+56,50,{align:'right',col:S.ink,ls:-2,w:300});
+    if(mult>=1.05)multArrow(x,336,W-336,y+38,`${mult>=10?Math.round(mult):mult.toFixed(1)}× of slow version`);
+  }
   footer(x);return c;}const timeNoteText=()=>((cur.timeNote||'').trim())||timeInsight();
 /* one dry line under the donut: where the clock actually went */
 function timeInsight(){
@@ -1374,6 +1400,7 @@ function togglePlan(key){const e=cur.plan.find(x=>x.key===key);if(e)e.on=!e.on;s
 function resetPlan(){cur.plan=null;saveSessions();renderPlan();buildSlides();}
 async function buildSlides(){
   await document.fonts.ready;
+  if(noteFont()!=='sans'){const f=noteFam();try{await document.fonts.load('400 30px '+f);await document.fonts.load('italic 400 30px '+f);}catch(e){}}
   const {byKey,plan}=syncPlan();renderPlan();
   const wrapEl=$('slides');wrapEl.innerHTML='';let n=0;
   for(const e of plan){

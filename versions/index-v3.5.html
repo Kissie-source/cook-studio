@@ -1,0 +1,1420 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#FAF6F0">
+<title>Perfection à la Carte — Cook Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..500;1,9..144,300..500&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* one family: navy · coral · sage — on cream (same world as the slides) */
+  --paper:#FAF6F0; --glass:rgba(255,255,255,.58); --glass-solid:#FDFAF6;
+  --ink:#14213D; --muted:#8A8F98; --line:rgba(20,33,61,.10); --line-2:rgba(20,33,61,.17);
+  --accent:#E07A5F; --accent-soft:rgba(224,122,95,.12); --blush:#F2CFC2; --blush-soft:rgba(242,207,194,.4); --sage:#3D5A80; --charcoal:#14213D;
+  /* cook mode — deep navy instrument */
+  --k-bg:#0F1A33; --k-line:#2A3A5E; --k-text:#F1EDE6; --k-muted:rgba(250,246,240,.60); --slow:#3D5A80;
+  --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,system-ui,sans-serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Code","Roboto Mono",monospace;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+/* fine-line icon system — one stroke weight everywhere */
+.ic{display:inline-block; width:1.05em; height:1.05em; vertical-align:-.16em; flex:none; margin-right:.45em}
+.ic.solo{margin-right:0}
+.ic svg{display:block; width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round}
+.big-btn .ic{width:1.2em; height:1.2em; vertical-align:-.22em}
+body{margin:0; font-family:var(--ui); background:var(--paper); color:var(--ink); -webkit-font-smoothing:antialiased}
+body::before{content:''; position:fixed; top:-140px; right:-160px; width:420px; height:420px; border-radius:50%;
+  background:radial-gradient(circle, rgba(224,122,95,.45), rgba(224,122,95,0) 68%); filter:blur(40px); pointer-events:none; z-index:0}
+header,nav,main{position:relative; z-index:1}
+header{padding:26px 20px 4px}
+header h1{margin:0; font:400 26px var(--ui); letter-spacing:-.3px}
+header p{margin:2px 0 0; font:500 12px var(--ui); color:var(--muted); letter-spacing:2.5px; text-transform:uppercase}
+nav{display:flex; gap:8px; padding:16px 20px 6px; position:sticky; top:0; background:linear-gradient(var(--paper) 75%,transparent); z-index:5}
+nav button{padding:9px 18px; border:none; border-radius:999px; background:transparent; color:var(--muted); font:500 14px var(--ui); cursor:pointer}
+nav button.on{background:var(--charcoal); color:#FAF6F0}
+main{padding:0 16px 44px; max-width:520px; margin:0 auto}
+.card{background:var(--glass); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+  border:1px solid rgba(255,255,255,.65); border-radius:26px; padding:22px 20px; margin:14px 0}
+.card h2{margin:0 0 14px; font:300 24px var(--ui); letter-spacing:.5px; color:var(--ink)}
+label{font:600 10.5px var(--ui); letter-spacing:1.6px; text-transform:uppercase; color:var(--muted); display:block; margin:16px 0 6px}
+input[type=text],input[type=password],textarea{width:100%; padding:13px 18px; border:1px solid transparent; border-radius:18px; background:rgba(255,255,255,.75); font:400 15px var(--ui); color:var(--ink)}
+input[type=text],input[type=password]{border-radius:999px}
+input:focus,textarea:focus{outline:none; border-color:var(--accent); background:#fff}
+textarea{min-height:88px; resize:vertical; line-height:1.55}
+.seg{display:flex; gap:4px; margin-top:6px; padding:4px; border-radius:999px; background:rgba(255,255,255,.5)}
+.seg button{flex:1; padding:11px; border:none; border-radius:999px; background:none; font:500 13.5px var(--ui); color:var(--muted); cursor:pointer}
+.seg button.rushed.on{background:#fff; color:var(--accent); font-weight:600; box-shadow:0 1px 6px rgba(20,33,61,.10)}
+.seg button.slow.on{background:#fff; color:#3D5A80; font-weight:600; box-shadow:0 1px 6px rgba(20,33,61,.10)}
+.big-btn{width:100%; padding:16px; margin-top:16px; border:none; border-radius:999px; background:var(--charcoal); font:500 15px var(--ui); letter-spacing:.3px; color:#FAF6F0; cursor:pointer}
+.big-btn.red{background:var(--accent); color:#fff}
+.big-btn.sage{background:rgba(255,255,255,.8); color:var(--ink); border:1px solid var(--line-2)}
+.big-btn:disabled{opacity:.4}
+#liveTotal{font:200 56px var(--ui); text-align:center; letter-spacing:-1px; font-variant-numeric:tabular-nums}
+#liveStep{font:500 22px var(--ui); text-align:center; margin:6px 0 2px}
+#liveStepTime{text-align:center; color:var(--muted); font:400 13px var(--mono)}
+.badge{display:inline-block; padding:6px 15px; border-radius:999px; border:1px solid var(--line-2); font:600 10.5px var(--ui); letter-spacing:2.2px}
+.badge.RUSHED{color:var(--accent); border-color:var(--accent); background:var(--accent-soft)}
+.badge.SLOW{color:#3D5A80; border-color:var(--sage); background:rgba(156,196,180,.22)}
+.rec{color:var(--muted); font-size:12px; text-align:center; margin-top:10px; letter-spacing:.3px}
+.rec .dot{display:inline-block; width:8px; height:8px; border-radius:99px; background:var(--accent); margin-right:6px; animation:bl 1.1s infinite}
+@keyframes bl{50%{opacity:.2}}
+.steplist{margin:16px 0 0; padding:0; list-style:none; font:400 14.5px var(--ui)}
+.steplist li{padding:9px 14px; border-radius:999px; color:var(--muted); display:flex; align-items:center; gap:10px}
+.steplist li .nm{flex:1; min-width:0}
+.steplist li.now{background:rgba(255,255,255,.75); color:var(--ink); font-weight:600}
+.steplist li.done{opacity:.45}
+.steplist li.done .nm{text-decoration:line-through}
+/* one dot per photo saved on that step */
+.pdots{display:inline-flex; align-items:center; gap:5px; flex:none}
+.pdots i{width:7px; height:7px; border-radius:50%; background:var(--accent); display:block}
+.pdots b{font:600 11px var(--mono); color:var(--accent); letter-spacing:.5px}
+.row{display:flex; gap:8px; align-items:center}
+.row .grow{flex:1}
+.sess{display:flex; justify-content:space-between; align-items:center; padding:15px 2px; border-bottom:1px solid var(--line)}
+.sess b{display:block; font:500 15px var(--ui)}
+.sess small{color:var(--muted); font-size:12px}
+.mini{padding:9px 15px; border:1px solid var(--line-2); border-radius:999px; background:rgba(255,255,255,.6); font:500 12.5px var(--ui); color:var(--ink); cursor:pointer}
+.mini.red{background:none; color:var(--accent); border-color:rgba(224,122,95,.4)}
+.steprow{display:flex; gap:5px; align-items:center; margin:4px 0; flex-wrap:wrap; padding:7px 9px 5px; border-radius:15px; background:rgba(255,255,255,.42)}
+.steprow input.nm{flex:1; min-width:96px; padding:6px 12px; font:400 13.5px var(--ui); color:var(--ink);
+  background:rgba(255,255,255,.85); border:1px solid var(--line); border-radius:999px}
+.steprow input.nm:focus{outline:none; border-color:var(--accent); background:#fff}
+.steprow .mini{padding:4px 0; width:27px; text-align:center; font-size:11px}
+.steprow .mini.red{width:27px}
+.steprow .mini.play{width:auto; padding:4px 9px; color:var(--accent); border-color:rgba(224,122,95,.45); font-variant-numeric:tabular-nums; white-space:nowrap}
+.steprow .mini.play.on{background:var(--accent); border-color:var(--accent); color:#fff}
+.chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:4px}
+.chips .mini.on{background:var(--accent); border-color:var(--accent); color:#fff}
+.planrow{margin:5px 0}
+.planrow .drag{cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; flex:none; width:34px; height:34px; display:flex; align-items:center; justify-content:center; color:var(--muted)}
+.planrow .drag svg{width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round}
+.planrow.dragging{opacity:.6; background:var(--accent-soft); box-shadow:0 4px 14px rgba(20,33,61,.14)}
+.steprow .icon-btn{width:28px; height:28px; font-size:13px}
+.cdot{width:10px; height:10px; border-radius:50%; flex:none}
+.sharewrap{display:flex; align-items:center; gap:8px; width:100%; margin-top:2px}
+.sharewrap input[type=range]{flex:1; accent-color:var(--accent); height:4px}
+.pct{width:36px; text-align:right; font:500 12px var(--mono)}
+.mini:disabled{opacity:.3}
+.icon-btn{width:40px; height:40px; border:1px solid var(--line-2); border-radius:50%; background:rgba(255,255,255,.6); font-size:17px; cursor:pointer}
+.total-lock{text-align:center; font:600 11px var(--ui); letter-spacing:2px; text-transform:uppercase; margin:6px 0 0; padding:9px; background:var(--accent-soft); color:var(--accent); border-radius:999px}
+.thumbs{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
+.thumbs .ph{width:72px; height:72px; border-radius:18px; border:2px solid transparent; object-fit:cover; opacity:.35; display:block; cursor:zoom-in}
+.thumbs .ph.use{opacity:1; border-color:var(--accent)}
+.thumbwrap{position:relative; line-height:0}
+.thumbwrap .badge-use{position:absolute; top:-4px; right:-4px; width:23px; height:23px; padding:0; border-radius:50%;
+  border:1px solid var(--line-2); background:var(--glass-solid); color:var(--muted); font:600 12px var(--ui); line-height:21px; text-align:center; cursor:pointer}
+.thumbwrap .badge-use.on{background:var(--accent); border-color:var(--accent); color:#fff}
+#lightbox{position:fixed; inset:0; background:rgba(22,20,17,.985); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); display:none; z-index:30;
+  flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:20px}
+#lightbox img{max-width:94vw; max-height:56vh; border-radius:16px; object-fit:contain}
+#lightbox .lbadj{display:none; flex-direction:column; gap:3px; width:min(92vw,420px)}
+#lightbox .lbadj canvas{width:auto; max-width:100%; max-height:44vh; align-self:center; border-radius:12px; margin-bottom:4px; box-shadow:0 0 0 1px rgba(255,255,255,.18); touch-action:none; cursor:grab}
+#lightbox .lbadj canvas.grabbing{cursor:grabbing}
+#lightbox .chips{justify-content:center; margin-bottom:6px}
+#lightbox .chips .mini{background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.28); color:#F1EDE6}
+#lightbox .chips .mini.on{background:var(--accent); border-color:var(--accent); color:#fff}
+#lightbox .lbtip{margin:0 0 8px; text-align:center; color:rgba(250,246,240,.55); font:500 11px var(--ui); letter-spacing:.3px}
+#lightbox .lbadj label{display:flex; align-items:center; gap:10px; color:rgba(250,246,240,.72); font:600 10px var(--ui); letter-spacing:1.6px; text-transform:uppercase; margin:0}
+#lightbox .lbadj label span{width:62px; text-align:right}
+#lightbox .lbadj input[type=range]{flex:1; accent-color:var(--blush); height:4px}
+#lightbox .lbadj .lbrow{margin-top:6px}
+#lightbox .lbcap{color:#F1EDE6; font:500 14px var(--ui); text-align:center}
+#lightbox .lbrow{display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap}
+#lightbox .lbbtn{padding:10px 18px; border:1px solid rgba(255,255,255,.28); border-radius:999px;
+  background:rgba(255,255,255,.08); color:#F1EDE6; font:500 13px var(--ui); cursor:pointer}
+#lightbox .lbbtn.on{background:var(--accent); border-color:var(--accent); color:#fff}
+#lightbox .lbbtn:disabled{opacity:.3}
+#lightbox .lbclose{position:absolute; top:calc(14px + env(safe-area-inset-top)); right:16px; width:42px; height:42px; border-radius:50%;
+  border:1px solid rgba(255,255,255,.28); background:rgba(255,255,255,.08); color:#F1EDE6; font-size:18px; cursor:pointer}
+.notes button{display:block; width:100%; text-align:left; margin:6px 0; padding:11px 16px; border:none; border-radius:999px; background:rgba(255,255,255,.7); font:400 13px var(--ui); color:var(--ink); cursor:pointer}
+#pieWrap{display:flex; gap:10px; align-items:center; justify-content:center; margin:2px 0}
+#slides{display:flex; gap:12px; overflow-x:auto; padding:10px 0}
+#slides .slide{flex:0 0 auto; text-align:center}
+#slides canvas{width:190px; border-radius:14px; display:block; box-shadow:0 2px 14px rgba(20,33,61,.12)}
+#picker{position:fixed; inset:0; background:rgba(20,33,61,.45); display:none; align-items:end; z-index:20}
+#picker .sheet{background:var(--glass-solid); border-radius:24px 24px 0 0; padding:22px; width:100%; max-width:520px; margin:0 auto}
+#picker .grid{display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-top:12px}
+#picker .grid button{font-size:24px; padding:9px; border:none; border-radius:14px; background:#fff; cursor:pointer}
+.pol{border:1px solid rgba(255,255,255,.7); border-radius:20px; padding:13px 16px; margin:9px 0; background:rgba(255,255,255,.55)}
+.pol small{color:var(--muted); letter-spacing:1.6px; font:600 10.5px var(--ui); text-transform:uppercase}
+.pol .was{color:var(--muted); text-decoration:line-through; font-size:13px; margin:6px 0}
+.pol .now{background:var(--accent-soft); border-radius:12px; padding:8px 12px; font-size:14px; margin:6px 0 10px; color:var(--ink)}
+.pol.done{opacity:.4}
+.mini.sagebg{background:var(--accent); border-color:var(--accent); color:#fff}
+#polishBox textarea{min-height:70px}
+.warn{background:var(--charcoal); color:#FAF6F0; border-radius:18px; padding:12px 16px; font-size:13px; margin:12px 0; display:none}
+.hint{font-size:12px; color:var(--muted); margin-top:8px; line-height:1.55}
+h3.sec{font:600 10.5px var(--ui); letter-spacing:1.8px; text-transform:uppercase; color:var(--muted); margin:16px 0 5px; padding-top:13px; border-top:1px solid var(--line)}
+
+/* ===== COOK MODE — charcoal instrument ===== */
+body.cooking{background:var(--k-bg)}
+body.cooking::before{display:none}
+body.cooking header, body.cooking nav{display:none}
+body.cooking main{padding:0; max-width:none}
+body.cooking #liveCard{background:var(--k-bg); backdrop-filter:none; -webkit-backdrop-filter:none; border:none; border-radius:0; margin:0; color:var(--k-text);
+  padding:32px 24px calc(26px + env(safe-area-inset-bottom)); min-height:100vh; min-height:100dvh; display:flex; flex-direction:column}
+body.cooking #liveCard>div:first-child{margin-bottom:4px}
+body.cooking #liveBadge{background:none}
+body.cooking #liveBadge.RUSHED{color:var(--accent); border-color:var(--accent)}
+body.cooking #liveBadge.SLOW{color:var(--slow); border-color:var(--slow); background:none}
+body.cooking #liveTotal{font-size:96px; font-weight:200; color:var(--k-text); margin-top:22px; letter-spacing:-2px}
+body.cooking #liveStep{font-size:30px; font-weight:400; color:var(--k-text); margin-top:10px}
+body.cooking #liveStepTime{color:var(--k-muted); font-size:14px}
+body.cooking .rec{color:var(--k-muted)}
+body.cooking .steplist{flex:1; margin-top:24px}
+body.cooking .steplist li{color:var(--k-muted); padding:10px 14px; border-radius:0}
+body.cooking .steplist li.now{background:none; color:var(--k-text); border-left:2px solid var(--accent); font-weight:500}
+body.cooking.slowround .steplist li.now{border-left-color:var(--slow)}
+body.cooking .big-btn{padding:17px; font-size:16px}
+body.cooking .row>.big-btn:first-child,body.cooking #addStepBtn{width:64px; flex:none; background:none; border:1px solid var(--k-line); color:var(--k-text)}
+body.cooking #nextBtn{background:var(--k-text); color:var(--k-bg)}
+body.cooking #recipeBtn{background:none; border:1px solid var(--k-line); color:var(--k-muted)}
+body.cooking .big-btn.red{background:none; border:1px solid var(--k-line); color:var(--k-muted)}
+body.cooking #castBlock label{color:var(--k-muted)}
+body.cooking #castBlock textarea{background:rgba(255,255,255,.07); color:var(--k-text)}
+body.cooking #castBlock textarea:focus{background:rgba(255,255,255,.12); border-color:var(--accent)}
+body.cooking #castBlock .hint{color:var(--k-muted)}
+body.cooking #castBlock .mini{background:none; border-color:var(--k-line); color:var(--k-text)}
+</style>
+</head>
+<body>
+<header>
+  <h1>perfection à la carte</h1>
+  <p>the cook studio</p>
+</header>
+<nav>
+  <button id="nav-cook" class="on" onclick="showTab('cook')">Cook</button>
+  <button id="nav-sessions" onclick="showTab('sessions')">Sessions</button>
+  <button id="nav-studio" onclick="showTab('studio')">Studio</button>
+</nav>
+<main>
+<div class="warn" id="httpsWarn"><i class="ic" data-ic="warn"></i>Voice recording needs HTTPS. Photos & timer still work.</div>
+
+<!-- COOK -->
+<section id="tab-cook">
+  <div class="card" id="resumeCard" style="display:none;border:2px solid var(--accent)">
+    <h2><i class="ic" data-ic="clock"></i>COOK IN PROGRESS</h2>
+    <p class="hint" id="resumeInfo" style="font-size:14px;color:var(--ink)"></p>
+    <button class="big-btn red" onclick="resumeCook()"><i class="ic" data-ic="play"></i>Resume — timer, notes & photos intact</button>
+    <button class="mini red" style="width:100%;margin-top:10px;padding:10px" onclick="discardLive()">throw it away</button>
+  </div>
+  <div class="card" id="setupCard">
+    <h2>NEW COOK</h2>
+    <label>Dish</label>
+    <input type="text" id="dish" placeholder="Carbonara">
+    <label>Round</label>
+    <div class="seg">
+      <button class="rushed on" id="segR" onclick="setRound('RUSHED')"><i class="ic" data-ic="clock"></i>RUSHED</button>
+      <button class="slow" id="segS" onclick="setRound('SLOW')"><i class="ic" data-ic="leaf"></i>SLOW</button>
+    </div>
+    <label>Steps (one per line — as many as you need; the mic re-records fresh for each; edits here stick even if you switch RUSHED/SLOW)</label>
+    <textarea id="stepsIn">Recipe Reading
+MEP
+Cooking
+Reset</textarea>
+    <div id="castBlock">
+      <button class="mini" id="recipeBtn" style="width:100%;margin-top:16px;padding:10px" onclick="recipeIn.click()"><i class="ic" data-ic="image"></i>shoot your ingredients — becomes "The Cast" slide</button>
+      <div id="castPanel" style="display:none">
+        <div class="row" style="margin-top:10px">
+          <img id="castThumbLive" style="width:56px;height:56px;border-radius:12px;object-fit:cover" alt="ingredients">
+          <button class="mini grow" onclick="extractLiveCast()"><i class="ic" data-ic="sparkle"></i>extract soul &amp; aromatics with AI</button>
+        <button class="mini" onclick="sendCastToClaude($('castStatusLive'))"><i class="ic" data-ic="image"></i>Claude app</button>
+        </div>
+        <p class="hint" id="castStatusLive"></p>
+        <label>Soul (the substance — one per line)</label>
+        <textarea id="castSoulLive" style="min-height:56px" placeholder="500 g spaghetti&#10;3 eggs&#10;80 g guanciale"></textarea>
+        <label>Aromatics (the character — one per line)</label>
+        <textarea id="castAromaticsLive" style="min-height:56px" placeholder="60 g pecorino&#10;black pepper, lots&#10;salt"></textarea>
+      </div>
+    </div>
+    <button class="big-btn red" id="startBtn" onclick="startCook()"><i class="ic" data-ic="play"></i>Start timer &amp; mic</button>
+    <p class="hint">At each step the mic records the first 12 seconds only — say what you're doing, then cook. Those notes are your captions.</p>
+  </div>
+
+  <div class="card" id="liveCard" style="display:none">
+    <div style="text-align:center"><span class="badge" id="liveBadge">RUSHED</span></div>
+    <div id="liveTotal">0:00</div>
+    <div id="liveStep">Prep</div>
+    <div id="liveStepTime">step · 0:00</div>
+    <div class="rec" id="recInd"><span class="dot"></span> recording voice note…</div>
+    <ul class="steplist" id="liveList"></ul>
+    <div class="row" style="margin-top:12px">
+      <button class="big-btn" style="margin-top:0" onclick="photoIn.click()"><i class="ic solo" data-ic="camera"></i></button>
+      <button class="big-btn" style="margin-top:0" id="addStepBtn" title="another round of this step" onclick="addLiveStep()"><i class="ic solo" data-ic="plus"></i></button>
+      <button class="big-btn sage grow" style="margin-top:0" id="nextBtn" onclick="nextStep()">Next step<i class="ic solo" data-ic="chevR" style="margin-left:.45em"></i></button>
+    </div>
+    <button class="big-btn red" id="finishBtn" onclick="finishCook()"><i class="ic" data-ic="stop"></i>Finish &amp; build carousel</button>
+    <input type="file" id="photoIn" accept="image/*" capture="environment" hidden>
+    <input type="file" id="recipeIn" accept="image/*" capture="environment" hidden>
+  </div>
+</section>
+
+<!-- SESSIONS -->
+<section id="tab-sessions" style="display:none">
+  <div class="card"><h2>SESSIONS</h2><div id="sessList"></div></div>
+</section>
+
+<!-- STUDIO -->
+<section id="tab-studio" style="display:none">
+  <div class="card" id="studioEmpty"><h2>STUDIO</h2><p class="hint">Finish a cook or pick a session to build its carousel.</p></div>
+  <div id="studioBody" style="display:none">
+    <div class="card">
+      <h2 id="stTitle">—</h2>
+      <div class="total-lock" id="stTotal">total locked · 0:00</div>
+      <div id="pieWrap" style="justify-content:center"><div id="pieSvg"></div></div>
+      <h3 class="sec">STEPS · drag order with the arrows · slider = share</h3>
+      <div id="stSteps"></div>
+      <button class="mini" onclick="addStep()"><i class="ic" data-ic="plus"></i>add step</button>
+      <h3 class="sec" id="notesHead" style="display:none">VOICE NOTES · from steps you removed</h3>
+      <div class="notes" id="stNotes" style="display:none"></div>
+      <h3 class="sec">PHOTOS · tap a photo to see it big, the corner dot to include / exclude</h3>
+      <div class="thumbs" id="stPhotos"></div>
+      <button class="mini" style="margin-top:8px" onclick="galleryIn.click()"><i class="ic" data-ic="plus"></i>add from gallery</button>
+      <input type="file" id="galleryIn" accept="image/*" multiple hidden>
+      <h3 class="sec">THE CAST · slide 2 — ingredients in two buckets</h3>
+      <div class="row">
+        <button class="mini" onclick="castIn.click()"><i class="ic" data-ic="plus"></i>ingredients photo</button>
+        <img id="castThumb" style="display:none;width:72px;height:72px;border-radius:12px;border:3px solid var(--sage);object-fit:cover;cursor:zoom-in" alt="ingredients" onclick="showBig(cur.cast.pic,'The Cast — your ingredients')">
+        <button class="mini" id="castAI" style="display:none" onclick="aiExtractCast(cur,$('castStatus'),$('castSoul'),$('castAromatics'))"><i class="ic" data-ic="sparkle"></i>AI</button>
+        <button class="mini" id="castSend" style="display:none" onclick="sendCastToClaude($('castStatus'))"><i class="ic" data-ic="image"></i>Send to Claude</button>
+        <button class="mini red" id="castDel" style="display:none" onclick="delCastPic()"><i class="ic solo" data-ic="x"></i></button>
+      </div>
+      <p class="hint" id="castStatus" style="margin-top:6px"></p>
+
+      <input type="file" id="castIn" accept="image/*" hidden>
+      <label>SOUL (the substance — one per line, with amount)</label>
+      <textarea id="castSoul" style="min-height:70px" placeholder="500 g spaghetti&#10;3 eggs&#10;80 g guanciale"></textarea>
+      <label>AROMATICS (the character — one per line)</label>
+      <textarea id="castAromatics" style="min-height:70px" placeholder="60 g pecorino&#10;black pepper, lots&#10;salt"></textarea>
+      <p class="hint">Typed buckets win the slide; the ingredients photo is used when both buckets are empty.</p>
+      <h3 class="sec">TITLE PIC · shown big on the cover slide</h3>
+      <div class="row">
+        <button class="mini" onclick="titleIn.click()"><i class="ic" data-ic="plus"></i>choose title pic</button>
+        <img id="tpThumb" style="display:none;width:72px;height:72px;border-radius:12px;border:3px solid var(--blush);object-fit:cover;cursor:zoom-in" alt="title pic" onclick="showBig(cur.titlePic,'Title pic — cover slide')">
+        <button class="mini red" id="tpDel" style="display:none" onclick="delTitlePic()"><i class="ic solo" data-ic="x"></i></button>
+      </div>
+      <input type="file" id="titleIn" accept="image/*" hidden>
+      <h3 class="sec">LEARNINGS</h3>
+      <input type="text" id="learn0" placeholder="What I learned #1" style="margin-bottom:6px">
+      <input type="text" id="learn1" placeholder="What I learned #2" style="margin-bottom:6px">
+      <input type="text" id="learn2" placeholder="What I learned #3">
+      <h3 class="sec">VERDICT / TEASER (last slide)</h3>
+      <input type="text" id="verdict" placeholder="e.g. Friday: same dish, 90 minutes. Worth it?">
+      <h3 class="sec">POLISH · Claude tightens your words — you decide, line by line</h3>
+      <button class="mini" onclick="startPolish()"><i class="ic" data-ic="sparkle"></i>Polish my words</button>
+      <div id="polishBox" style="display:none">
+        <label>Anthropic API key (stored only on this phone — leave empty to use the free copy-paste route)</label>
+        <input type="password" id="apiKey" placeholder="sk-ant-...">
+        <p class="hint" id="polishStatus"></p>
+        <div id="polishManual" style="display:none">
+          <button class="mini" onclick="copyPolishPrompt()"><i class="ic" data-ic="clipboard"></i>Copy prompt for the Claude app</button>
+          <label>Paste Claude's reply here</label>
+          <textarea id="polishPaste" placeholder='[{"id":"learn-0","polished":"..."}]'></textarea>
+          <button class="mini" onclick="parsePolishPaste()">Check suggestions</button>
+        </div>
+        <div id="polishResults"></div>
+      </div>
+      <h3 class="sec">TIME SLIDE · comment and its font</h3>
+      
+      <label>Comment font</label>
+      <div class="chips" id="noteFontChips"></div>
+      <label>Comment on the time slide</label>
+      <input type="text" id="timeNote" placeholder="written for you — type over it">
+      <button class="mini" style="margin-top:6px" onclick="suggestTimeNote()"><i class="ic" data-ic="refresh"></i>write it for me</button>
+      <button class="big-btn sage" onclick="buildSlides()"><i class="ic" data-ic="sparkle"></i>Generate carousel</button>
+    </div>
+    <div class="card">
+      <h2>CAROUSEL · tick the slides, drag to order, then post on IG</h2>
+      <div id="slidePlan"></div>
+      <button class="mini" onclick="resetPlan()" style="margin:2px 0 10px"><i class="ic" data-ic="refresh"></i>reset to suggested</button>
+      <div id="slides"></div>
+      <button class="big-btn" onclick="downloadAll()"><i class="ic" data-ic="download"></i>Download all slides</button>
+    </div>
+  </div>
+</section>
+</main>
+
+
+<div id="lightbox">
+  <button class="lbclose" onclick="closeLightbox()"><i class="ic solo" data-ic="x"></i></button>
+  <img id="lbImg" alt="">
+  <div class="lbcap" id="lbCap"></div>
+  <div class="lbrow">
+    <button class="lbbtn" id="lbPrev" onclick="stepLightbox(-1)"><i class="ic solo" data-ic="chevL"></i></button>
+    <button class="lbbtn" id="lbUse" onclick="toggleLightboxUse()">in carousel</button>
+    <button class="lbbtn" id="lbNext" onclick="stepLightbox(1)"><i class="ic solo" data-ic="chevR"></i></button>
+  </div>
+  <div class="lbrow"><button class="lbbtn" id="lbTitle" onclick="photoAsTitle()"><i class="ic" data-ic="star"></i>make title pic</button><button class="lbbtn" id="lbEdit" onclick="toggleAdj()"><i class="ic" data-ic="pencil"></i>adjust</button></div>
+  <div class="lbadj" id="lbAdj">
+    <div class="chips" id="lbRatio"></div>
+    <canvas id="lbFrame" width="432" height="540"></canvas>
+    <p class="lbtip" id="lbTip">drag the photo to move it · pinch to zoom</p>
+    <label><span>bright</span><input type="range" min="0.7" max="1.3" step="0.01" data-k="b" oninput="adjInput(this)" onchange="adjCommit()"></label>
+    <label><span>contrast</span><input type="range" min="0.7" max="1.3" step="0.01" data-k="c" oninput="adjInput(this)" onchange="adjCommit()"></label>
+    <label><span>colour</span><input type="range" min="0.5" max="1.6" step="0.01" data-k="s" oninput="adjInput(this)" onchange="adjCommit()"></label>
+    <label><span>warm</span><input type="range" min="-1" max="1" step="0.02" data-k="w" oninput="adjInput(this)" onchange="adjCommit()"></label>
+    <div class="lbrow"><button class="lbbtn" onclick="polishPhoto()"><i class="ic" data-ic="sparkle"></i>polish</button><button class="lbbtn" onclick="resetAdj()">reset</button></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+const HANDLE='@perfection.a.la.carte';
+const PIE=['#14213D','#E07A5F','#F2CFC2','#8A8F98','#3D5A80','#EADFD3','#3D5A80','#B85C45'];
+const PIE_DARK=new Set(['#14213D','#E07A5F','#8A8F98','#3D5A80','#B85C45']);
+const pieText=i=>PIE_DARK.has(PIE[i%PIE.length])?'#FAF6F0':'#14213D';
+/* fine-line icons — 24×24, stroke only, no fills */
+const IC={
+  clock:'<circle cx="12" cy="12" r="8.6"/><path d="M12 6.8V12l3.3 2"/>',
+  camera:'<path d="M3.2 8.9A1.7 1.7 0 0 1 4.9 7.2h1.9l1.4-2h7.6l1.4 2h1.9a1.7 1.7 0 0 1 1.7 1.7v8.4a1.7 1.7 0 0 1-1.7 1.7H4.9a1.7 1.7 0 0 1-1.7-1.7z"/><circle cx="12" cy="12.8" r="3.4"/>',
+  mic:'<rect x="9.2" y="3" width="5.6" height="10.6" rx="2.8"/><path d="M5.4 11.4a6.6 6.6 0 0 0 13.2 0M12 18v3M9 21h6"/>',
+  play:'<path d="M8.4 5.6v12.8L18.6 12z"/>',
+  stop:'<rect x="6.8" y="6.8" width="10.4" height="10.4" rx="1.8"/>',
+  sparkle:'<path d="M11.4 4l1.7 4.7 4.7 1.7-4.7 1.7-1.7 4.7-1.7-4.7L5 10.4l4.7-1.7z"/><path d="M18.4 15.2l.7 1.9 1.9.7-1.9.7-.7 1.9-.7-1.9-1.9-.7 1.9-.7z"/>',
+  plus:'<path d="M12 5.4v13.2M5.4 12h13.2"/>',
+  x:'<path d="M6.4 6.4l11.2 11.2M17.6 6.4L6.4 17.6"/>',
+  chevL:'<path d="M14.4 5.2L7.6 12l6.8 6.8"/>',
+  chevR:'<path d="M9.6 5.2L16.4 12l-6.8 6.8"/>',
+  up:'<path d="M6 14.4L12 8.4l6 6"/>',
+  down:'<path d="M6 9.6l6 6 6-6"/>',
+  star:'<path d="M12 4.2l2.4 5 5.4.8-3.9 3.8.9 5.4-4.8-2.6-4.8 2.6.9-5.4L4.2 10l5.4-.8z"/>',
+  pencil:'<path d="M4.4 19.6l4.3-1 9.6-9.6a2 2 0 0 0-2.9-2.9L5.8 15.7z"/><path d="M14.4 6.6l3 3"/>',
+  drag:'<path d="M5.4 9h13.2M5.4 15h13.2"/>',
+  download:'<path d="M12 4.4v10.8M7.6 10.8L12 15.2l4.4-4.4M4.8 19.2h14.4"/>',
+  refresh:'<path d="M19.8 12a7.8 7.8 0 1 1-2.3-5.5"/><path d="M19.8 4.6v4.6h-4.6"/>',
+  clipboard:'<rect x="6.4" y="4.6" width="11.2" height="15.4" rx="2"/><path d="M9.6 4.6V3.4h4.8v1.2"/>',
+  check:'<path d="M5.2 12.4l4.6 4.6 9-10"/>',
+  leaf:'<path d="M5 19.4c0-8 5.6-14 14.4-14 0 8.4-5.6 14-14.4 14z"/><path d="M8.6 15.8c1.8-3 4.6-5.2 7.8-6.4"/>',
+  warn:'<path d="M12 4.6l8.6 15.2H3.4z"/><path d="M12 10v4.2M12 17.2h.01"/>',
+  image:'<rect x="3.6" y="5.2" width="16.8" height="13.6" rx="2"/><path d="M3.6 15.4l4.4-4 4 3.4 3.4-3 5 4.4"/><circle cx="8.6" cy="9.6" r="1.4"/>'
+};
+const svgFor=n=>`<svg viewBox="0 0 24 24" aria-hidden="true">${IC[n]||''}</svg>`;
+const ic=(n,solo)=>`<i class="ic${solo?' solo':''}" data-ic="${n}"></i>`;
+function paintIcons(root){(root||document).querySelectorAll('[data-ic]').forEach(e=>{if(!e.firstChild)e.innerHTML=svgFor(e.dataset.ic);});}
+
+if(!window.isSecureContext) document.getElementById('httpsWarn').style.display='block';
+
+/* ---------- storage ---------- */
+let sessions=JSON.parse(localStorage.getItem('palc_sessions')||'[]');
+const saveSessions=()=>localStorage.setItem('palc_sessions',JSON.stringify(sessions));
+let db;
+/* the database opens asynchronously — everything that touches a blob waits for it,
+   otherwise a tap in the first moments after load silently reads nothing */
+const dbReady=new Promise(res=>{
+  const req=indexedDB.open('palc',1);
+  req.onupgradeneeded=e=>e.target.result.createObjectStore('blobs');
+  req.onsuccess=e=>{db=e.target.result;res(db);};
+  req.onerror=()=>res(null);
+  setTimeout(()=>res(db||null),4000);
+});
+const putBlob=async(id,b)=>{await dbReady;if(!db)throw new Error('no storage');
+  return new Promise((res,rej)=>{const tx=db.transaction('blobs','readwrite');tx.objectStore('blobs').put(b,id);tx.oncomplete=res;tx.onerror=rej;});};
+const getBlob=async id=>{await dbReady;if(!db||!id)return null;
+  return new Promise(res=>{try{const r=db.transaction('blobs').objectStore('blobs').get(id);r.onsuccess=()=>res(r.result);r.onerror=()=>res(null);}catch(e){res(null);}});};
+const delBlob=async id=>{await dbReady;try{db.transaction('blobs','readwrite').objectStore('blobs').delete(id);}catch(e){}};
+
+/* ---------- helpers ---------- */
+const $=id=>document.getElementById(id);
+function setTheme(c){const m=document.querySelector('meta[name=theme-color]');if(m)m.content=c;}
+const fmt=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
+const parseTm=v=>{const m=v.split(':');return m.length===2?(+m[0])*60+(+m[1]||0):(+v||0);};
+function showTab(t){['cook','sessions','studio'].forEach(x=>{$('tab-'+x).style.display=x===t?'':'none';$('nav-'+x).classList.toggle('on',x===t);});if(t==='sessions')renderSessions();}
+
+/* ---------- cook mode ---------- */
+let round='RUSHED', live=null;
+const STD_STEPS={RUSHED:'Recipe Reading\nMEP\nCooking\nReset',SLOW:'Recipe Reading\nMEP\nCooking\nReset\nPlating'};
+let stepsDirty=false;
+$('stepsIn').addEventListener('input',()=>{stepsDirty=true;});
+function setRound(r){round=r;$('segR').classList.toggle('on',r==='RUSHED');$('segS').classList.toggle('on',r==='SLOW');
+  if(!stepsDirty)$('stepsIn').value=STD_STEPS[r];}
+async function startCook(){
+  const dish=$('dish').value.trim()||'Untitled dish';
+  const steps=$('stepsIn').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  if(!steps.length){alert('Add at least one step');return;}
+  live={s:{id:''+Date.now(),dish,round,date:new Date().toISOString().slice(0,10),
+        steps:steps.map((n,i)=>({id:'s'+Date.now()+'_'+i,name:n,sec:0,icon:''})),total:0,photos:[],notes:[],learnings:['','',''],verdict:'',
+        cast:{pic:null,soul:'',aromatics:''}},
+        i:0,t0:Date.now(),st0:Date.now(),stream:null,rec:null,chunks:[]};
+  if(pendingCast.pic||pendingCast.soul.trim()||pendingCast.aromatics.trim()){
+    live.s.cast={...pendingCast};pendingCast={pic:null,soul:'',aromatics:''};
+  }else{
+    resetCastPanel();
+  }
+  saveLive();
+  await enterCookMode();
+}
+/* shared by a fresh start and a resume after the phone killed the page */
+async function enterCookMode(){
+  $('liveCard').insertBefore($('castBlock'),$('finishBtn'));
+  try{live.stream=await navigator.mediaDevices.getUserMedia({audio:true});startRec();}
+  catch(e){$('recInd').innerHTML='mic off — timer & photos still running';}
+  wakeLock();
+  $('setupCard').style.display='none';$('liveCard').style.display='';$('resumeCard').style.display='none';
+  document.body.classList.add('cooking');document.body.classList.toggle('slowround',round==='SLOW');setTheme('#0F1A33');
+  $('liveBadge').textContent=round;$('liveBadge').className='badge '+round;
+  live.int=setInterval(tick,500);renderLive();
+}
+let wl=null;
+function wakeLock(){try{navigator.wakeLock&&navigator.wakeLock.request('screen').then(l=>{wl=l;}).catch(()=>{});}catch(e){}}
+/* ---- crash insurance: the live session is mirrored to localStorage on every change and every 3 s;
+        the blobs are already in IndexedDB, so a reload loses nothing ---- */
+const LIVE_KEY='palc_live';
+function saveLive(){if(!live)return;try{localStorage.setItem(LIVE_KEY,JSON.stringify({s:live.s,i:live.i,t0:live.t0,st0:live.st0,round,at:Date.now()}));}catch(e){}}
+function clearLive(){localStorage.removeItem(LIVE_KEY);}
+function pendingLive(){try{const d=JSON.parse(localStorage.getItem(LIVE_KEY)||'null');return d&&d.s?d:null;}catch(e){return null;}}
+function showResumeCard(){
+  const d=pendingLive();const c=$('resumeCard');
+  if(!d||live){c.style.display='none';return;}
+  const n=d.s.notes.length,p=d.s.photos.length;
+  $('resumeInfo').innerHTML=`<b>${d.s.dish}</b> · ${d.round} · started ${fmt((Date.now()-d.t0)/1000)} ago<br>step ${d.i+1} of ${d.s.steps.length} · ${n}&nbsp;${ic('mic',1)} · ${p}&nbsp;${ic('camera',1)} — all kept. The clock has been running the whole time.`;
+  paintIcons(c);
+  c.style.display='';
+}
+async function resumeCook(){
+  const d=pendingLive();if(!d)return;
+  round=d.round;$('segR').classList.toggle('on',round==='RUSHED');$('segS').classList.toggle('on',round==='SLOW');
+  live={s:d.s,i:d.i,t0:d.t0,st0:d.st0,stream:null,rec:null,chunks:[]};
+  pendingCast={pic:null,soul:'',aromatics:''};
+  /* cast panel back into the state it was */
+  const cast=live.s.cast||{pic:null,soul:'',aromatics:''};live.s.cast=cast;
+  $('castSoulLive').value=cast.soul||'';$('castAromaticsLive').value=cast.aromatics||'';
+  resetCastPanel();
+  if(cast.pic){const b=await getBlob(cast.pic);if(b)$('castThumbLive').src=URL.createObjectURL(b);setRecipeBtn(true);}
+  $('castSoulLive').value=cast.soul||'';$('castAromaticsLive').value=cast.aromatics||'';
+  if(cast.pic||(cast.soul||'').trim()||(cast.aromatics||'').trim())$('castPanel').style.display='';
+  await enterCookMode();
+}
+function discardLive(){
+  const d=pendingLive();if(!d)return;
+  if(!confirm(`Throw away the unfinished ${d.s.dish} cook (${d.s.notes.length} notes, ${d.s.photos.length} photos)?`))return;
+  d.s.photos.forEach(p=>delBlob(p.id));d.s.notes.forEach(n=>delBlob(n.id));if(d.s.cast&&d.s.cast.pic)delBlob(d.s.cast.pic);
+  clearLive();showResumeCard();
+}
+setInterval(saveLive,3000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveLive();else if(live)wakeLock();});
+window.addEventListener('pagehide',saveLive);
+/* how long the mic listens at the top of each step */
+const NOTE_SEC=12;
+function startRec(){if(!live||!live.stream)return;live.chunks=[];live.rec=new MediaRecorder(live.stream);live.rec.ondataavailable=e=>live.chunks.push(e.data);live.rec.start();live.recT0=Date.now();
+  $('recInd').innerHTML=`<span class="dot"></span> recording ${NOTE_SEC}s step note — say what you're doing`;
+  clearTimeout(live.recTimer);
+  live.recTimer=setTimeout(async()=>{await stopRec();
+    if(live){$('recInd').innerHTML=ic('mic')+'note saved — keep cooking';paintIcons($('recInd'));}},NOTE_SEC*1000);}
+function stopRec(){
+  /* already stopped (the auto-timer got there first) — its note may still be being written, so wait for that */
+  if(!live||!live.rec||live.rec.state==='inactive')return Promise.resolve(live&&live.saving).catch(()=>{}).then(()=>{});
+  clearTimeout(live.recTimer);
+  /* capture everything up front: by the time the write lands, the cook may be over and `live` gone */
+  const sess=live.s,stepId=live.s.steps[live.i].id,stepIdx=live.i,t0=live.recT0,
+        rec=live.rec,mime=rec.mimeType||'audio/webm',chunks=live.chunks;
+  const p=new Promise(res=>{
+    rec.onstop=()=>{
+      const b=new Blob(chunks,{type:mime});
+      if(b.size<=200)return res();
+      const id='a'+Date.now();
+      putBlob(id,b)
+        .then(()=>{sess.notes.push({id,stepId,stepIdx,sec:Math.round((Date.now()-t0)/1000)});
+                   saveLive();if(sessions.includes(sess))saveSessions();})
+        .catch(()=>{})
+        .then(res);
+    };
+  });
+  /* claim it now, not in onstop — finishing in that gap must still wait for the note */
+  live.saving=p;p.then(()=>{if(live&&live.saving===p)live.saving=null;});
+  rec.stop();
+  return p;}
+function tick(){$('liveTotal').textContent=fmt((Date.now()-live.t0)/1000);$('liveStepTime').textContent='step · '+fmt((Date.now()-live.st0)/1000);}
+function setRecipeBtn(saved){
+  $('recipeBtn').innerHTML=ic('image')+(saved?'ingredients photo saved — tap to retake':'shoot your ingredients — becomes “The Cast” slide');
+  paintIcons($('recipeBtn'));
+}
+/* a dot per photo saved on this step — past 6 it turns into "●×9" so the row never wraps */
+function photoDots(stepId){
+  const n=live.s.photos.filter(p=>p.stepId===stepId).length;
+  if(!n)return '';
+  return n<=6?`<span class="pdots">${'<i></i>'.repeat(n)}</span>`
+             :`<span class="pdots"><i></i><b>×${n}</b></span>`;
+}
+function renderLive(){
+  $('liveStep').textContent=live.s.steps[live.i].name;
+  $('liveList').innerHTML=live.s.steps.map((s,j)=>
+    `<li class="${j<live.i?'done':j===live.i?'now':''}"><span class="nm">${j+1}. ${s.name}</span>${photoDots(s.id)}</li>`).join('');
+  $('nextBtn').style.display=live.i>=live.s.steps.length-1?'none':'';
+}
+/* "MEP" -> "MEP 2" -> "MEP 3": another round of whatever you are on, inserted next */
+function addLiveStep(){
+  if(!live)return;
+  const base=live.s.steps[live.i].name.replace(/\s+\d+$/,'').trim();
+  const esc=base.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  let n=2;live.s.steps.forEach(s=>{const m=s.name.match(new RegExp('^'+esc+'\\s+(\\d+)$','i'));if(m)n=Math.max(n,+m[1]+1);});
+  /* sit behind the last round of the same step, so MEP · MEP 2 · MEP 3 stay in order */
+  const fam=new RegExp('^'+esc+'(\\s+\\d+)?$','i');
+  let at=live.i;while(at+1<live.s.steps.length&&fam.test(live.s.steps[at+1].name))at++;
+  live.s.steps.splice(at+1,0,{id:'s'+Date.now(),name:`${base} ${n}`,sec:0,icon:'',added:true});
+  saveLive();renderLive();
+  $('recInd').innerHTML=ic('plus')+`added “${base} ${n}” — it is next`;paintIcons($('recInd'));
+}
+async function nextStep(){
+  live.s.steps[live.i].sec=Math.round((Date.now()-live.st0)/1000);
+  await stopRec();live.i++;live.st0=Date.now();saveLive();startRec();renderLive();
+}
+async function finishCook(){
+  live.s.steps[live.i].sec=Math.round((Date.now()-live.st0)/1000);
+  await stopRec();
+  if(live.stream)live.stream.getTracks().forEach(t=>t.stop());
+  clearInterval(live.int);
+  /* drop only the standard steps you never reached — anything you added by hand stays,
+     and a step that got no time still counts as one second so the charts hold up */
+  const kept=live.s.steps.filter(s=>s.sec>0||s.added);
+  live.s.steps=kept.length?kept:live.s.steps;
+  live.s.steps.forEach(s=>{if(!s.sec||s.sec<1)s.sec=1;});
+  live.s.total=live.s.steps.reduce((a,b)=>a+b.sec,0)||1;
+  sessions.unshift(live.s);saveSessions();
+  const id=live.s.id;live=null;clearLive();
+  document.body.classList.remove('cooking','slowround');setTheme('#FAF6F0');
+  $('setupCard').style.display='';$('liveCard').style.display='none';
+  $('setupCard').insertBefore($('castBlock'),$('startBtn'));
+  resetCastPanel();
+  stepsDirty=false;$('stepsIn').value=STD_STEPS[round];
+  openStudio(id);
+}
+$('photoIn').addEventListener('change',async e=>{
+  for(const f of e.target.files){const id='p'+Date.now()+Math.random().toString(36).slice(2,6);await putBlob(id,f);live.s.photos.push({id,stepId:live.s.steps[live.i].id,stepIdx:live.i,use:true});}
+  e.target.value='';saveLive();renderLive();});
+let pendingCast={pic:null,soul:'',aromatics:''};
+const activeCast=()=>live?live.s.cast:pendingCast;
+function resetCastPanel(){
+  setRecipeBtn(false);
+  $('castPanel').style.display='none';
+  $('castSoulLive').value='';$('castAromaticsLive').value='';$('castStatusLive').textContent='';
+}
+$('recipeIn').addEventListener('change',async e=>{
+  const f=e.target.files[0];if(!f)return;
+  const cast=activeCast();
+  if(cast.pic)delBlob(cast.pic);
+  const id='c'+Date.now();await putBlob(id,f);
+  cast.pic=id;e.target.value='';saveLive();
+  setRecipeBtn(true);
+  $('castPanel').style.display='';
+  $('castThumbLive').src=URL.createObjectURL(f);
+  if((localStorage.getItem('palc_key')||'').trim())extractLiveCast();
+  else $('castStatusLive').textContent='Tap the sparkle to extract with AI (asks for your API key once), or type the buckets below.';});
+$('castSoulLive').addEventListener('input',e=>{activeCast().soul=e.target.value;saveLive();});
+$('castAromaticsLive').addEventListener('input',e=>{activeCast().aromatics=e.target.value;saveLive();});
+paintIcons();showResumeCard();
+
+/* ---------- cast AI extraction ---------- */
+async function blobToJpegB64(blob){
+  const img=await createImageBitmap(blob);
+  const s=Math.min(1,1200/Math.max(img.width,img.height));
+  const c=document.createElement('canvas');c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);
+  c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+  return c.toDataURL('image/jpeg',0.82).split(',')[1];
+}
+async function aiExtractCast(sess,statusEl,soulEl,aromEl){
+  let key=(localStorage.getItem('palc_key')||'').trim();
+  if(!key){
+    const k=prompt('Anthropic API key (sk-ant-…) — stored only on this device:');
+    if(!k||!k.trim()){statusEl.textContent='No API key — type the buckets yourself, or tap the sparkle again to add a key.';return;}
+    key=k.trim();localStorage.setItem('palc_key',key);
+  }
+  if(!sess.cast.pic){statusEl.textContent='Shoot the ingredients first.';return;}
+  statusEl.textContent='Claude is reading your ingredients…';
+  try{
+    const blob=await getBlob(sess.cast.pic);
+    const b64=await blobToJpegB64(blob);
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({
+        model:'claude-opus-4-8',max_tokens:1500,
+        output_config:{format:{type:'json_schema',schema:{type:'object',properties:{soul:{type:'string'},aromatics:{type:'string'}},required:['soul','aromatics'],additionalProperties:false}}},
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64}},
+          {type:'text',text:castPromptText(sess.dish)}
+        ]}]
+      })});
+    const d=await r.json();
+    if(d.error)throw new Error(d.error.message||('HTTP '+r.status));
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    if(d.stop_reason==='refusal')throw new Error('Claude declined this request');
+    const out=JSON.parse((d.content.find(b=>b.type==='text')||{}).text||'{}');
+    sess.cast.soul=(out.soul||'').trim();sess.cast.aromatics=(out.aromatics||'').trim();
+    soulEl.value=sess.cast.soul;aromEl.value=sess.cast.aromatics;
+    if(sessions.includes(sess))saveSessions();
+    statusEl.textContent='Extracted — edit anything that looks off';
+  }catch(e){statusEl.textContent='AI failed ('+e.message+') — type the buckets below, or tap the sparkle to retry.';}
+}
+/* one prompt, used by the API call and by the copy-paste route */
+function castPromptText(dish){
+  return `This photo shows the ingredients (or the recipe) for "${dish||'my dish'}". List every ingredient you can identify, one per line, split into two buckets. The label or packaging may be in any language — always answer in English, translating the ingredient names (keep the amounts exactly as printed):\nsoul = the substance (protein, carbs, vegetables, dairy base) — include amounts only if visible or readable;\naromatics = the character (herbs, spices, seasonings, condiments, oils, finishing touches).\nTranslate cooking shorthand into English too: EL/Essloeffel = tbsp, TL/Teeloeffel = tsp, Prise = pinch, Msp./Messerspitze = knife tip, Bund = bunch, Packung = pack, Scheibe = slice, Stueck = pcs, Dose = tin, Becher = tub. Keep metric units exactly as printed (g, kg, ml, l). Keep the qualifier when there is one: '1 kleiner EL' = '1 small tbsp', '1 gehaeufter TL' = '1 heaped tsp', 'etwas' = 'a little'. Short practical names. Never invent amounts.\nReply with ONLY this JSON: {"soul":"one per line","aromatics":"one per line"}`;
+}
+/* hands the photo AND the prompt to the Claude app through the phone's share sheet —
+   no API key, and no hunting for the picture in the gallery */
+async function sendCastToClaude(statusEl){
+  const sess=live?live.s:cur;if(!sess||!sess.cast.pic){statusEl.textContent='Shoot the ingredients first.';return;}
+  const blob=await getBlob(sess.cast.pic);if(!blob){statusEl.textContent='That photo could not be read.';return;}
+  const text=castPromptText(sess.dish);
+  const file=new File([blob],'ingredients.jpg',{type:blob.type||'image/jpeg'});
+  try{
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],text});
+      statusEl.textContent='Sent. Paste Claude’s answer into the two fields below.';
+      return;
+    }
+  }catch(e){if(e&&e.name==='AbortError')return;}
+  /* desktop or a browser without file sharing: prompt on the clipboard, Claude in a new tab */
+  try{await navigator.clipboard.writeText(text);}catch(e){}
+  window.open('https://claude.ai/new','_blank');
+  statusEl.textContent='Prompt copied and Claude opened — attach the photo there, then paste the answer below.';
+}
+function extractLiveCast(){
+  aiExtractCast(live?live.s:{dish:($('dish').value.trim()||'this dish'),cast:pendingCast},
+    $('castStatusLive'),$('castSoulLive'),$('castAromaticsLive'));
+}
+
+/* ---------- sessions ---------- */
+function renderSessions(){
+  $('sessList').innerHTML=sessions.length?sessions.map(s=>`<div class="sess">
+    <div><b>${s.dish} <span class="badge ${s.round}" style="font-size:10px">${s.round}</span></b>
+    <small>${s.date} · ${fmt(s.total)} · ${s.steps.length} steps · ${s.photos.length}&nbsp;${ic('camera',1)} · ${s.notes.length}&nbsp;${ic('mic',1)}</small></div>
+    <div class="row"><button class="mini" onclick="openStudio('${s.id}')">Studio</button>
+    <button class="mini red" onclick="delSession('${s.id}')">${ic('x',1)}</button></div></div>`).join('')
+  :'<p class="hint">No cooks yet. Your rushed carbonara awaits.</p>';
+  paintIcons($('sessList'));
+}
+function delSession(id){
+  if(!confirm('Delete this session and its recordings?'))return;
+  const s=sessions.find(x=>x.id===id);
+  if(s){s.photos.forEach(p=>delBlob(p.id));s.notes.forEach(n=>delBlob(n.id));if(s.titlePic)delBlob(s.titlePic);if(s.cast&&s.cast.pic)delBlob(s.cast.pic);}
+  sessions=sessions.filter(x=>x.id!==id);saveSessions();renderSessions();
+}
+
+/* ---------- studio ---------- */
+let cur=null;
+function openStudio(id){cur=sessions.find(s=>s.id===id);if(!cur)return;
+  if(!cur.cast)cur.cast={pic:null,soul:'',aromatics:''};
+  /* migrate older sessions: steps get ids, notes/photos point at ids instead of positions */
+  cur.steps.forEach((s,i)=>{if(!s.id)s.id='s'+cur.id+'_'+i;});
+  cur.notes.forEach(n=>{if(!n.stepId&&cur.steps[n.stepIdx])n.stepId=cur.steps[n.stepIdx].id;});
+  cur.photos.forEach(p=>{if(!p.stepId&&p.stepIdx>=0&&cur.steps[p.stepIdx])p.stepId=cur.steps[p.stepIdx].id;});
+  showTab('studio');
+  $('studioEmpty').style.display='none';$('studioBody').style.display='';
+  $('learn0').value=cur.learnings[0]||'';$('learn1').value=cur.learnings[1]||'';$('learn2').value=cur.learnings[2]||'';
+  $('verdict').value=cur.verdict||'';renderStudio();}
+['learn0','learn1','learn2'].forEach((id,i)=>$(id).addEventListener('input',e=>{if(cur){cur.learnings[i]=e.target.value;saveSessions();}}));
+$('verdict').addEventListener('input',e=>{if(cur){cur.verdict=e.target.value;saveSessions();}});
+
+function renderStudio(){
+  $('stTitle').textContent=cur.dish+' · '+cur.round;
+  $('stTotal').textContent='total locked · '+fmt(cur.total);
+  renderPie();renderSteps();renderNotes();renderPhotos();renderTitlePic();renderCast();renderTimeChips();renderTimeNote();paintIcons();
+}
+function renderTimeNote(){const i=$('timeNote');i.value=cur.timeNote||'';i.placeholder=timeInsight();}
+function renderTimeChips(){
+  const now=noteFont();
+  $('noteFontChips').innerHTML=NOTE_FONTS.map(([k,label,fam])=>
+    `<button class="mini${k===now?' on':''}" style="font-family:${fam}" onclick="setNoteFont('${k}')">${label}</button>`).join('');
+}
+function setNoteFont(k){cur.noteFont=k;saveSessions();renderTimeChips();buildSlides();}
+function suggestTimeNote(){cur.timeNote='';saveSessions();$('timeNote').value='';$('timeNote').placeholder=timeInsight();buildSlides();}
+$('timeNote').addEventListener('input',e=>{if(cur){cur.timeNote=e.target.value;saveSessions();}});
+function renderPie(){
+  const size=164,r=70,cx=size/2,cy=size/2;let a=-Math.PI/2,ps='',ls='';
+  cur.steps.forEach((s,i)=>{const f=s.sec/cur.total,a2=a+f*2*Math.PI;
+    const x1=cx+r*Math.cos(a),y1=cy+r*Math.sin(a),x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2);
+    ps+=`<path d="M${cx} ${cy} L${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 ${f>.5?1:0} 1 ${x2.toFixed(1)} ${y2.toFixed(1)} Z" fill="${PIE[i%PIE.length]}" stroke="#FAF6F0" stroke-width="2.5"/>`;
+    const mid=(a+a2)/2,pct=Math.round(f*100);
+    if(pct>=8)ls+=`<text x="${(cx+Math.cos(mid)*r*0.62).toFixed(1)}" y="${(cy+Math.sin(mid)*r*0.62+4).toFixed(1)}" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="600" font-size="12" fill="${pieText(i)}">${pct}%</text>`;
+    a=a2;});
+  $('pieSvg').innerHTML=`<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${ps}${ls}</svg>`;
+}
+function renderSteps(){
+  $('stSteps').innerHTML=cur.steps.map((s,i)=>{
+    const pct=Math.round(s.sec/cur.total*100);
+    return `<div class="steprow">
+    <span class="cdot" style="background:${PIE[i%PIE.length]}"></span>
+    <button class="mini" onclick="moveStep(${i},-1)" ${i===0?'disabled':''}>${ic('up',1)}</button>
+    <button class="mini" onclick="moveStep(${i},1)" ${i===cur.steps.length-1?'disabled':''}>${ic('down',1)}</button>
+    <input class="nm" value="${s.name.replace(/"/g,'&quot;')}" onchange="cur.steps[${i}].name=this.value;saveSessions();">
+    ${notesFor(s.id).map(n=>`<button class="mini play" data-t="${fmt(n.sec)}" title="listen to your note for this step" onclick="playNote('${n.id}',this)">${ic('play',1)}${fmt(n.sec)}</button>`).join('')}
+    <div class="sharewrap"><input type="range" min="1" max="99" step="1" value="${pct}" oninput="slideShare(${i},this.value)" onchange="renderStudio()">
+    ${cur.steps.length>1?`<button class="mini red" onclick="rmStep(${i})">${ic('x',1)}</button>`:''}</div>
+    </div>`;}).join('');
+}
+/* smallest slice a step may hold — 5s normally, less on very short cooks */
+function minSec(){const n=Math.max(1,cur.steps.length);return Math.max(1,Math.min(5,Math.floor(cur.total/(n*2))||1));}
+function slideShare(i,pct){
+  const n=cur.steps.length;if(n<2)return;
+  const m=minSec(),hi=cur.total-m*(n-1);if(hi<m)return;
+  let sec=Math.round(cur.total*pct/100);
+  sec=Math.min(Math.max(m,sec),hi);
+  cur.steps[i].sec=sec;redistribute(i,cur.total-sec);
+  saveSessions();renderPie();
+  
+}
+function moveStep(i,d){
+  const j=i+d;if(j<0||j>=cur.steps.length)return;
+  [cur.steps[i],cur.steps[j]]=[cur.steps[j],cur.steps[i]];
+  saveSessions();renderStudio();
+}
+function redistribute(exceptIdx,targetOthers){
+  const others=cur.steps.filter((_,j)=>j!==exceptIdx);
+  const old=others.reduce((a,b)=>a+b.sec,0)||1;const m=minSec();let acc=0;
+  others.forEach((st,k)=>{if(k===others.length-1)st.sec=Math.max(m,targetOthers-acc);
+    else{st.sec=Math.max(m,Math.round(st.sec*targetOthers/old));acc+=st.sec;}});
+}
+function addStep(){
+  const name=prompt('Step name (its time is taken from the other steps — total stays locked):');if(!name)return;
+  const take=Math.max(10,Math.round(cur.total*0.1));
+  cur.steps.push({id:'s'+Date.now(),name,sec:take,icon:''});
+  redistribute(cur.steps.length-1,cur.total-take);
+  saveSessions();renderStudio();
+}
+function rmStep(i){
+  cur.steps.splice(i,1);
+  redistribute(-1,cur.total);
+  saveSessions();renderStudio();
+}
+
+const stepName=stepId=>{const s=cur&&cur.steps.find(x=>x.id===stepId);return s?s.name:null;};
+const notesFor=stepId=>(cur.notes||[]).filter(n=>n.stepId===stepId);
+/* one shared player — a second tap stops the first */
+let noteAudio=null,noteBtn=null;
+const noteLabel=b=>ic('play',1)+(b.dataset.t||'');
+function stopNote(){if(noteAudio){noteAudio.pause();noteAudio=null;}
+  if(noteBtn){noteBtn.classList.remove('on');noteBtn.innerHTML=noteLabel(noteBtn);paintIcons(noteBtn);noteBtn=null;}}
+async function playNote(id,btn){
+  const same=noteBtn===btn;stopNote();if(same)return;
+  const blob=await getBlob(id);if(!blob)return;
+  noteAudio=new Audio(URL.createObjectURL(blob));noteBtn=btn;btn.classList.add('on');
+  btn.innerHTML=ic('stop',1);paintIcons(btn);
+  const failed=()=>{stopNote();btn.innerHTML=ic('warn',1)+'no sound';paintIcons(btn);
+    setTimeout(()=>{btn.innerHTML=noteLabel(btn);paintIcons(btn);},2600);};
+  noteAudio.onended=stopNote;noteAudio.onerror=failed;
+  const pr=noteAudio.play();if(pr&&pr.catch)pr.catch(failed);
+}
+/* only notes whose step no longer exists land here — everything else sits beside its step */
+async function renderNotes(){
+  const el=$('stNotes');el.innerHTML='';stopNote();
+  const orphans=(cur.notes||[]).filter(n=>!cur.steps.some(s=>s.id===n.stepId));
+  $('notesHead').style.display=el.style.display=orphans.length?'':'none';
+  orphans.forEach(n=>{const b=document.createElement('button');
+    b.dataset.t=`note from a removed step · ${fmt(n.sec)}`;b.innerHTML=noteLabel(b);
+    b.onclick=()=>playNote(n.id,b);el.appendChild(b);paintIcons(b);});
+}
+async function renderPhotos(){
+  const el=$('stPhotos');el.innerHTML='';
+  for(let i=0;i<cur.photos.length;i++){
+    const p=cur.photos[i];const blob=await getBlob(p.id);if(!blob)continue;
+    const wrap=document.createElement('div');wrap.className='thumbwrap';
+    const img=document.createElement('img');img.className='ph'+(p.use?' use':'');img.src=URL.createObjectURL(blob);
+    img.style.filter=cssFilter(adjOf(p));img.style.aspectRatio=ratioOf(p)==='fill'?'4/5':String(ratioVal(ratioOf(p)));img.style.height='auto';
+    img.onclick=()=>openLightbox(i);
+    const badge=document.createElement('button');badge.className='badge-use'+(p.use?' on':'');
+    badge.innerHTML=p.use?svgFor('check'):'';badge.title='include in carousel';
+    badge.onclick=e=>{e.stopPropagation();setPhotoUse(p,!p.use);};
+    wrap.appendChild(img);wrap.appendChild(badge);el.appendChild(wrap);}
+}
+function setPhotoUse(p,on){
+  p.use=on;saveSessions();renderPhotos();
+  if(cur.plan){const e=cur.plan.find(x=>x.key==='photo:'+p.id);if(e){e.on=on;saveSessions();renderPlan();}}
+}
+/* ---------- photo adjustments ---------- */
+/* b/c/s/w = brightness, contrast, saturation, warmth · fx/fy = where the frame sits on the photo (0..1) · z = zoom */
+const DEF_ADJ={b:1,c:1,s:1,w:0,fx:.5,fy:.5,z:1};
+/* the "polish" look: a touch brighter, a little more bite, colour up 15%, gently warm — positive and energetic, never the cheap punch */
+const POLISH_ADJ={b:1.06,c:1.08,s:1.15,w:0.25};
+const adjOf=p=>({...DEF_ADJ,...((p&&p.adj)||{})});
+const isDefColor=a=>a.b===1&&a.c===1&&a.s===1&&a.w===0;
+const isDefAdj=a=>isDefColor(a)&&a.fx===.5&&a.fy===.5&&a.z===1;
+const cssFilter=a=>`brightness(${a.b}) contrast(${a.c}) saturate(${a.s}) sepia(${Math.max(0,a.w)*0.35})`;
+/* cover-fit an image into a box (with the chosen frame + zoom) and bake the colour adjustment into the pixels — canvas ctx.filter is not reliable on phones */
+function drawAdjusted(x,img,dx,dy,dw,dh,a){
+  const s=Math.max(dw/img.width,dh/img.height)*(a.z||1),sw=dw/s,sh=dh/s,sx=(img.width-sw)*a.fx,sy=(img.height-sh)*a.fy;
+  if(isDefColor(a)){x.drawImage(img,sx,sy,sw,sh,dx,dy,dw,dh);return;}
+  const o=document.createElement('canvas');o.width=Math.round(dw);o.height=Math.round(dh);const ox=o.getContext('2d');
+  ox.drawImage(img,sx,sy,sw,sh,0,0,o.width,o.height);
+  const id=ox.getImageData(0,0,o.width,o.height),d=id.data,wr=a.w*22,wb=-a.w*18;
+  for(let i=0;i<d.length;i+=4){
+    let r=(d[i]*a.b-128)*a.c+128,g=(d[i+1]*a.b-128)*a.c+128,b=(d[i+2]*a.b-128)*a.c+128;
+    const gr=.299*r+.587*g+.114*b;
+    r=gr+(r-gr)*a.s+wr;g=gr+(g-gr)*a.s;b=gr+(b-gr)*a.s+wb;
+    d[i]=r<0?0:r>255?255:r;d[i+1]=g<0?0:g>255?255:g;d[i+2]=b<0?0:b>255?255:b;}
+  ox.putImageData(id,0,0);x.drawImage(o,dx,dy);
+}
+let lbBitmap=null;
+function framePreview(p){const c=$('lbFrame');if(!lbBitmap||$('lbAdj').style.display==='none')return;drawAdjusted(c.getContext('2d'),lbBitmap,0,0,c.width,c.height,adjOf(p));}
+/* the shape the photo takes on its slide — full bleed, or a card in one of these ratios */
+const RATIOS=[['fill','Full slide',0.8],['45','4:5',0.8],['11','1:1',1],['43','4:3',4/3],['169','16:9',16/9],['34','3:4',0.75]];
+const ratioOf=p=>(p&&p.ratio)||'fill';
+const ratioVal=k=>(RATIOS.find(r=>r[0]===k)||RATIOS[0])[2];
+function renderRatioChips(p){
+  const now=ratioOf(p);
+  $('lbRatio').innerHTML=RATIOS.map(([k,label])=>`<button class="mini${k===now?' on':''}" onclick="setRatio('${k}')">${label}</button>`).join('');
+}
+function setRatio(k){
+  const p=cur.photos[lbIdx];if(!p)return;
+  p.ratio=k;const c=$('lbFrame'),w=432;c.width=w;c.height=Math.round(w/ratioVal(k));
+  saveSessions();renderRatioChips(p);framePreview(p);renderPhotos();
+}
+/* the crop preview is dragged and pinched directly — no sliders for framing */
+const lbPtrs=new Map();let lbStart=null;
+const clamp01=v=>v<0?0:v>1?1:v;
+function frameMetrics(){
+  const c=$('lbFrame'),r=c.getBoundingClientRect();
+  return {cssW:r.width||c.width,cssH:r.height||c.height};
+}
+function adjPan(dxCss,dyCss,a){
+  if(!lbBitmap)return;
+  const c=$('lbFrame'),m=frameMetrics();
+  const s=Math.max(c.width/lbBitmap.width,c.height/lbBitmap.height)*(a.z||1);
+  const sw=c.width/s,sh=c.height/s;                       /* visible slice, in image pixels */
+  const perCssX=(c.width/m.cssW)/s,perCssY=(c.height/m.cssH)/s;
+  const spanX=lbBitmap.width-sw,spanY=lbBitmap.height-sh;
+  if(spanX>0)a.fx=clamp01(a.fx-dxCss*perCssX/spanX);
+  if(spanY>0)a.fy=clamp01(a.fy-dyCss*perCssY/spanY);
+}
+function lbDown(e){
+  const p=cur&&cur.photos[lbIdx];if(!p)return;
+  e.preventDefault();$('lbFrame').setPointerCapture(e.pointerId);$('lbFrame').classList.add('grabbing');
+  lbPtrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(lbPtrs.size===2){const[a,b]=[...lbPtrs.values()];lbStart={d:Math.hypot(a.x-b.x,a.y-b.y),z:adjOf(p).z};}
+}
+function lbMove(e){
+  if(!lbPtrs.has(e.pointerId))return;
+  const p=cur&&cur.photos[lbIdx];if(!p)return;
+  e.preventDefault();
+  const prev=lbPtrs.get(e.pointerId);
+  lbPtrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  const a=adjOf(p);p.adj=a;
+  if(lbPtrs.size>=2&&lbStart){
+    const[u,v]=[...lbPtrs.values()];const d=Math.hypot(u.x-v.x,u.y-v.y);
+    if(lbStart.d>0)a.z=Math.min(4,Math.max(1,lbStart.z*(d/lbStart.d)));
+  }else{
+    adjPan(e.clientX-prev.x,e.clientY-prev.y,a);
+  }
+  framePreview(p);
+}
+function lbUp(e){
+  lbPtrs.delete(e.pointerId);
+  if(lbPtrs.size<2)lbStart=null;
+  if(!lbPtrs.size){$('lbFrame').classList.remove('grabbing');adjCommit();}
+}
+function lbWheel(e){
+  const p=cur&&cur.photos[lbIdx];if(!p)return;
+  e.preventDefault();const a=adjOf(p);p.adj=a;
+  a.z=Math.min(4,Math.max(1,a.z*(e.deltaY<0?1.08:1/1.08)));
+  framePreview(p);clearTimeout(lbWheel.t);lbWheel.t=setTimeout(adjCommit,250);
+}
+(function(){const c=$('lbFrame');
+  c.addEventListener('pointerdown',lbDown);c.addEventListener('pointermove',lbMove);
+  c.addEventListener('pointerup',lbUp);c.addEventListener('pointercancel',lbUp);
+  c.addEventListener('wheel',lbWheel,{passive:false});})();
+function syncAdjUI(p){const a=adjOf(p);const c=lbFrame,w=432;c.width=w;c.height=Math.round(w/ratioVal(ratioOf(p)));renderRatioChips(p);$('lbAdj').querySelectorAll('input').forEach(r=>r.value=a[r.dataset.k]);$('lbImg').style.filter=cssFilter(a);framePreview(p);}
+function adjInput(r){const p=cur.photos[lbIdx];if(!p)return;p.adj=adjOf(p);p.adj[r.dataset.k]=+r.value;$('lbImg').style.filter=cssFilter(p.adj);framePreview(p);}
+function adjCommit(){const p=cur.photos[lbIdx];if(!p)return;if(isDefAdj(adjOf(p)))delete p.adj;saveSessions();renderPhotos();}
+function polishPhoto(){const p=cur.photos[lbIdx];if(!p)return;p.adj={...adjOf(p),...POLISH_ADJ};syncAdjUI(p);adjCommit();}
+function resetAdj(){const p=cur.photos[lbIdx];if(!p)return;delete p.adj;syncAdjUI(p);adjCommit();}
+/* "adjust" swaps the big photo for the exact slide crop (4:5), so the sliders show what the slide will show */
+function toggleAdj(on){
+  const open=on===undefined?$('lbAdj').style.display==='none':on;
+  $('lbAdj').style.display=open?'flex':'none';$('lbImg').style.display=open?'none':'';
+  $('lbEdit').innerHTML=open?ic('check')+'done':ic('pencil')+'adjust';$('lbEdit').classList.toggle('on',open);paintIcons($('lbEdit'));
+  if(open){renderRatioChips(cur.photos[lbIdx]);framePreview(cur.photos[lbIdx]);paintIcons(lbAdj);}
+}
+/* ---------- lightbox ---------- */
+let lbIdx=-1;
+async function openLightbox(i){
+  const p=cur.photos[i];if(!p)return;
+  const blob=await getBlob(p.id);if(!blob)return;
+  lbIdx=i;
+  $('lbImg').src=URL.createObjectURL(blob);lbBitmap=await createImageBitmap(blob);
+  $('lbEdit').style.display='';toggleAdj(false);syncAdjUI(p);
+  const sn=stepName(p.stepId);
+  $('lbCap').textContent=`${i+1} / ${cur.photos.length}${sn?' · '+sn:''}`;
+  $('lbPrev').disabled=i===0;$('lbNext').disabled=i===cur.photos.length-1;
+  $('lbPrev').style.display=$('lbNext').style.display=cur.photos.length>1?'':'none';
+  const b=$('lbUse');b.style.display='';b.classList.toggle('on',!!p.use);b.innerHTML=p.use?ic('check')+'in carousel':'excluded';
+  const t=$('lbTitle');t.style.display='';t.classList.toggle('on',cur.titlePicFrom===p.id);t.innerHTML=ic('star')+(cur.titlePicFrom===p.id?'is the title pic':'make title pic');paintIcons(t);
+  $('lightbox').style.display='flex';setTheme('#0E1326');paintIcons($('lightbox'));
+}
+function closeLightbox(){lbIdx=-1;$('lightbox').style.display='none';setTheme('#FAF6F0');}
+function stepLightbox(d){const j=lbIdx+d;if(j>=0&&j<cur.photos.length)openLightbox(j);}
+function toggleLightboxUse(){
+  const p=cur.photos[lbIdx];if(!p)return;
+  setPhotoUse(p,!p.use);
+  const b=$('lbUse');b.classList.toggle('on',!!p.use);b.innerHTML=p.use?ic('check')+'in carousel':'excluded';paintIcons(b);
+}
+/* copy the photo into its own blob, so deleting the title pic later never deletes the photo */
+/* the outgoing title pic is never thrown away: it joins the photo strip,
+   unless it was only a copy of a photo that is already there */
+async function retireTitlePic(){
+  if(!cur.titlePic)return;
+  const dupe=cur.titlePicFrom&&cur.photos.some(x=>x.id===cur.titlePicFrom);
+  if(dupe){delBlob(cur.titlePic);return;}
+  cur.photos.push({id:cur.titlePic,stepId:null,stepIdx:-1,use:false,adj:cur.titleAdj||undefined});
+}
+async function photoAsTitle(){
+  const p=cur.photos[lbIdx];if(!p)return;
+  const blob=await getBlob(p.id);if(!blob)return;
+  await retireTitlePic();
+  const id='t'+Date.now();await putBlob(id,blob);
+  cur.titlePic=id;cur.titlePicFrom=p.id;cur.titleAdj=p.adj?{...p.adj}:null;saveSessions();renderTitlePic();renderPhotos();
+  const t=$('lbTitle');t.classList.add('on');t.innerHTML=ic('star')+'is the title pic';paintIcons(t);
+}
+async function showBig(blobId,caption){
+  const blob=await getBlob(blobId);if(!blob)return;
+  lbIdx=-1;
+  $('lbImg').src=URL.createObjectURL(blob);$('lbCap').textContent=caption||'';$('lbImg').style.filter='';$('lbImg').style.display='';
+  $('lbPrev').style.display=$('lbNext').style.display=$('lbUse').style.display=$('lbTitle').style.display=$('lbAdj').style.display=$('lbEdit').style.display='none';
+  $('lightbox').style.display='flex';setTheme('#0E1326');
+}
+$('lightbox').addEventListener('click',e=>{if(e.target.id==='lightbox')closeLightbox();});
+document.addEventListener('keydown',e=>{
+  if($('lightbox').style.display!=='flex')return;
+  if(e.key==='Escape')closeLightbox();
+  else if(e.key==='ArrowLeft'&&lbIdx>=0)stepLightbox(-1);
+  else if(e.key==='ArrowRight'&&lbIdx>=0)stepLightbox(1);
+});
+$('galleryIn').addEventListener('change',async e=>{
+  for(const f of e.target.files){const id='p'+Date.now()+Math.random().toString(36).slice(2,6);await putBlob(id,f);cur.photos.push({id,stepIdx:-1,use:true});}
+  e.target.value='';saveSessions();renderPhotos();});
+$('titleIn').addEventListener('change',async e=>{
+  const f=e.target.files[0];if(!f)return;
+  await retireTitlePic();
+  const id='t'+Date.now();await putBlob(id,f);
+  cur.titlePic=id;cur.titlePicFrom=null;cur.titleAdj=null;saveSessions();e.target.value='';renderTitlePic();renderPhotos();});
+async function renderTitlePic(){
+  const has=!!cur.titlePic;$('tpDel').style.display=has?'':'none';
+  const img=$('tpThumb');
+  if(!has){img.style.display='none';return;}
+  const b=await getBlob(cur.titlePic);
+  if(b){img.src=URL.createObjectURL(b);img.style.display='';img.style.filter=cssFilter(adjOf({adj:cur.titleAdj}));}else{img.style.display='none';}
+}
+function delTitlePic(){if(cur.titlePic)delBlob(cur.titlePic);cur.titlePic=null;cur.titlePicFrom=null;saveSessions();renderTitlePic();}
+$('castIn').addEventListener('change',async e=>{
+  const f=e.target.files[0];if(!f)return;
+  if(cur.cast.pic)delBlob(cur.cast.pic);
+  const id='c'+Date.now();await putBlob(id,f);
+  cur.cast.pic=id;saveSessions();e.target.value='';renderCast();});
+async function renderCast(){
+  $('castSoul').value=cur.cast.soul||'';
+  $('castAromatics').value=cur.cast.aromatics||'';
+  const has=!!cur.cast.pic;$('castDel').style.display=has?'':'none';$('castAI').style.display=has?'':'none';$('castSend').style.display=has?'':'none';
+  const img=$('castThumb');
+  if(!has){img.style.display='none';return;}
+  const b=await getBlob(cur.cast.pic);
+  if(b){img.src=URL.createObjectURL(b);img.style.display='';}else{img.style.display='none';}
+}
+function delCastPic(){if(cur.cast.pic)delBlob(cur.cast.pic);cur.cast.pic=null;saveSessions();renderCast();}
+$('castSoul').addEventListener('input',e=>{if(cur){cur.cast.soul=e.target.value;saveSessions();}});
+$('castAromatics').addEventListener('input',e=>{if(cur){cur.cast.aromatics=e.target.value;saveSessions();}});
+
+/* ---------- polish (AI copy editor) ---------- */
+const POLISH_RULES=`You are the copy editor for @perfection.a.la.carte, an Instagram channel where one dish is cooked twice: once rushed against a timer, once slow with unlimited time. Polish each item of carousel text: fix grammar (the writer is a German native writing English), make it as short as possible, readable and practical — never influencer hype, never like a generic recipe app. Voice: dry wink; at most ONE line per set may go properly cheeky by personifying the food or the equipment (example: instead of "keep the airfryer moderate or the chicken dries out" write "not your show-off day, dear airfryer — keep the chicken chill"). The rest stay clean and useful; the practical tip must survive the joke. Keep the writer's meaning and personality. Banned words: yummy, delicious, easy peasy, foodie, elevate, game-changer. No exclamation marks. If an item is already great, return it unchanged.
+NUMBERS & SIGNS: always write numbers as digits (3, not three) and reach for the compact sign or abbreviation whenever it reads naturally and stays unambiguous — it is shorter, scans faster on a slide, and carries more punch. Use < > ≈ ~ = + − × ÷ % → ° and short units (s, min, h, g, kg, ml, l, °C, €). Examples: "under five minutes of active work" → "<5 min hands-on"; "about twice as fast" → "≈2× faster"; "thirty percent less" → "−30%"; "two hundred degrees" → "200 °C"; "from rushed to slow" → "rushed → slow". Ranges use an en dash (8–10 min). Keep at most two signs per line and never let one replace the verb — the line must still read as a sentence out loud, not as a formula. Never start a line with a bare digit-sign pair that reads as code.
+VERDICT: always include a suggestion for id "verdict" — catchy and specific to THIS session, built from the session facts provided (dish, round, times, time split, learnings). If the writer's verdict is empty, invent one; otherwise sharpen theirs. Occasionally overarching (done vs. perfect) is fine, but default to something only this session could produce.`;
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function polishItems(){
+  const items=[];
+  cur.steps.forEach((s,i)=>{if(s.name.trim().split(/\s+/).length>2)items.push({id:'step-'+i,label:'STEP '+(i+1),text:s.name.trim()});});
+  (cur.learnings||[]).forEach((l,i)=>{if(l&&l.trim())items.push({id:'learn-'+i,label:'LEARNING '+(i+1),text:l.trim()});});
+  items.push({id:'verdict',label:'VERDICT SLIDE',text:(cur.verdict||'').trim()});
+  return items;
+}
+function sessionContext(){
+  const shares=cur.steps.map(s=>`${s.name} ${Math.round(s.sec/cur.total*100)}%`).join(', ');
+  return `Session facts: dish=${cur.dish}; round=${cur.round}; total time=${fmt(cur.total)}; time split: ${shares}; learnings: ${(cur.learnings||[]).filter(Boolean).join(' | ')||'none yet'}.`;
+}
+async function startPolish(){
+  $('polishBox').style.display='';
+  const saved=localStorage.getItem('palc_key')||'';
+  if(saved&&!$('apiKey').value)$('apiKey').value=saved;
+  const items=polishItems();
+  if(!items.length){$('polishStatus').textContent='Nothing to polish yet — write a learning or a verdict line first.';return;}
+  const key=$('apiKey').value.trim();
+  if(!key){
+    $('polishStatus').textContent='No API key — free route: copy the prompt, paste it into the Claude app, paste the reply back below.';
+    $('polishManual').style.display='';return;
+  }
+  localStorage.setItem('palc_key',key);
+  $('polishStatus').textContent='Asking Claude…';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({
+        model:'claude-opus-4-8',max_tokens:2000,system:POLISH_RULES,
+        output_config:{format:{type:'json_schema',schema:{type:'object',properties:{suggestions:{type:'array',items:{type:'object',properties:{id:{type:'string'},polished:{type:'string'}},required:['id','polished'],additionalProperties:false}}},required:['suggestions'],additionalProperties:false}}},
+        messages:[{role:'user',content:'Polish these items:\n'+JSON.stringify(items.map(({id,text})=>({id,text})))+'\n\n'+sessionContext()}]
+      })});
+    const d=await r.json();
+    if(d.error)throw new Error(d.error.message);
+    if(d.stop_reason==='refusal')throw new Error('Claude declined this request');
+    const txt=(d.content.find(b=>b.type==='text')||{}).text||'{}';
+    showPolish(items,JSON.parse(txt).suggestions||[]);
+  }catch(e){
+    $('polishStatus').textContent='API call failed ('+e.message+') — use the free copy-paste route below.';
+    $('polishManual').style.display='';
+  }
+}
+function copyPolishPrompt(){
+  const items=polishItems();
+  const p=POLISH_RULES+'\n\nReply with ONLY a JSON array like [{"id":"...","polished":"..."}].\n\n'+sessionContext()+'\n\nItems:\n'+JSON.stringify(items.map(({id,text})=>({id,text})),null,1);
+  navigator.clipboard.writeText(p);
+  $('polishManual').style.display='';
+  $('polishStatus').textContent='Prompt copied — paste it into the Claude app, then paste the reply below.';
+}
+function parsePolishPaste(){
+  try{
+    const m=$('polishPaste').value.match(/\[[\s\S]*\]/);
+    const arr=JSON.parse(m[0]);
+    showPolish(polishItems(),Array.isArray(arr)?arr:arr.suggestions);
+  }catch(e){$('polishStatus').textContent="Couldn't read that — paste Claude's JSON reply exactly as it came.";}
+}
+let polishSug=[];
+function showPolish(items,sugs){
+  polishSug=(sugs||[]).map(g=>({...g,item:items.find(x=>x.id===g.id)})).filter(g=>g.item&&g.polished&&g.polished!==g.item.text);
+  $('polishStatus').textContent=polishSug.length?'Your words vs. Claude’s — take it or keep yours, line by line.':'Claude thinks your words are already good. Suspicious, but okay.';
+  $('polishResults').innerHTML=polishSug.map((g,i)=>`<div class="pol" id="pol-${i}">
+    <small>${g.item.label}</small>
+    ${g.item.text?`<div class="was">${esc(g.item.text)}</div>`:`<div class="was" style="text-decoration:none">(you left this empty — Claude suggests:)</div>`}
+    <div class="now">${esc(g.polished)}</div>
+    <div class="row"><button class="mini sagebg" onclick="applyPolishIdx(${i})">${ic('check')}take it</button>
+    <button class="mini" onclick="$('pol-${i}').classList.add('done')">keep mine</button></div></div>`).join('');
+}
+function applyPolishIdx(i){
+  const g=polishSug[i],id=g.id,v=g.polished;
+  if(id.startsWith('step-'))cur.steps[+id.slice(5)].name=v;
+  else if(id.startsWith('learn-')){const k=+id.slice(6);cur.learnings[k]=v;$('learn'+k).value=v;}
+  else if(id==='verdict'){cur.verdict=v;$('verdict').value=v;}
+  saveSessions();$('pol-'+i).classList.add('done');renderPie();renderSteps();
+}
+
+/* ---------- carousel builder (1080x1350) ---------- */
+const W=1080,H=1350;
+/* three looks for the slides — pick per session in the Studio */
+const grad=(x,stops,diag)=>{const g=diag?x.createLinearGradient(0,0,W,H):x.createLinearGradient(0,0,0,H);stops.forEach(([o,c])=>g.addColorStop(o,c));return g;};
+/* the one look: navy & coral on cream */
+const S={paper:'#FAF6F0',ink:'#14213D',gray:'#8A8F98',accent:'#E07A5F',dark:'#14213D',line:'#EADFD3',
+  pie:[{c:'#14213D',t:'#FAF6F0'},{c:'#E07A5F',t:'#FAF6F0'},{c:'#F2CFC2',t:'#14213D'},{c:'#8A8F98',t:'#FAF6F0'},{c:'#3D5A80',t:'#FAF6F0'},{c:'#EADFD3',t:'#14213D'}],
+  cta:{bg:'#14213D',title:'#FAF6F0',title2:'#E07A5F',text:'#E8E4DC',label:'rgba(250,246,240,.8)'}};
+const hero=()=>S.accent;
+const SANS="'Helvetica Neue',Helvetica,Arial,sans-serif";const SANSFAM=SANS;
+function newC(bg){const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+  if(!bg&&S.paint)S.paint(x);else{x.fillStyle=bg||S.paper;x.fillRect(0,0,W,H);}return[c,x];}
+function rr(x,a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath();}
+function txt(x,t,px,y,size,{w=400,col=S.ink,align='left',ls=0,fam=SANS}={}){
+  x.fillStyle=col;x.textAlign=align;
+  try{x.letterSpacing=ls+'px';}catch(e){}
+  x.font=`${w} ${size}px ${fam}`;x.fillText(t,px,y);
+  try{x.letterSpacing='0px';}catch(e){}}
+function footer(x,col){txt(x,HANDLE,W-90,H-80,26,{col:col||S.gray,align:'right',ls:2,w:500});}
+function wrap(x,t,px,y,size,maxW,lh,opts={}){x.font=`${opts.w||400} ${size}px ${opts.fam||SANS}`;const words=String(t).split(' ');let line='',yy=y;
+  for(const wd of words){const test=line?line+' '+wd:wd;
+    if(x.measureText(test).width>maxW&&line){txt(x,line,px,yy,size,opts);line=wd;yy+=lh;}else line=test;}
+  if(line)txt(x,line,px,yy,size,opts);return yy;}
+
+async function slCover(){const[c,x]=newC();
+  txt(x,cur.round==='RUSHED'?'ROUND 1 · RUSHED':'ROUND 2 · SLOW',W-90,124,23,{col:S.accent,align:'right',ls:4,w:600});
+  const name=cur.dish.toUpperCase(),hasPic=!!cur.titlePic;
+  const sz=hasPic?(name.length<=10?118:88):(name.length<=8?176:name.length<=14?134:98);
+  const yy=wrap(x,name,86,hasPic?330:480,sz,910,Math.round(sz*1.04),{w:800,col:hero(x),ls:1});
+  if(hasPic){
+    const b=await getBlob(cur.titlePic);
+    const iy=yy+70,ih=1050-iy;
+    if(b&&ih>200){
+      const img=await createImageBitmap(b);
+      x.save();rr(x,90,iy,900,ih,26);x.clip();
+      drawAdjusted(x,img,90,iy,900,ih,adjOf({adj:cur.titleAdj}));x.restore();
+      timeRing(x,90+134,iy+134,96,S.paper,true);
+    }else{
+      timeRing(x,90+134,iy+134,96,S.accent);
+    }
+  }else{
+    timeRing(x,210,yy+250,152,S.accent);
+    txt(x,'EVERY SECOND TRACKED',400,yy+240,24,{col:S.gray,ls:4,w:500});
+    txt(x,'DOOR TO BOWL',400,yy+290,24,{col:S.gray,ls:4,w:500});
+  }
+  footer(x);return c;}
+/* thin ring with the total time inside — the cover's stamp */
+function timeRing(x,cx,cy,r,col,onPhoto){
+  if(onPhoto){x.beginPath();x.arc(cx,cy,r,0,7);x.fillStyle='rgba(20,33,61,.34)';x.fill();}
+  x.beginPath();x.arc(cx,cy,r,0,7);x.strokeStyle=col;x.lineWidth=3;x.stroke();
+  const t=fmt(cur.total),size=t.length>4?r*0.52:r*0.62;
+  x.textBaseline='middle';
+  txt(x,t,cx,cy+2,size,{align:'center',w:300,col,ls:-1});
+  x.textBaseline='alphabetic';
+}
+async function slCast(){const[c,x]=newC();
+  txt(x,cur.dish.toUpperCase(),W-90,124,23,{col:S.gray,align:'right',ls:4,w:500});
+  txt(x,'THE CAST',86,330,150,{w:800,col:S.accent,ls:1});
+  const st=(cur.cast.soul||'').split('\n').map(s=>s.trim()).filter(Boolean);
+  const ar=(cur.cast.aromatics||'').split('\n').map(s=>s.trim()).filter(Boolean);
+  if(st.length||ar.length){
+    /* "500 g spaghetti" → amount "500 g" + name "spaghetti"; lines without an amount keep the whole text as the name */
+    const AMT=/^((?:\d+(?:[.,]\d+)?|[½¼¾⅓⅔]|\d+\s*\/\s*\d+)(?:\s*[–-]\s*\d+(?:[.,]\d+)?)?\s*(?:g|kg|mg|ml|cl|dl|l|tsp|tbsp|tl|el|pcs?|stk|cups?|oz|lb|bunch|cloves?|pinch|handful|slices?|sprigs?|x)?\.?)\s+(.+)$/i;
+    const col=(title,items,px)=>{
+      const rows=items.map(it=>{const m=it.match(AMT);return m?{amt:m[1].trim(),name:m[2].trim()}:{amt:'',name:it};});
+      x.font=`500 30px ${SANS}`;
+      const amtW=rows.reduce((w,r)=>Math.max(w,r.amt?x.measureText(r.amt).width:0),0);
+      const nameX=amtW?px+amtW+22:px, nameW=400-(nameX-px);
+      let y=470;
+      txt(x,title,px,y,25,{col:S.accent,ls:5,w:600});
+      x.strokeStyle=S.line;x.lineWidth=2;x.beginPath();x.moveTo(px,y+22);x.lineTo(px+400,y+22);x.stroke();
+      y+=84;
+      rows.forEach(r=>{
+        if(r.amt)txt(x,r.amt,px+amtW,y,30,{w:500,col:S.gray,align:'right'});
+        y=wrap(x,r.name,nameX,y,36,nameW,46,{w:400})+58;});
+    };
+    if(st.length)col('SOUL',st,90);
+    if(ar.length)col('AROMATICS',ar,590);
+  }else if(cur.cast.pic){
+    const b=await getBlob(cur.cast.pic);
+    if(b){const img=await createImageBitmap(b);
+      const ix=90,iy=420,iw=900,ih=780;
+      const s=Math.max(iw/img.width,ih/img.height);
+      x.save();rr(x,ix,iy,iw,ih,26);x.clip();
+      x.drawImage(img,ix+iw/2-img.width*s/2,iy+ih/2-img.height*s/2,img.width*s,img.height*s);x.restore();}
+  }
+  footer(x);return c;}
+/* ---- "where the time went" — five layouts, picked per session ---- */
+/* the comment can wear one of three serifs — the rest of the slide stays on the house sans */
+const NOTE_FONTS=[['sans','House sans',SANSFAM],['fraunces','Fraunces',"'Fraunces',Georgia,serif"],
+  ['cormorant','Cormorant',"'Cormorant Garamond',Georgia,serif"],['garamond','EB Garamond',"'EB Garamond',Georgia,serif"]];
+const noteFont=()=>cur.noteFont||'sans';
+const noteFam=()=>(NOTE_FONTS.find(f=>f[0]===noteFont())||NOTE_FONTS[0])[2];
+/* the same dish in the other round, if it has been cooked */
+function counterpart(){
+  const d=(cur.dish||'').trim().toLowerCase();
+  return sessions.find(s=>s.id!==cur.id&&s.round!==cur.round&&(s.dish||'').trim().toLowerCase()===d)||null;
+}
+const pieCol=i=>S.pie?S.pie[i%S.pie.length].c:PIE[i%PIE.length];
+const pieTxt=i=>S.pie?S.pie[i%S.pie.length].t:pieText(i);
+const pct=s=>Math.round(s.sec/cur.total*100);
+/* a wedge from a to a2, between two radii (r0=0 gives a plain pie slice) */
+function wedge(x,cx,cy,r,r0,a,a2,fill){
+  x.beginPath();
+  if(r0>0){x.arc(cx,cy,r,a,a2);x.arc(cx,cy,r0,a2,a,true);}
+  else{x.moveTo(cx,cy);x.arc(cx,cy,r,a,a2);}
+  x.closePath();x.fillStyle=fill;x.fill();
+  x.strokeStyle=S.paper;x.lineWidth=5;x.stroke();
+}
+function ringChart(x,cx,cy,r,r0,labels){
+  let a=-Math.PI/2;
+  cur.steps.forEach((s,i)=>{const a2=a+(s.sec/cur.total)*2*Math.PI;wedge(x,cx,cy,r,r0,a,a2,pieCol(i));a=a2;});
+  if(!labels)return;
+  a=-Math.PI/2;const rmid=(r+r0)/2;
+  cur.steps.forEach((s,i)=>{const a2=a+(s.sec/cur.total)*2*Math.PI,mid=(a+a2)/2,p=pct(s);
+    if(p>=9)txt(x,p+'%',cx+Math.cos(mid)*rmid,cy+Math.sin(mid)*rmid+13,38,{align:'center',w:600,col:pieTxt(i)});
+    const cos=Math.cos(mid),sin=Math.sin(mid),out=r+(p<9?74:38),lx=cx+cos*out,ly=cy+sin*out+10;
+    txt(x,`${s.name}${p<9?' · '+p+'%':''}`,lx,ly,29,{align:Math.abs(cos)<0.35?'center':(cos>0?'left':'right'),w:500,col:S.gray});
+    a=a2;});
+}
+/* legend in two columns, for the layouts that have no room for labels around the chart */
+function legend(x,y){
+  const half=Math.ceil(cur.steps.length/2);
+  cur.steps.forEach((s,i)=>{
+    const col=i<half?0:1,row=i<half?i:i-half;
+    const lx=90+col*460,ly=y+row*52;
+    x.beginPath();x.arc(lx+9,ly-9,9,0,7);x.fillStyle=pieCol(i);x.fill();
+    txt(x,`${s.name} · ${pct(s)}%`,lx+30,ly,28,{w:500,col:S.ink});
+  });
+  return y+Math.ceil(cur.steps.length/2)*52;
+}
+/* a slim arrow from the rushed total to the slow one, carrying the multiplier */
+function multArrow(x,x0,x1,y,label){
+  const mid=(x0+x1)/2;
+  x.strokeStyle=S.gray;x.lineWidth=2;x.lineCap='round';
+  x.beginPath();x.moveTo(x0,y);x.lineTo(x1-16,y);x.stroke();
+  x.beginPath();x.moveTo(x1-26,y-9);x.lineTo(x1-4,y);x.lineTo(x1-26,y+9);x.stroke();
+  if(label){
+    x.font=`500 27px ${noteFam()}`;
+    const w=x.measureText(label).width+26;
+    x.fillStyle=S.paper;x.fillRect(mid-w/2,y-20,w,40);
+    txt(x,label,mid,y+9,27,{align:'center',col:S.ink,w:500,fam:noteFam()});
+  }
+}
+function slPie(){const[c,x]=newC();
+  txt(x,cur.dish.toUpperCase(),W-90,124,23,{col:S.gray,align:'right',ls:4,w:500});
+  txt(x,'WHERE THE',86,300,104,{w:800,col:S.ink,ls:1});
+  txt(x,'TIME WENT',86,408,104,{w:800,col:S.accent,ls:1});
+
+  /* your comment sits above the chart, in the font you picked */
+  const noteEnd=wrap(x,timeNoteText(),90,496,31,900,44,{w:400,col:S.ink,fam:noteFam()});
+
+  const other=counterpart(),T=fmt(cur.total),round=cur.round==='RUSHED'?'RUSHED':'SLOW';
+  const r=other?204:244,ri=other?132:150,cx=W/2;
+  /* the ring drops below the comment, however many lines it runs to */
+  const cy=Math.max(other?792:852,noteEnd+r+68);
+
+  /* names and shares sit around the ring — no second legend to collide with */
+  ringChart(x,cx,cy,r,ri,true);
+  if(other){
+    ringChart(x,cx,cy,ri-16,0,false);           /* the same split again, as a pie */
+  }else{
+    x.beginPath();x.arc(cx,cy,ri,0,7);x.fillStyle=S.paper;x.fill();
+    x.textBaseline='middle';txt(x,T,cx,cy-4,T.length>4?74:88,{align:'center',w:300,col:S.ink,ls:-2});x.textBaseline='alphabetic';
+    txt(x,round,cx,cy+64,22,{align:'center',col:S.gray,ls:5,w:600});
+  }
+
+  if(other){
+    const rushed=cur.round==='RUSHED'?cur:other,slow=cur.round==='SLOW'?cur:other;
+    const mult=rushed.total?slow.total/rushed.total:0,y=1136;
+    x.strokeStyle=S.line;x.lineWidth=2;x.beginPath();x.moveTo(90,y-58);x.lineTo(W-90,y-58);x.stroke();
+    txt(x,'RUSHED',90,y,23,{col:S.gray,ls:5,w:600});
+    txt(x,fmt(rushed.total),90,y+56,50,{col:S.ink,ls:-2,w:300});
+    txt(x,'SLOW',W-90,y,23,{align:'right',col:S.gray,ls:5,w:600});
+    txt(x,fmt(slow.total),W-90,y+56,50,{align:'right',col:S.ink,ls:-2,w:300});
+    if(mult>=1.05)multArrow(x,336,W-336,y+38,`${mult>=10?Math.round(mult):mult.toFixed(1)}× of slow version`);
+  }
+  footer(x);return c;}const timeNoteText=()=>((cur.timeNote||'').trim())||timeInsight();
+/* one dry line under the donut: where the clock actually went */
+function timeInsight(){
+  const ss=[...cur.steps].filter(s=>s.sec>0).sort((a,b)=>b.sec-a.sec);
+  if(!ss.length)return '';
+  const p=s=>Math.round(s.sec/cur.total*100);
+  const a=ss[0];
+  if(ss.length===1)return `All ${fmt(cur.total)} went to ${a.name}.`;
+  const b=ss[1];
+  return `${p(a)}% of the clock went to ${a.name.toLowerCase()} · ${p(b)}% to ${b.name.toLowerCase()}.`;
+}
+function slSteps(){const[c,x]=newC();
+  txt(x,cur.dish.toUpperCase(),W-90,124,23,{col:S.gray,align:'right',ls:4,w:500});
+  txt(x,'METHOD',86,330,150,{w:800,col:S.accent,ls:1});
+  const st=cur.steps,n=st.length;
+  const top=500,bottom=1120,gap=n>1?Math.min(140,(bottom-top)/(n-1)):0;
+  const dotX=350,nameX=410,amtX=310;
+  /* dotted rail down the minute column */
+  if(n>1){x.save();x.beginPath();x.setLineDash([2,13]);x.lineCap='round';x.lineWidth=3;x.strokeStyle=S.gray;
+    x.moveTo(dotX,top+16);x.lineTo(dotX,top+gap*(n-1)-16);x.stroke();x.restore();}
+  st.forEach((s,i)=>{
+    const y=top+gap*i;
+    txt(x,dur(s.sec),amtX,y+11,32,{align:'right',col:S.accent,w:600,ls:1});
+    x.beginPath();x.arc(dotX,y,9,0,7);x.fillStyle=S.accent;x.fill();
+    x.beginPath();x.arc(dotX,y,9,0,7);x.strokeStyle=S.paper;x.lineWidth=4;x.stroke();
+    wrap(x,s.name,nameX,y+13,40,W-nameX-90,48,{w:500,col:S.ink});
+  });
+  txt(x,`TOTAL ${fmt(cur.total)} — DOOR TO BOWL`,90,1210,24,{col:S.gray,ls:4,w:500});
+  footer(x);return c;}
+/* "4 min" / "45 s" — the minute rail reads at a glance */
+const dur=sec=>sec>=60?`${Math.round(sec/60)} min`:`${sec} s`;
+async function slPhoto(p){
+  const r=ratioOf(p);
+  if(r!=='fill')return slPhotoCard(p);
+  const[c,x]=newC(S.ink);const blob=await getBlob(p.id);
+  if(blob){const img=await createImageBitmap(blob);
+    drawAdjusted(x,img,0,0,W,H,adjOf(p));
+    const gr=x.createLinearGradient(0,H-360,0,H);
+    gr.addColorStop(0,'rgba(20,18,16,0)');gr.addColorStop(1,'rgba(20,18,16,.68)');
+    x.fillStyle=gr;x.fillRect(0,H-360,W,360);}
+  const cap=stepName(p.stepId)||cur.dish;
+  txt(x,cap.toUpperCase(),90,H-104,38,{col:S.paper,w:600,ls:5});
+  footer(x,'rgba(255,255,255,.8)');return c;}
+/* a photo that is not full-bleed sits as a card on paper, caption underneath */
+async function slPhotoCard(p){
+  const[c,x]=newC();
+  txt(x,cur.dish.toUpperCase(),W-90,124,23,{col:S.gray,align:'right',ls:4,w:500});
+  const iw=900,ih=Math.min(980,Math.round(iw/ratioVal(ratioOf(p))));
+  const ix=90,iy=Math.round((H-ih)/2)-40;
+  const blob=await getBlob(p.id);
+  if(blob){const img=await createImageBitmap(blob);
+    x.save();rr(x,ix,iy,iw,ih,26);x.clip();
+    drawAdjusted(x,img,ix,iy,iw,ih,adjOf(p));x.restore();}
+  const cap=stepName(p.stepId)||cur.dish;
+  txt(x,cap.toUpperCase(),90,iy+ih+78,36,{col:S.accent,w:600,ls:5});
+  footer(x);return c;}
+function slLearn(){const[c,x]=newC();
+  txt(x,cur.dish.toUpperCase(),W-90,124,23,{col:S.gray,align:'right',ls:4,w:500});
+  txt(x,'WHAT I',86,300,104,{w:800,col:S.ink,ls:1});
+  txt(x,'LEARNED',86,408,104,{w:800,col:S.accent,ls:1});
+  let y=580;
+  cur.learnings.filter(l=>l&&l.trim()).forEach((l,i)=>{
+    txt(x,String(i+1).padStart(2,'0'),90,y,28,{col:S.accent,w:600,ls:2});
+    y=wrap(x,l.trim(),175,y,42,790,56,{w:400})+110;
+  });
+  footer(x);return c;}
+function slCTA(){const T=S.cta,[c,x]=newC(T.bg);if(T.paint)T.paint(x);
+  txt(x,cur.round==='RUSHED'?'ROUND 1 · RUSHED':'ROUND 2 · SLOW',W-90,124,23,{col:T.label,align:'right',ls:4,w:600});
+  txt(x,'WORTH',86,560,190,{w:800,col:T.title,ls:1});
+  txt(x,'IT?',86,752,190,{w:800,col:T.title2,ls:1});
+  wrap(x,cur.verdict||(cur.round==='RUSHED'?'Friday: same dish, unlimited time. Will it even taste different?':'Verdict is in. Follow for the next dish — cooked twice.'),90,910,48,880,64,{w:400,col:T.text});
+  footer(x,T.label);return c;}
+
+function availSpecs(){
+  const s=[];
+  s.push({key:'cover',label:'Cover',render:slCover});
+  const hasCast=cur.cast&&((cur.cast.soul||'').trim()||(cur.cast.aromatics||'').trim()||cur.cast.pic);
+  s.push({key:'cast',label:'The Cast (ingredients)',render:slCast,def:!!hasCast});
+  s.push({key:'pie',label:'Time pie',render:slPie});
+  s.push({key:'steps',label:'The steps',render:slSteps});
+  (cur.photos||[]).forEach((p,i)=>s.push({key:'photo:'+p.id,label:'Photo '+(i+1),render:()=>slPhoto(p),def:p.use}));
+  s.push({key:'learn',label:'Learnings',render:slLearn,def:cur.learnings.some(Boolean)});
+  s.push({key:'cta',label:'Verdict / teaser',render:slCTA});
+  return s;
+}
+function syncPlan(){
+  const specs=availSpecs(),byKey={};specs.forEach(s=>byKey[s.key]=s);
+  let plan=(cur.plan||[]).filter(e=>byKey[e.key]);
+  const have=new Set(plan.map(e=>e.key));
+  specs.forEach(s=>{if(!have.has(s.key))plan.push({key:s.key,on:s.def!==false});});
+  cur.plan=plan;saveSessions();
+  return {byKey,plan};
+}
+function renderPlan(){
+  const {byKey,plan}=syncPlan();
+  $('slidePlan').innerHTML=plan.map((e,i)=>`<div class="steprow planrow" data-key="${e.key}">
+    <label style="display:flex;align-items:center;gap:8px;flex:1;margin:0">
+      <input type="checkbox" ${e.on?'checked':''} onchange="togglePlan('${e.key}')" style="width:20px;height:20px">
+      <span style="font-weight:700;font-size:14px">${byKey[e.key].label}</span></label>
+    <span class="drag" title="drag to reorder" data-ic="drag" onpointerdown="planDragStart(event)" onpointermove="planDragMove(event)" onpointerup="planDragEnd(event)" onpointercancel="planDragEnd(event)"></span>
+  </div>`).join('');
+  paintIcons($('slidePlan'));
+}
+/* drag-to-reorder slides — pointer events, so it works with a finger on the phone */
+let planDrag=null;
+function planDragStart(e){
+  e.preventDefault();const row=e.currentTarget.closest('.planrow');
+  e.currentTarget.setPointerCapture(e.pointerId);
+  planDrag={row};row.classList.add('dragging');
+}
+function planDragMove(e){
+  if(!planDrag)return;
+  const list=$('slidePlan'),others=[...list.children].filter(r=>r!==planDrag.row);
+  const idx=others.findIndex(r=>{const b=r.getBoundingClientRect();return e.clientY<b.top+b.height/2;});
+  const ref=idx<0?null:others[idx];
+  if(planDrag.row.nextSibling!==ref)list.insertBefore(planDrag.row,ref);
+}
+function planDragEnd(){
+  if(!planDrag)return;
+  planDrag.row.classList.remove('dragging');planDrag=null;
+  const order=[...$('slidePlan').children].map(r=>r.dataset.key);
+  cur.plan.sort((a,b)=>order.indexOf(a.key)-order.indexOf(b.key));
+  saveSessions();renderPlan();buildSlides();
+}
+function togglePlan(key){const e=cur.plan.find(x=>x.key===key);if(e)e.on=!e.on;saveSessions();renderPlan();buildSlides();}
+function resetPlan(){cur.plan=null;saveSessions();renderPlan();buildSlides();}
+async function buildSlides(){
+  await document.fonts.ready;
+  if(noteFont()!=='sans'){const f=noteFam();try{await document.fonts.load('400 30px '+f);await document.fonts.load('italic 400 30px '+f);}catch(e){}}
+  const {byKey,plan}=syncPlan();renderPlan();
+  const wrapEl=$('slides');wrapEl.innerHTML='';let n=0;
+  for(const e of plan){
+    if(!e.on)continue;
+    const c=await byKey[e.key].render();
+    const i=n++;const d=document.createElement('div');d.className='slide';d.appendChild(c);
+    const b=document.createElement('button');b.className='mini';b.style.marginTop='6px';b.innerHTML=ic('download')+'slide '+(i+1);paintIcons(b);
+    b.onclick=()=>dl(c,i);d.appendChild(b);wrapEl.appendChild(d);
+  }
+}
+function dl(c,i){c.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);
+  a.download=`${cur.dish.replace(/\s+/g,'-').toLowerCase()}-${cur.round.toLowerCase()}-${i+1}.png`;a.click();},'image/png');}
+async function downloadAll(){const cs=$('slides').querySelectorAll('canvas');let i=0;
+  for(const c of cs){dl(c,i++);await new Promise(r=>setTimeout(r,400));}}
+</script>
+</body>
+</html>

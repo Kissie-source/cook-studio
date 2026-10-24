@@ -3,6 +3,21 @@
 Every version is a full snapshot in `versions/index-vX.Y.html` (and a git commit).
 **Roll back:** copy the snapshot over `index.html`, re-upload to GitHub.
 
+## v3.5 — 2026-10-24
+- **Fix: steps added mid-cook were thrown away.** Anything added with "+" is now kept
+  through to the Studio even if you never reach it (a step with no time counts as one
+  second, so the charts still add up). Previously only steps with recorded time survived.
+- **Send to Claude.** Next to the sparkle there is now a one-tap handoff: the ingredients
+  photo *and* the prompt go to the Claude app through the phone's share sheet — no API
+  key, no hunting in the gallery. On a desktop it copies the prompt and opens Claude.
+- **Time slide, reworked.** Only the rushed round recorded → the plain donut with the
+  total in the centre. Both rounds recorded → the nested ring, with RUSHED and SLOW
+  underneath joined by a thin arrow carrying "4.3× of slow version", pointing at the slow
+  time. Labels and figures are ink and grey now — colour belongs to the chart, not the type.
+- **The comment moved above the chart** and can wear one of three serifs: **Fraunces**,
+  **Cormorant Garamond** or **EB Garamond** (house sans stays the default). The ring drops
+  to clear however many lines the comment runs to.
+
 ## v3.4 — 2026-10-24
 - **Ingredient extraction stays in the app.** The copy-paste detour is gone — one tap on
   the sparkle, the key is asked for once and kept on the device. The prompt now also reads

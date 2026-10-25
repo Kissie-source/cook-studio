@@ -283,7 +283,7 @@ Reset</textarea>
         <button class="mini red" id="castDel" style="display:none" onclick="delCastPic()"><i class="ic solo" data-ic="x"></i></button>
       </div>
       <p class="hint" id="castStatus" style="margin-top:6px"></p>
-      <p class="hint">“Fill it in” does it here in the app and needs your Anthropic key once. “Via Claude app” needs no key: it sends the photo and copies the prompt for you to paste.</p>
+      <p class="hint">“Fill it in” works inside the app but needs an Anthropic <b>API</b> key once — made at console.anthropic.com, a developer account with credit, not your Claude app login. “Via Claude app” needs no key at all: it sends the photo and copies the prompt for you to paste.</p>
 
       <input type="file" id="castIn" accept="image/*" hidden>
       <label>SOUL (the substance — one per line, with amount)</label>
@@ -307,7 +307,7 @@ Reset</textarea>
       <h3 class="sec">POLISH · Claude tightens your words — you decide, line by line</h3>
       <button class="mini" onclick="startPolish()"><i class="ic" data-ic="sparkle"></i>Polish my words</button>
       <div id="polishBox" style="display:none">
-        <label>Anthropic API key (stored only on this phone — leave empty to use the free copy-paste route)</label>
+        <label>Anthropic API key — from console.anthropic.com, not your Claude login (leave empty for the copy-paste route)</label>
         <input type="password" id="apiKey" placeholder="sk-ant-...">
         <p class="hint" id="polishStatus"></p>
         <div id="polishManual" style="display:none">
@@ -616,7 +616,7 @@ async function blobToJpegB64(blob){
 async function aiExtractCast(sess,statusEl,soulEl,aromEl){
   let key=(localStorage.getItem('palc_key')||'').trim();
   if(!key){
-    const k=prompt('Anthropic API key (sk-ant-…) — stored only on this device:');
+    const k=prompt('Paste an Anthropic API key (starts with sk-ant-).\n\nThis is NOT your Claude app login. You create one at console.anthropic.com under API keys — a developer account with a few euros of credit. Roughly 2 cents per photo.\n\nIt stays on this phone. No key? Cancel and use the "via Claude app" button instead.');
     if(!k||!k.trim()){statusEl.textContent='No API key — type the buckets yourself, or tap the sparkle again to add a key.';return;}
     key=k.trim();localStorage.setItem('palc_key',key);
   }

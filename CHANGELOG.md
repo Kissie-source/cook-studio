@@ -3,6 +3,12 @@
 Every version is a full snapshot in `versions/index-vX.Y.html` (and a git commit).
 **Roll back:** copy the snapshot over `index.html`, re-upload to GitHub.
 
+## v3.7 — 2026-10-25
+- **The key prompt explains itself.** Asking for the API key now says what it is: made at
+  console.anthropic.com as a developer account with credit, *not* the Claude app login,
+  about 2 cents per photo, kept on the phone — and that cancelling leaves the no-key
+  "via Claude app" route. The same wording sits under the cast buttons and on the polish field.
+
 ## v3.6 — 2026-10-25
 - **"Via Claude app" now carries the prompt too.** Phones drop the text when a file rides
   along in the share sheet, so the photo goes through the sheet and the prompt is put on

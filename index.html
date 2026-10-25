@@ -7,7 +7,7 @@
 <title>Perfection à la Carte — Cook Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..500;1,9..144,300..500&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
 <style>
 :root{
   /* one family: navy · coral · sage — on cream (same world as the slides) */
@@ -220,8 +220,8 @@ Reset</textarea>
       <div id="castPanel" style="display:none">
         <div class="row" style="margin-top:10px">
           <img id="castThumbLive" style="width:56px;height:56px;border-radius:12px;object-fit:cover" alt="ingredients">
-          <button class="mini grow" onclick="extractLiveCast()"><i class="ic" data-ic="sparkle"></i>extract soul &amp; aromatics with AI</button>
-        <button class="mini" onclick="sendCastToClaude($('castStatusLive'))"><i class="ic" data-ic="image"></i>Claude app</button>
+          <button class="mini grow" onclick="extractLiveCast()"><i class="ic" data-ic="sparkle"></i>fill in soul &amp; aromatics</button>
+        <button class="mini" onclick="sendCastToClaude($('castStatusLive'))"><i class="ic" data-ic="image"></i>via Claude app</button>
         </div>
         <p class="hint" id="castStatusLive"></p>
         <label>Soul (the substance — one per line)</label>
@@ -278,11 +278,12 @@ Reset</textarea>
       <div class="row">
         <button class="mini" onclick="castIn.click()"><i class="ic" data-ic="plus"></i>ingredients photo</button>
         <img id="castThumb" style="display:none;width:72px;height:72px;border-radius:12px;border:3px solid var(--sage);object-fit:cover;cursor:zoom-in" alt="ingredients" onclick="showBig(cur.cast.pic,'The Cast — your ingredients')">
-        <button class="mini" id="castAI" style="display:none" onclick="aiExtractCast(cur,$('castStatus'),$('castSoul'),$('castAromatics'))"><i class="ic" data-ic="sparkle"></i>AI</button>
-        <button class="mini" id="castSend" style="display:none" onclick="sendCastToClaude($('castStatus'))"><i class="ic" data-ic="image"></i>Send to Claude</button>
+        <button class="mini" id="castAI" style="display:none" onclick="aiExtractCast(cur,$('castStatus'),$('castSoul'),$('castAromatics'))"><i class="ic" data-ic="sparkle"></i>fill it in</button>
+        <button class="mini" id="castSend" style="display:none" onclick="sendCastToClaude($('castStatus'))"><i class="ic" data-ic="image"></i>via Claude app</button>
         <button class="mini red" id="castDel" style="display:none" onclick="delCastPic()"><i class="ic solo" data-ic="x"></i></button>
       </div>
       <p class="hint" id="castStatus" style="margin-top:6px"></p>
+      <p class="hint">“Fill it in” does it here in the app and needs your Anthropic key once. “Via Claude app” needs no key: it sends the photo and copies the prompt for you to paste.</p>
 
       <input type="file" id="castIn" accept="image/*" hidden>
       <label>SOUL (the substance — one per line, with amount)</label>
@@ -317,11 +318,10 @@ Reset</textarea>
         </div>
         <div id="polishResults"></div>
       </div>
-      <h3 class="sec">TIME SLIDE · comment and its font</h3>
+      <h3 class="sec">TIME SLIDE · the line above the chart</h3>
       
-      <label>Comment font</label>
-      <div class="chips" id="noteFontChips"></div>
       <label>Comment on the time slide</label>
+
       <input type="text" id="timeNote" placeholder="written for you — type over it">
       <button class="mini" style="margin-top:6px" onclick="suggestTimeNote()"><i class="ic" data-ic="refresh"></i>write it for me</button>
       <button class="big-btn sage" onclick="buildSlides()"><i class="ic" data-ic="sparkle"></i>Generate carousel</button>
@@ -570,7 +570,6 @@ async function finishCook(){
      and a step that got no time still counts as one second so the charts hold up */
   const kept=live.s.steps.filter(s=>s.sec>0||s.added);
   live.s.steps=kept.length?kept:live.s.steps;
-  live.s.steps.forEach(s=>{if(!s.sec||s.sec<1)s.sec=1;});
   live.s.total=live.s.steps.reduce((a,b)=>a+b.sec,0)||1;
   sessions.unshift(live.s);saveSessions();
   const id=live.s.id;live=null;clearLive();
@@ -658,20 +657,23 @@ async function sendCastToClaude(statusEl){
   const sess=live?live.s:cur;if(!sess||!sess.cast.pic){statusEl.textContent='Shoot the ingredients first.';return;}
   const blob=await getBlob(sess.cast.pic);if(!blob){statusEl.textContent='That photo could not be read.';return;}
   const text=castPromptText(sess.dish);
+  /* phones drop the text when a file rides along, so the prompt goes to the clipboard
+     and the photo goes through the share sheet — one paste at the other end */
+  let copied=false;
+  try{await navigator.clipboard.writeText(text);copied=true;}catch(e){}
   const file=new File([blob],'ingredients.jpg',{type:blob.type||'image/jpeg'});
   try{
     if(navigator.canShare&&navigator.canShare({files:[file]})){
       await navigator.share({files:[file],text});
-      statusEl.textContent='Sent. Paste Claude’s answer into the two fields below.';
+      statusEl.textContent=copied?'Photo sent. The prompt is on your clipboard — paste it in Claude, then paste the answer back here.'
+                                 :'Photo sent. Ask Claude to list the ingredients, then paste the answer back here.';
       return;
     }
   }catch(e){if(e&&e.name==='AbortError')return;}
-  /* desktop or a browser without file sharing: prompt on the clipboard, Claude in a new tab */
-  try{await navigator.clipboard.writeText(text);}catch(e){}
   window.open('https://claude.ai/new','_blank');
-  statusEl.textContent='Prompt copied and Claude opened — attach the photo there, then paste the answer below.';
-}
-function extractLiveCast(){
+  statusEl.textContent=copied?'Prompt copied and Claude opened — paste it, attach the photo, then paste the answer back here.'
+                             :'Claude opened — attach the photo and ask for the ingredients.';
+}function extractLiveCast(){
   aiExtractCast(live?live.s:{dish:($('dish').value.trim()||'this dish'),cast:pendingCast},
     $('castStatusLive'),$('castSoulLive'),$('castAromaticsLive'));
 }
@@ -711,20 +713,15 @@ $('verdict').addEventListener('input',e=>{if(cur){cur.verdict=e.target.value;sav
 function renderStudio(){
   $('stTitle').textContent=cur.dish+' · '+cur.round;
   $('stTotal').textContent='total locked · '+fmt(cur.total);
-  renderPie();renderSteps();renderNotes();renderPhotos();renderTitlePic();renderCast();renderTimeChips();renderTimeNote();paintIcons();
+  renderPie();renderSteps();renderNotes();renderPhotos();renderTitlePic();renderCast();renderTimeNote();paintIcons();
 }
 function renderTimeNote(){const i=$('timeNote');i.value=cur.timeNote||'';i.placeholder=timeInsight();}
-function renderTimeChips(){
-  const now=noteFont();
-  $('noteFontChips').innerHTML=NOTE_FONTS.map(([k,label,fam])=>
-    `<button class="mini${k===now?' on':''}" style="font-family:${fam}" onclick="setNoteFont('${k}')">${label}</button>`).join('');
-}
-function setNoteFont(k){cur.noteFont=k;saveSessions();renderTimeChips();buildSlides();}
+
 function suggestTimeNote(){cur.timeNote='';saveSessions();$('timeNote').value='';$('timeNote').placeholder=timeInsight();buildSlides();}
 $('timeNote').addEventListener('input',e=>{if(cur){cur.timeNote=e.target.value;saveSessions();}});
 function renderPie(){
   const size=164,r=70,cx=size/2,cy=size/2;let a=-Math.PI/2,ps='',ls='';
-  cur.steps.forEach((s,i)=>{const f=s.sec/cur.total,a2=a+f*2*Math.PI;
+  cur.steps.filter(s=>s.sec>0).forEach((s,i)=>{const f=s.sec/cur.total,a2=a+f*2*Math.PI;
     const x1=cx+r*Math.cos(a),y1=cy+r*Math.sin(a),x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2);
     ps+=`<path d="M${cx} ${cy} L${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 ${f>.5?1:0} 1 ${x2.toFixed(1)} ${y2.toFixed(1)} Z" fill="${PIE[i%PIE.length]}" stroke="#FAF6F0" stroke-width="2.5"/>`;
     const mid=(a+a2)/2,pct=Math.round(f*100);
@@ -1183,11 +1180,9 @@ async function slCast(){const[c,x]=newC();
   }
   footer(x);return c;}
 /* ---- "where the time went" — five layouts, picked per session ---- */
-/* the comment can wear one of three serifs — the rest of the slide stays on the house sans */
-const NOTE_FONTS=[['sans','House sans',SANSFAM],['fraunces','Fraunces',"'Fraunces',Georgia,serif"],
-  ['cormorant','Cormorant',"'Cormorant Garamond',Georgia,serif"],['garamond','EB Garamond',"'EB Garamond',Georgia,serif"]];
-const noteFont=()=>cur.noteFont||'sans';
-const noteFam=()=>(NOTE_FONTS.find(f=>f[0]===noteFont())||NOTE_FONTS[0])[2];
+/* comments wear Cormorant; everything else stays on the house sans */
+const NOTE_FAM="'Cormorant Garamond',Georgia,serif";
+const noteFam=()=>NOTE_FAM;
 /* the same dish in the other round, if it has been cooked */
 function counterpart(){
   const d=(cur.dish||'').trim().toLowerCase();
@@ -1196,6 +1191,8 @@ function counterpart(){
 const pieCol=i=>S.pie?S.pie[i%S.pie.length].c:PIE[i%PIE.length];
 const pieTxt=i=>S.pie?S.pie[i%S.pie.length].t:pieText(i);
 const pct=s=>Math.round(s.sec/cur.total*100);
+/* a step you added but never ran has no slice — it still shows in the method list */
+const timedSteps=()=>cur.steps.filter(s=>s.sec>0);
 /* a wedge from a to a2, between two radii (r0=0 gives a plain pie slice) */
 function wedge(x,cx,cy,r,r0,a,a2,fill){
   x.beginPath();
@@ -1205,11 +1202,11 @@ function wedge(x,cx,cy,r,r0,a,a2,fill){
   x.strokeStyle=S.paper;x.lineWidth=5;x.stroke();
 }
 function ringChart(x,cx,cy,r,r0,labels){
-  let a=-Math.PI/2;
-  cur.steps.forEach((s,i)=>{const a2=a+(s.sec/cur.total)*2*Math.PI;wedge(x,cx,cy,r,r0,a,a2,pieCol(i));a=a2;});
+  let a=-Math.PI/2;const st=timedSteps();
+  st.forEach((s,i)=>{const a2=a+(s.sec/cur.total)*2*Math.PI;wedge(x,cx,cy,r,r0,a,a2,pieCol(i));a=a2;});
   if(!labels)return;
   a=-Math.PI/2;const rmid=(r+r0)/2;
-  cur.steps.forEach((s,i)=>{const a2=a+(s.sec/cur.total)*2*Math.PI,mid=(a+a2)/2,p=pct(s);
+  st.forEach((s,i)=>{const a2=a+(s.sec/cur.total)*2*Math.PI,mid=(a+a2)/2,p=pct(s);
     if(p>=9)txt(x,p+'%',cx+Math.cos(mid)*rmid,cy+Math.sin(mid)*rmid+13,38,{align:'center',w:600,col:pieTxt(i)});
     const cos=Math.cos(mid),sin=Math.sin(mid),out=r+(p<9?74:38),lx=cx+cos*out,ly=cy+sin*out+10;
     txt(x,`${s.name}${p<9?' · '+p+'%':''}`,lx,ly,29,{align:Math.abs(cos)<0.35?'center':(cos>0?'left':'right'),w:500,col:S.gray});
@@ -1217,14 +1214,14 @@ function ringChart(x,cx,cy,r,r0,labels){
 }
 /* legend in two columns, for the layouts that have no room for labels around the chart */
 function legend(x,y){
-  const half=Math.ceil(cur.steps.length/2);
-  cur.steps.forEach((s,i)=>{
+  const st=timedSteps(),half=Math.ceil(st.length/2);
+  st.forEach((s,i)=>{
     const col=i<half?0:1,row=i<half?i:i-half;
     const lx=90+col*460,ly=y+row*52;
     x.beginPath();x.arc(lx+9,ly-9,9,0,7);x.fillStyle=pieCol(i);x.fill();
     txt(x,`${s.name} · ${pct(s)}%`,lx+30,ly,28,{w:500,col:S.ink});
   });
-  return y+Math.ceil(cur.steps.length/2)*52;
+  return y+Math.ceil(st.length/2)*52;
 }
 /* a slim arrow from the rushed total to the slow one, carrying the multiplier */
 function multArrow(x,x0,x1,y,label){
@@ -1236,7 +1233,7 @@ function multArrow(x,x0,x1,y,label){
     x.font=`500 27px ${noteFam()}`;
     const w=x.measureText(label).width+26;
     x.fillStyle=S.paper;x.fillRect(mid-w/2,y-20,w,40);
-    txt(x,label,mid,y+9,27,{align:'center',col:S.ink,w:500,fam:noteFam()});
+    txt(x,label,mid,y+9,28,{align:'center',col:S.ink,w:600,fam:NOTE_FAM});
   }
 }
 function slPie(){const[c,x]=newC();
@@ -1245,7 +1242,7 @@ function slPie(){const[c,x]=newC();
   txt(x,'TIME WENT',86,408,104,{w:800,col:S.accent,ls:1});
 
   /* your comment sits above the chart, in the font you picked */
-  const noteEnd=wrap(x,timeNoteText(),90,496,31,900,44,{w:400,col:S.ink,fam:noteFam()});
+  const noteEnd=wrap(x,timeNoteText(),90,498,36,900,48,{w:500,col:S.ink,fam:NOTE_FAM});
 
   const other=counterpart(),T=fmt(cur.total),round=cur.round==='RUSHED'?'RUSHED':'SLOW';
   const r=other?204:244,ri=other?132:150,cx=W/2;
@@ -1275,7 +1272,7 @@ function slPie(){const[c,x]=newC();
   footer(x);return c;}const timeNoteText=()=>((cur.timeNote||'').trim())||timeInsight();
 /* one dry line under the donut: where the clock actually went */
 function timeInsight(){
-  const ss=[...cur.steps].filter(s=>s.sec>0).sort((a,b)=>b.sec-a.sec);
+  const ss=[...timedSteps()].sort((a,b)=>b.sec-a.sec);
   if(!ss.length)return '';
   const p=s=>Math.round(s.sec/cur.total*100);
   const a=ss[0];
@@ -1302,7 +1299,7 @@ function slSteps(){const[c,x]=newC();
   txt(x,`TOTAL ${fmt(cur.total)} — DOOR TO BOWL`,90,1210,24,{col:S.gray,ls:4,w:500});
   footer(x);return c;}
 /* "4 min" / "45 s" — the minute rail reads at a glance */
-const dur=sec=>sec>=60?`${Math.round(sec/60)} min`:`${sec} s`;
+const dur=sec=>!sec?"—":sec>=60?`${Math.round(sec/60)} min`:`${sec} s`;
 async function slPhoto(p){
   const r=ratioOf(p);
   if(r!=='fill')return slPhotoCard(p);
@@ -1400,7 +1397,7 @@ function togglePlan(key){const e=cur.plan.find(x=>x.key===key);if(e)e.on=!e.on;s
 function resetPlan(){cur.plan=null;saveSessions();renderPlan();buildSlides();}
 async function buildSlides(){
   await document.fonts.ready;
-  if(noteFont()!=='sans'){const f=noteFam();try{await document.fonts.load('400 30px '+f);await document.fonts.load('italic 400 30px '+f);}catch(e){}}
+  try{await document.fonts.load('500 34px '+NOTE_FAM);await document.fonts.load('600 34px '+NOTE_FAM);}catch(e){}
   const {byKey,plan}=syncPlan();renderPlan();
   const wrapEl=$('slides');wrapEl.innerHTML='';let n=0;
   for(const e of plan){

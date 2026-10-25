@@ -3,6 +3,18 @@
 Every version is a full snapshot in `versions/index-vX.Y.html` (and a git commit).
 **Roll back:** copy the snapshot over `index.html`, re-upload to GitHub.
 
+## v3.6 — 2026-10-25
+- **"Via Claude app" now carries the prompt too.** Phones drop the text when a file rides
+  along in the share sheet, so the photo goes through the sheet and the prompt is put on
+  the clipboard at the same time — one paste at the other end. The two buttons also say
+  what they do now: **fill it in** (here in the app, needs your key once) and
+  **via Claude app** (no key).
+- **Comments are set in Cormorant Garamond**, a little larger and heavier so the serif
+  holds up at slide size. The font picker is gone.
+- **A step you added but never ran keeps its place without inventing time.** It no longer
+  gets a made-up second, it is left out of the donut and the legend, and the method slide
+  shows it with a dash instead of a duration.
+
 ## v3.5 — 2026-10-24
 - **Fix: steps added mid-cook were thrown away.** Anything added with "+" is now kept
   through to the Studio even if you never reach it (a step with no time counts as one

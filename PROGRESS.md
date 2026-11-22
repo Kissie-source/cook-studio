@@ -1,6 +1,6 @@
 # Cook Studio — progress, open issues, next steps
 
-_Last updated: 2026-11-22 · shipped version: **v3.7** (commit `ff9b164`) live at; **v3.8** on branch `feat/step-drag-handles`, not yet merged ·
+_Last updated: 2026-11-22 · shipped version: **v3.8** (commit `d9eb611`) · live and verified at
 https://kissie-source.github.io/cook-studio/_
 
 ---

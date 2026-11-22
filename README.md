@@ -8,6 +8,7 @@ in your phone's browser storage.
 
 - `index.html` — the entire app (UI + logic)
 - `versions/` — one full snapshot per version, for rollback
+- `PROGRESS.md` — current status, open issues, next steps
 - `CHANGELOG.md` — what changed in each version
 - `serve.ps1` — local dev server only, do **not** upload
 

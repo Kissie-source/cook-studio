@@ -3,6 +3,19 @@
 Every version is a full snapshot in `versions/index-vX.Y.html` (and a git commit).
 **Roll back:** copy the snapshot over `index.html`, re-upload to GitHub.
 
+## v3.10 — 2026-11-22
+- **The time-split sliders are folded away.** Each step shows its share as a number; tap
+  **adjust time split** to bring the sliders out and **done adjusting** to put them away, so
+  the chart can't be nudged by accident. They are folded again every time you open a session.
+- **Polish stays tidy while your key works.** Once a call has worked, the key field and the
+  copy-paste route are hidden: just the button and the suggestions. If a call fails (wrong
+  key, credit used up), everything comes back with the reason. **change API key** opens the
+  field on purpose. A successful "fill it in" counts too.
+- **The two buttons at the bottom say what they do.** "write it for me" is now **suggest a
+  line from my times** (it only refills the line above the time chart, free, no Claude), and
+  **Generate carousel** sits under its own heading, "CAROUSEL · all slides".
+- The steps heading no longer mentions the arrows that v3.8 removed.
+
 ## v3.9 — 2026-11-22
 - **Fix: pasting Claude's polish reply failed with "couldn't read that".** The reader now
   finds the suggestions whatever the Claude app wraps them in: a code block, chat text before

@@ -96,6 +96,10 @@ textarea{min-height:88px; resize:vertical; line-height:1.55}
 .cdot{width:10px; height:10px; border-radius:50%; flex:none}
 .sharewrap{display:flex; align-items:center; gap:8px; width:100%; margin-top:2px}
 .sharewrap input[type=range]{flex:1; accent-color:var(--accent); height:4px}
+#stSteps:not(.split-open) .sharewrap input[type=range]{display:none}
+#stSteps:not(.split-open) .sharewrap{justify-content:flex-end}
+#stSteps .pct{color:var(--muted)}
+#splitBtn{margin-bottom:6px}
 .pct{width:36px; text-align:right; font:500 12px var(--mono)}
 .mini:disabled{opacity:.3}
 .icon-btn{width:40px; height:40px; border:1px solid var(--line-2); border-radius:50%; background:rgba(255,255,255,.6); font-size:17px; cursor:pointer}
@@ -147,6 +151,7 @@ textarea{min-height:88px; resize:vertical; line-height:1.55}
 #polishBox textarea{min-height:70px}
 .warn{background:var(--charcoal); color:#FAF6F0; border-radius:18px; padding:12px 16px; font-size:13px; margin:12px 0; display:none}
 .hint{font-size:12px; color:var(--muted); margin-top:8px; line-height:1.55}
+.linkish{background:none; border:0; padding:2px 0; font:500 12px var(--ui); color:var(--muted); text-decoration:underline; text-underline-offset:2px; cursor:pointer}
 h3.sec{font:600 10.5px var(--ui); letter-spacing:1.8px; text-transform:uppercase; color:var(--muted); margin:16px 0 5px; padding-top:13px; border-top:1px solid var(--line)}
 
 /* ===== COOK MODE — charcoal instrument ===== */
@@ -265,7 +270,8 @@ Reset</textarea>
       <h2 id="stTitle">—</h2>
       <div class="total-lock" id="stTotal">total locked · 0:00</div>
       <div id="pieWrap" style="justify-content:center"><div id="pieSvg"></div></div>
-      <h3 class="sec">STEPS · drag order with the arrows · slider = share</h3>
+      <h3 class="sec">STEPS · hold the grip to reorder</h3>
+      <button class="mini" id="splitBtn" onclick="toggleSplit()"></button>
       <div id="stSteps"></div>
       <button class="mini" onclick="addStep()"><i class="ic" data-ic="plus"></i>add step</button>
       <h3 class="sec" id="notesHead" style="display:none">VOICE NOTES · from steps you removed</h3>
@@ -307,9 +313,12 @@ Reset</textarea>
       <h3 class="sec">POLISH · Claude tightens your words — you decide, line by line</h3>
       <button class="mini" onclick="startPolish()"><i class="ic" data-ic="sparkle"></i>Polish my words</button>
       <div id="polishBox" style="display:none">
+        <div id="keyBox">
         <label>Anthropic API key — from console.anthropic.com, not your Claude login (leave empty for the copy-paste route)</label>
         <input type="password" id="apiKey" placeholder="sk-ant-...">
+        </div>
         <p class="hint" id="polishStatus"></p>
+        <button class="linkish" id="keyShow" style="display:none" onclick="showKeyBox()">change API key</button>
         <div id="polishManual" style="display:none">
           <button class="mini" onclick="copyPolishPrompt()"><i class="ic" data-ic="clipboard"></i>Copy prompt for the Claude app</button>
           <label>Paste Claude's reply here</label>
@@ -323,8 +332,11 @@ Reset</textarea>
       <label>Comment on the time slide</label>
 
       <input type="text" id="timeNote" placeholder="written for you — type over it">
-      <button class="mini" style="margin-top:6px" onclick="suggestTimeNote()"><i class="ic" data-ic="refresh"></i>write it for me</button>
+      <button class="mini" style="margin-top:6px" onclick="suggestTimeNote()"><i class="ic" data-ic="refresh"></i>suggest a line from my times</button>
+      <p class="hint">Only refills this one line, worked out from your step times. Free, no Claude.</p>
+      <h3 class="sec">CAROUSEL · all slides</h3>
       <button class="big-btn sage" onclick="buildSlides()"><i class="ic" data-ic="sparkle"></i>Generate carousel</button>
+      <p class="hint">Draws every slide from everything above, ready to download.</p>
     </div>
     <div class="card">
       <h2>CAROUSEL · tick the slides, drag to order, then post on IG</h2>
@@ -644,8 +656,9 @@ async function aiExtractCast(sess,statusEl,soulEl,aromEl){
     sess.cast.soul=(out.soul||'').trim();sess.cast.aromatics=(out.aromatics||'').trim();
     soulEl.value=sess.cast.soul;aromEl.value=sess.cast.aromatics;
     if(sessions.includes(sess))saveSessions();
+    setKeyOk(true);
     statusEl.textContent='Extracted — edit anything that looks off';
-  }catch(e){statusEl.textContent='AI failed ('+e.message+') — type the buckets below, or tap the sparkle to retry.';}
+  }catch(e){if(/key|auth|credit|40[13]/i.test(e.message))setKeyOk(false);statusEl.textContent='AI failed ('+e.message+') — type the buckets below, or tap the sparkle to retry.';}
 }
 /* one prompt, used by the API call and by the copy-paste route */
 function castPromptText(dish){
@@ -697,7 +710,7 @@ function delSession(id){
 
 /* ---------- studio ---------- */
 let cur=null;
-function openStudio(id){cur=sessions.find(s=>s.id===id);if(!cur)return;
+function openStudio(id){cur=sessions.find(s=>s.id===id);if(!cur)return;splitOpen=false;
   if(!cur.cast)cur.cast={pic:null,soul:'',aromatics:''};
   /* migrate older sessions: steps get ids, notes/photos point at ids instead of positions */
   cur.steps.forEach((s,i)=>{if(!s.id)s.id='s'+cur.id+'_'+i;});
@@ -737,11 +750,16 @@ function renderSteps(){
     <span class="cdot" style="background:${PIE[i%PIE.length]}"></span>
     <input class="nm" value="${s.name.replace(/"/g,'&quot;')}" onchange="cur.steps[${i}].name=this.value;saveSessions();">
     ${notesFor(s.id).map(n=>`<button class="mini play" data-t="${fmt(n.sec)}" title="listen to your note for this step" onclick="playNote('${n.id}',this)">${ic('play',1)}${fmt(n.sec)}</button>`).join('')}
-    <div class="sharewrap"><input type="range" min="1" max="99" step="1" value="${pct}" oninput="slideShare(${i},this.value)" onchange="renderStudio()">
+    <div class="sharewrap"><span class="pct">${s.sec>0?pct+'%':'–'}</span><input type="range" min="1" max="99" step="1" value="${pct}" oninput="slideShare(${i},this.value)" onchange="renderStudio()">
     ${cur.steps.length>1?`<button class="mini red" onclick="rmStep(${i})">${ic('x',1)}</button>`:''}</div>
     </div>`;}).join('');
-  paintIcons($('stSteps'));
+  $('stSteps').classList.toggle('split-open',splitOpen);
+  $('splitBtn').innerHTML=splitOpen?ic('check')+'done adjusting':ic('pencil')+'adjust time split';
+  paintIcons($('stSteps'));paintIcons($('splitBtn'));
 }
+/* the share sliders stay folded away unless asked for, so the chart isn't moved by accident */
+var splitOpen=false;
+function toggleSplit(){splitOpen=!splitOpen;renderSteps();}
 /* drag-to-reorder steps — same pointer-event approach as the carousel list */
 let stepDrag=null;
 function stepDragStart(e){
@@ -773,6 +791,7 @@ function slideShare(i,pct){
   sec=Math.min(Math.max(m,sec),hi);
   cur.steps[i].sec=sec;redistribute(i,cur.total-sec);
   saveSessions();renderPie();
+  [...$('stSteps').querySelectorAll('.pct')].forEach((el,k)=>{const st=cur.steps[k];if(st&&st.sec>0)el.textContent=Math.round(st.sec/cur.total*100)+'%';});
   
 }
 function redistribute(exceptIdx,targetOthers){
@@ -1044,10 +1063,20 @@ function sessionContext(){
   const shares=cur.steps.map(s=>`${s.name} ${Math.round(s.sec/cur.total*100)}%`).join(', ');
   return `Session facts: dish=${cur.dish}; round=${cur.round}; total time=${fmt(cur.total)}; time split: ${shares}; learnings: ${(cur.learnings||[]).filter(Boolean).join(' | ')||'none yet'}.`;
 }
+/* while a saved key works, the key field and the copy-paste route stay out of sight */
+function keyWorks(){return !!(localStorage.getItem('palc_key')||'').trim()&&localStorage.getItem('palc_key_ok')!=='0';}
+function setKeyOk(ok){localStorage.setItem('palc_key_ok',ok?'1':'0');}
+function setKeyUI(){
+  const hide=keyWorks();
+  $('keyBox').style.display=hide?'none':'';$('keyShow').style.display=hide?'':'none';
+  if(hide)$('polishManual').style.display='none';
+}
+function showKeyBox(){$('keyBox').style.display='';$('keyShow').style.display='none';$('apiKey').focus();}
 async function startPolish(){
   $('polishBox').style.display='';
   const saved=localStorage.getItem('palc_key')||'';
   if(saved&&!$('apiKey').value)$('apiKey').value=saved;
+  setKeyUI();
   const items=polishItems();
   if(!items.length){$('polishStatus').textContent='Nothing to polish yet — write a learning or a verdict line first.';return;}
   const key=$('apiKey').value.trim();
@@ -1067,11 +1096,13 @@ async function startPolish(){
         messages:[{role:'user',content:'Polish these items:\n'+JSON.stringify(items.map(({id,text})=>({id,text})))+'\n\n'+sessionContext()}]
       })});
     const d=await r.json();
-    if(d.error)throw new Error(d.error.message);
+    if(d.error)throw new Error(d.error.message||('HTTP '+r.status));
     if(d.stop_reason==='refusal')throw new Error('Claude declined this request');
     const txt=(d.content.find(b=>b.type==='text')||{}).text||'{}';
+    setKeyOk(true);setKeyUI();
     showPolish(items,JSON.parse(txt).suggestions||[]);
   }catch(e){
+    setKeyOk(false);setKeyUI();
     $('polishStatus').textContent='API call failed ('+e.message+') — use the free copy-paste route below.';
     $('polishManual').style.display='';
   }

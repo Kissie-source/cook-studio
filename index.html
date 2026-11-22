@@ -89,9 +89,9 @@ textarea{min-height:88px; resize:vertical; line-height:1.55}
 .chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:4px}
 .chips .mini.on{background:var(--accent); border-color:var(--accent); color:#fff}
 .planrow{margin:5px 0}
-.planrow .drag{cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; flex:none; width:34px; height:34px; display:flex; align-items:center; justify-content:center; color:var(--muted)}
-.planrow .drag svg{width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round}
-.planrow.dragging{opacity:.6; background:var(--accent-soft); box-shadow:0 4px 14px rgba(20,33,61,.14)}
+.steprow .drag{cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; flex:none; width:34px; height:34px; display:flex; align-items:center; justify-content:center; color:var(--muted)}
+.steprow .drag svg{width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round}
+.steprow.dragging{opacity:.6; background:var(--accent-soft); box-shadow:0 4px 14px rgba(20,33,61,.14)}
 .steprow .icon-btn{width:28px; height:28px; font-size:13px}
 .cdot{width:10px; height:10px; border-radius:50%; flex:none}
 .sharewrap{display:flex; align-items:center; gap:8px; width:100%; margin-top:2px}
@@ -732,15 +732,37 @@ function renderPie(){
 function renderSteps(){
   $('stSteps').innerHTML=cur.steps.map((s,i)=>{
     const pct=Math.round(s.sec/cur.total*100);
-    return `<div class="steprow">
+    return `<div class="steprow" data-i="${i}">
+    ${cur.steps.length>1?`<span class="drag" title="drag to reorder" data-ic="drag" onpointerdown="stepDragStart(event)" onpointermove="stepDragMove(event)" onpointerup="stepDragEnd(event)" onpointercancel="stepDragEnd(event)"></span>`:''}
     <span class="cdot" style="background:${PIE[i%PIE.length]}"></span>
-    <button class="mini" onclick="moveStep(${i},-1)" ${i===0?'disabled':''}>${ic('up',1)}</button>
-    <button class="mini" onclick="moveStep(${i},1)" ${i===cur.steps.length-1?'disabled':''}>${ic('down',1)}</button>
     <input class="nm" value="${s.name.replace(/"/g,'&quot;')}" onchange="cur.steps[${i}].name=this.value;saveSessions();">
     ${notesFor(s.id).map(n=>`<button class="mini play" data-t="${fmt(n.sec)}" title="listen to your note for this step" onclick="playNote('${n.id}',this)">${ic('play',1)}${fmt(n.sec)}</button>`).join('')}
     <div class="sharewrap"><input type="range" min="1" max="99" step="1" value="${pct}" oninput="slideShare(${i},this.value)" onchange="renderStudio()">
     ${cur.steps.length>1?`<button class="mini red" onclick="rmStep(${i})">${ic('x',1)}</button>`:''}</div>
     </div>`;}).join('');
+  paintIcons($('stSteps'));
+}
+/* drag-to-reorder steps — same pointer-event approach as the carousel list */
+let stepDrag=null;
+function stepDragStart(e){
+  e.preventDefault();const row=e.currentTarget.closest('.steprow');
+  e.currentTarget.setPointerCapture(e.pointerId);
+  stepDrag={row};row.classList.add('dragging');
+}
+function stepDragMove(e){
+  if(!stepDrag)return;
+  const list=$('stSteps'),others=[...list.children].filter(r=>r!==stepDrag.row);
+  const idx=others.findIndex(r=>{const b=r.getBoundingClientRect();return e.clientY<b.top+b.height/2;});
+  const ref=idx<0?null:others[idx];
+  if(stepDrag.row.nextSibling!==ref)list.insertBefore(stepDrag.row,ref);
+}
+function stepDragEnd(){
+  if(!stepDrag)return;
+  stepDrag.row.classList.remove('dragging');stepDrag=null;
+  const order=[...$('stSteps').children].map(r=>+r.dataset.i);
+  if(order.every((v,k)=>v===k)){renderSteps();return;}
+  cur.steps=order.map(k=>cur.steps[k]);
+  saveSessions();renderStudio();
 }
 /* smallest slice a step may hold — 5s normally, less on very short cooks */
 function minSec(){const n=Math.max(1,cur.steps.length);return Math.max(1,Math.min(5,Math.floor(cur.total/(n*2))||1));}
@@ -752,11 +774,6 @@ function slideShare(i,pct){
   cur.steps[i].sec=sec;redistribute(i,cur.total-sec);
   saveSessions();renderPie();
   
-}
-function moveStep(i,d){
-  const j=i+d;if(j<0||j>=cur.steps.length)return;
-  [cur.steps[i],cur.steps[j]]=[cur.steps[j],cur.steps[i]];
-  saveSessions();renderStudio();
 }
 function redistribute(exceptIdx,targetOthers){
   const others=cur.steps.filter((_,j)=>j!==exceptIdx);

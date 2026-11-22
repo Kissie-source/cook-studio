@@ -3,6 +3,11 @@
 Every version is a full snapshot in `versions/index-vX.Y.html` (and a git commit).
 **Roll back:** copy the snapshot over `index.html`, re-upload to GitHub.
 
+## v3.8 — 2026-11-22
+- **Studio steps reorder by dragging.** The ▲▼ buttons on the step rows are gone; each row
+  has the same grip handle as the carousel list — hold it and drag the step to its place.
+  Times, notes and photos travel with the step. With only one step there is no handle.
+
 ## v3.7 — 2026-10-25
 - **The key prompt explains itself.** Asking for the API key now says what it is: made at
   console.anthropic.com as a developer account with credit, *not* the Claude app login,

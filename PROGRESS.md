@@ -1,6 +1,6 @@
 # Cook Studio — progress, open issues, next steps
 
-_Last updated: 2026-11-22 · shipped version: **v3.7** (commit `ff9b164`) · live and verified at
+_Last updated: 2026-11-22 · shipped version: **v3.7** (commit `ff9b164`) live at; **v3.8** on branch `feat/step-drag-handles`, not yet merged ·
 https://kissie-source.github.io/cook-studio/_
 
 ---
@@ -78,7 +78,6 @@ note stores its true length, so nothing is mislabelled. Not fixed — probably u
 in a web app.
 
 ### 4. Smaller things
-- **Studio step rows still use ▲▼**; only the carousel list has drag handles.
 - **The polish feature still has a copy-paste fallback**; the equivalent route for
   ingredients was removed in v3.6. Inconsistent.
 - **Cormorant loads from Google Fonts** — offline, slide comments fall back to Georgia.
@@ -97,7 +96,7 @@ in a web app.
    drop "fill it in" and keep the no-key route as the only path.
 2. **Do one real cook end to end on the phone** and report what breaks. That single pass
    closes most of issue 2: share sheet, pinch, playback, 12 s notes, and lock/resume.
-3. **Then, in rough order of value:** drag handles on Studio step rows · switch extraction
+3. **Then, in rough order of value:** ~~drag handles on Studio step rows~~ (v3.8) · switch extraction
    to Haiku to cut cost · decide the `Stickers Kissie/` folder · make the polish route
    consistent with the ingredient one.
 

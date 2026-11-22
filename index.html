@@ -1083,12 +1083,45 @@ function copyPolishPrompt(){
   $('polishManual').style.display='';
   $('polishStatus').textContent='Prompt copied — paste it into the Claude app, then paste the reply below.';
 }
+/* find the suggestions in whatever the Claude app sent back: code fences, prose around it,
+   {suggestions:[...]} or a bare array, curly quotes from the phone, a missing closing bracket */
+function jsonEnd(src,s){
+  let depth=0,inStr=false;
+  for(let i=s;i<src.length;i++){const c=src[i];
+    if(inStr){if(c==='\\')i++;else if(c==='"')inStr=false;continue;}
+    if(c==='"')inStr=true;else if(c==='['||c==='{')depth++;
+    else if(c===']'||c==='}'){depth--;if(depth===0)return i;}}
+  return -1;
+}
+function asSuggestions(v){
+  const arr=Array.isArray(v)?v:(v&&Array.isArray(v.suggestions)?v.suggestions:null);
+  if(!arr)return null;
+  const out=arr.filter(x=>x&&typeof x==='object'&&x.id).map(x=>({id:String(x.id),polished:String(x.polished??x.text??x.suggestion??'')}))
+    .filter(x=>x.polished);
+  return out.length?out:null;
+}
+function readPolishReply(raw){
+  const straight=raw.replace(/[“”„‟″«»]/g,'"').replace(/[‘’‚]/g,"'");
+  for(const t of [raw,straight]){
+    const srcs=[];const f=t.match(/```(?:json)?\s*([\s\S]*?)```/i);if(f)srcs.push(f[1]);srcs.push(t);
+    for(const src of srcs){
+      for(let s=0;s<src.length;s++){
+        if(src[s]!=='['&&src[s]!=='{')continue;
+        const e=jsonEnd(src,s);
+        const piece=e<0?src.slice(s).trim()+(src[s]==='['?']':'}'):src.slice(s,e+1);
+        try{const r=asSuggestions(JSON.parse(piece));if(r)return r;}catch(err){}
+        if(e<0)break;
+      }
+    }
+  }
+  return null;
+}
 function parsePolishPaste(){
-  try{
-    const m=$('polishPaste').value.match(/\[[\s\S]*\]/);
-    const arr=JSON.parse(m[0]);
-    showPolish(polishItems(),Array.isArray(arr)?arr:arr.suggestions);
-  }catch(e){$('polishStatus').textContent="Couldn't read that — paste Claude's JSON reply exactly as it came.";}
+  const raw=$('polishPaste').value;
+  if(!raw.trim()){$('polishStatus').textContent="Paste Claude's reply into the box first.";return;}
+  const sugs=readPolishReply(raw);
+  if(sugs){showPolish(polishItems(),sugs);return;}
+  $('polishStatus').textContent="Couldn't find the suggestions in that reply. In the Claude app, use the copy button under the whole answer (not a selection), then paste again. If it still fails, ask Claude there: “reply again as JSON only”.";
 }
 let polishSug=[];
 function showPolish(items,sugs){

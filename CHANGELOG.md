@@ -3,6 +3,13 @@
 Every version is a full snapshot in `versions/index-vX.Y.html` (and a git commit).
 **Roll back:** copy the snapshot over `index.html`, re-upload to GitHub.
 
+## v3.9 — 2026-11-22
+- **Fix: pasting Claude's polish reply failed with "couldn't read that".** The reader now
+  finds the suggestions whatever the Claude app wraps them in: a code block, chat text before
+  or after (even text with brackets in it), `{"suggestions": [...]}`, curly quotes from the
+  phone, or a reply cut off before its last bracket. If it still finds nothing, it says how
+  to copy the whole answer.
+
 ## v3.8 — 2026-11-22
 - **Studio steps reorder by dragging.** The ▲▼ buttons on the step rows are gone; each row
   has the same grip handle as the carousel list — hold it and drag the step to its place.

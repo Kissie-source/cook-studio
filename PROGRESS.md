@@ -1,6 +1,6 @@
 # Cook Studio — progress, open issues, next steps
 
-_Last updated: 2026-11-22 · shipped version: **v3.8** (commit `d9eb611`) · live and verified at
+_Last updated: 2026-11-22 · shipped version: **v3.10** (commit `86862c9`) · live and verified at
 https://kissie-source.github.io/cook-studio/_
 
 ---
@@ -56,13 +56,10 @@ photos, ingredients, learnings, verdict) → generated 1080×1350 slides → dow
 
 ## Open issues
 
-### 1. "Fill it in" (in-app ingredient extraction) reportedly fails — cause unknown
-**The blocker.** The user reports the sparkle button failing; the cause was never
-captured. Most likely no Anthropic API key, or a key without credit — but unconfirmed.
-The app now explains what the key is (v3.7) and shows the HTTP status on failure.
-**To resolve:** tap it once and read the status line. `401` = wrong key · `400` = credit
-or malformed request · `429` = rate limited. Workaround in place: **via Claude app**
-(no key).
+### 1. ~~"Fill it in" fails~~ — resolved 2026-11-22
+The account had no API credits. With credits bought and a key saved, **Polish my words**
+works on the phone; "fill it in" uses the same key. Since v3.10 the key field and the
+copy-paste route stay hidden while the key works and come back if a call fails.
 
 ### 2. Unverified on the real phone
 Everything below was verified only with synthetic events in a desktop browser:
@@ -92,8 +89,7 @@ in a web app.
 
 ## Next steps
 
-1. **Settle issue 1** — one tap, read the status line, then either fix the request or
-   drop "fill it in" and keep the no-key route as the only path.
+1. ~~**Settle issue 1**~~ — done: missing credits.
 2. **Do one real cook end to end on the phone** and report what breaks. That single pass
    closes most of issue 2: share sheet, pinch, playback, 12 s notes, and lock/resume.
 3. **Then, in rough order of value:** ~~drag handles on Studio step rows~~ (v3.8) · switch extraction
